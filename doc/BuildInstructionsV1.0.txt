@@ -1,0 +1,134 @@
+Build OpenSSL files:
+===================	
+
+	Copy BuildInstructions*.txt from docs directory to DevRoot
+		From: /Docs/BuildInstructions*.txt 
+		To:		/Devroot/BuildInstructions*.txt 
+
+	Obtain OPenSSL files from approved source
+
+	Prepare the OpenSSL Sources
+		gunzip -c openssl-fips-ecp-2.0.2.tar.gz | tar xf -
+		gunzip -c openssl-1.0.1c.tar.gz | tar xf -
+
+	Set up environment (Setenv-android.sh)
+		ANDROID_NDK_ROOT: /Users/scoleman/android-ndk-r9d
+		ANDROID_EABI: arm-linux-androideabi-4.6
+		ANDROID_API: android-14
+		ANDROID_SYSROOT: /Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm
+		ANDROID_TOOLCHAIN: /Users/scoleman/android-ndk-r9d/toolchains/arm-linux-androideabi-4.6/prebuilt/darwin-x86_64/bin
+		FIPS_SIG: /Users/scoleman/ssl/openssl-fips-ecp-2.0.2/util/incore
+		CROSS_COMPILE: arm-linux-androideabi-
+		ANDROID_DEV: /Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr
+
+	Run the setup script from the FIPS object module directory
+		cd openssl-fips-ecp-2.0.2
+		. ../Setenv-android.sh
+
+	Build the FIPS Object Module
+	------------------------------
+		cd openssl-fips-ecp-2.02/
+		./config
+		make                                             # Creates ./fips/fipscanister.o
+		sudo make install # copy files to /usr/local/ssl/
+	
+		Results: 
+		========
+			
+			/usr/local/ssl/fips-2.0/bin/fips_standalone_sha1					
+			/usr/local/ssl/fips-2.0/bin/fipsld
+			/usr/local/ssl/fips-2.0/include/openssl/*.h					
+			/usr/local/ssl/fips-2.0/lib/fips_premain.c
+			/usr/local/ssl/fips-2.0/lib/fips_premain.c.sha1
+			/usr/local/ssl/fips-2.0/lib/fipscanister.o
+			/usr/local/ssl/fips-2.0/lib/fipscanister.o.sha1
+
+	Build the FIPS capable library
+	-------------------------------	 	
+		cd ../openssl-1.0.1f
+		./config fips no-ec2m --with-fipslibdir=/usr/local/ssl/fips-2.0/lib/ 
+		make depend
+		make
+	
+		Results: 
+		========
+			openssl-1.0.1f/libcrypto.a
+
+Build SQLCipher
+================
+	Download and modify SQLCipher files
+	------------------------------------
+		gir clone git://github.com/sqlcipher/android-database-sqlcipher.git
+		make init (Downloads all dependencies)
+		(Note that the directory /Users/scoleman/dev/OpenSSLTestCompiles/5-28-14NoMods has fresh checkout)
+
+		Make changes:
+			To fix adroid sdk version issue:
+				update makefile (root dir) to add
+					t2fix:
+						android update project -p . --target 1
+
+				in makefile (root dir) change 
+					android update project -p . to
+					android update project -p . --target 1
+
+				To make it so it only builds arm
+						change /jni/application.mk
+						from: APP_ABI := armeabi x86
+						to: APP_ABI := armeabi	
+
+				Add T2 supplemental build files to external directory
+						/Users/scoleman/dev/OpenSSLTestCompiles/5-28-2014/android-database-sqlcipher/external/buildit.sh
+						/Users/scoleman/dev/OpenSSLTestCompiles/5-28-2014/android-database-sqlcipher/external/buildA5.sh
+						/Users/scoleman/dev/OpenSSLTestCompiles/5-28-2014/android-database-sqlcipher/external/wrapper.c
+
+
+	Copy OpenSSL file(s) to SqlCipher uses previously build libcrypto.a
+	--------------------------------------------------------------------
+	copy 
+		/Users/scoleman/dev/OpenSSLTestCompiles/6-2-2014/openssl-1.0.1f/libcrypto.a
+		to 
+		/Users/scoleman/dev/OpenSSLTestCompiles/6-2-2014/android-database-sqlcipher/external/android-libs/armeabi
+
+	Build SQLCipher files
+	------------------------------------
+		cd ../android-database-sqlcipher
+		make t2fix (changes android update) ** important!!!! 
+		make 
+		(If it fails, run make clean first)
+
+		Note that you may get a no such file or directory at eh very end of the process if you updated application.mk as above
+		Results:
+		========
+		libs/
+			armeabi/	
+				libdatabase_sqlcipher.so
+				libsqlcipher_android.so
+				libstlport.so
+			commons-codec.jar
+			guava-r09.jar
+			sqlcipher.jar
+
+	Run T2 Script to compile with wrapper and create new libdatabase_sqlciipher.so
+	==============================================================================
+		cd external
+
+		. ./buildit.sh 
+
+		Results:
+		========
+		/Users/scoleman/dev/OpenSSLTestCompiles/6-2-2014/android-database-sqlcipher/external/libsqlcipher_android.so (updated)
+
+
+	Test on Android
+	=================
+		Copy .so files from lib dir:
+			/Users/scoleman/dev/OpenSSLTestCompiles/6-4-2014/android-database-sqlcipher/libs
+
+		to android project at /Users/scoleman/dev/eclipse/HelloSQLCipherActivity
+		Then build and run the example		
+
+		This tests two things:
+			1 - That that an encrypted database can be created, written to and read for successfyllyt
+			2 - That FIPS can be enabled prperly
+			

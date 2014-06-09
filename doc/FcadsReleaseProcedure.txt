@@ -1,0 +1,94 @@
+
+
+After build is complete:
+
+1. Create release directory based on release number and date: ex: 1.0-06052014
+
+2. Copy Source Files:
+	
+		* Copy supplemental files
+			From: DevRoot/SupplementalFiles/*.*
+			To: 	ReleaseDir/source/SupplementalFiles/*.*
+			
+				Ex:
+					buildA5.sh
+					buildit.sh
+					Setenv-android.sh
+					wrapper.c
+			
+		* Copy Android Test Project
+			From: DevRoot/HelloSqlCipherActivity/*.*
+			To: 	ReleaseDir/source/HelloSqlCipherActivity/*.*
+				
+		* Copy main make files from the sqlcipher directory
+			From: DevRoot/android-databse-sqlcipher
+			To:		ReleaseDir/source/android-databse-sqlcipher
+			
+				Files:
+					makefile
+					external/Android.mk
+					external/buildA5.sh
+					external/buildit.sh
+					external/wrapper.c
+
+3. Copy Object files:
+
+	* Copy all FIPS Module files:
+		From: usr/local/ssl/*.*
+		To: 	ReleaseDir/object/usr/local/ssl
+		
+			Ex:
+				/usr/local/ssl/fips-2.0/bin/fips_standalone_sha1
+				/usr/local/ssl/fips-2.0/bin/fipsld
+				/usr/local/ssl/fips-2.0/include/openssl/*.h		
+				/usr/local/ssl/fips-2.0/lib/fips_premain.c
+				/usr/local/ssl/fips-2.0/lib/fips_premain.c.sha1
+				/usr/local/ssl/fips-2.0/lib/fipscanister.o
+				/usr/local/ssl/fips-2.0/lib/fipscanister.o.sha1
+
+	* Copy FIPS capable OpenSSL files:
+		From: DevRoot/openssl-1.0.1f/libcrypto.a
+		To:		ReleaseDir/object/openssl-1.0.1f/libcrypto.a
+
+	* Copy SqlCipher files:
+		From: DevRoot/android-database-sqlcipher/libs/*.*
+		To: 	ReleaseDir/object/android-database-sqlcipher/libs/*.*
+		
+			Ex:
+				armeabi/libdatabase_sqlcipher.so
+				armeabi/libsqlcipher_android.so
+				armeabi/libstlport.so
+				commons-codec.jar
+				guava-r09.jar
+				sqlcipher.jar
+		
+4. Copy documentation files
+		From: DevRoot/BuildInstructions*.txt
+		To:		ReleaseDir/doc/BuildInstructions*.txt
+		
+	* Copy compliance record files
+		From: Docs/*.txt
+		To:		ReleaseDir/doc/*.txt
+		
+			Ex:
+				FcadsReleaseProcedure.txt
+				FIPS140-2ApplicationComplianceRecord.txt
+				FIPS140-2ApplicationComplianceStatement.txt
+				FIPS140-2ObjectModuleRecordV1.0.txt
+
+5. Update compliance record files in release directory
+
+Example Release Tree:
+1.0-06052014
+	/object/
+		/usr/local/ssl
+		/android-database-sqlcipher
+		/openssl-1.0.1f
+	/Source/
+		/SupplementalFiles
+		/HelloSqlCipherActivity
+		/android-databse-sqlcipher
+	/doc/
+		
+
+
