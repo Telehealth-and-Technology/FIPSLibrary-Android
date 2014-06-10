@@ -6,22 +6,34 @@ Tools Necessary for Build
 		ex: echo $ANDROID_NDK_ROOT 
 			/Users/scoleman/android-ndk-r9d
 
+
+Shell Scripts to build
+	GetCannedFiles.sh
+	PrepareFiles.sh
+	BuildOpenSsl.sh
+	BuildSqlCipher.sh
+	cd ../../ (because of error in build)
+	BuildT2.sh
+
+
+
+Clone the fcads project from git:
+(Altrnately - run FakeGitClone.sh)
+================================
+	git clone ssh://scoleman@git.t2.local/git/mobile/android/fcads.git
+
+	Results: 
+	========
+		fcads/dev/supplemental
+			.. files
+		fcads/doc
+			.. files
+
 Retrieve source files:
+(Alternately - run fcads/GetCannedFiles.sh)
 =====================
 	mkdir fcads
 	cd fcads
-
-	Clone the fcads project from git
-	---------------------------------
-		git clone ssh://scoleman@git.t2.local/git/mobile/android/fcads.git
-
-		Results: 
-		========
-			fcads/dev/supplemental
-				.. files
-			fcads/doc
-				.. files
-
 
 	Obtain OPenSSL files from approved source, copy them to fcads/dev
 	-----------------------------------------------------------------
@@ -32,17 +44,7 @@ Retrieve source files:
 				openssl-fips-ecp-2.0.2.tar.gz	
 				openssl-1.0.1f.tar.gz
 
-	Unpack OpenSSL files
-	-----------------------------------------------------------------
-		gunzip -c openssl-fips-ecp-2.0.2.tar.gz | tar xf -
-		gunzip -c openssl-1.0.1f.tar.gz | tar xf -
 
-		Results: 
-		========
-			fcads/dev/openssl-1.0.1f
-				.. files
-			fcads/dev/openssl-fips-ecp-2.0.2
-				.. files
 
 	Download SQLCipher files
 		Note: this script was tested on sqlcipher comit 62badb8f8b
@@ -57,37 +59,29 @@ Retrieve source files:
 			fcads/dev/android-database-sqlcipher
 				.. Lots of files and directories (~2.9 Gb)
 
+Prepare files
+(Alternately - run fcads/PrepareFiles.sh)
+=============
+	Unpack OpenSSL files
+	-----------------------------------------------------------------
+		gunzip -c openssl-fips-ecp-2.0.2.tar.gz | tar xf -
+		gunzip -c openssl-1.0.1f.tar.gz | tar xf -
 
-Update source files:
-=====================
-		Make changes:
-			To fix adroid sdk version issue:
-				Update fcads/dev/android-database-sqlcipher/Makefile 
-					change:
-						android update project -p . to
-						android update project -p . --target 1
+		Results: 
+		========
+			fcads/dev/openssl-1.0.1f
+				.. files
+			fcads/dev/openssl-fips-ecp-2.0.2
+				.. files
 
-				update fcads/dev/android-database-sqlcipher/Makefile to add
-					t2fix:
-						android update project -p . --target 1
-
-			To make it so it only builds arm (Optional)
-				Change fcads/dev/android-database-sqlcipher/jni/Application.mk
-					from: APP_ABI := armeabi armeabi-v7a x86
-					to: APP_ABI := armeabi	  # leave only the targets you want
-
-			CopyT2 supplemental build files to external directory
-				cp SupplementalFiles/*.* android-database-sqlcipher/external
-
-			Results:
-			========
-					fcads/dev/android-database-sqlcipher/external/buildit.sh
-					fcads/dev//android-database-sqlcipher/external/buildA5.sh
-					fcads/dev/android-database-sqlcipher/external/wrapper.c
-
+	Copy makefiles from supplemental directory to where they belong (See appendix A for changes to these files)
+	---------------------------------------------
+	cp SupplementalFiles/Makefile android-database-sqlcipher/
+	cp SupplementalFiles/Application.mk android-database-sqlcipher/jni/
 
 
 Build OpenSSL files:
+(Alternately - run fcads/BuildOpenSsl.sh) - Be prepared to enter password!
 ===================	
 
 	Run the setup script from the FIPS object module directory
@@ -122,6 +116,7 @@ Build OpenSSL files:
 			openssl-1.0.1f/libcrypto.a
 
 Build SQLCipher
+(Alternately - run fcads/BuildSqlCipher.sh)
 ================
 
 	cd fcads/dev
@@ -152,29 +147,30 @@ Build SQLCipher
 			guava-r09.jar
 			sqlcipher.jar
 
-	Run T2 Script to compile with wrapper and create new libdatabase_sqlciipher.so
-	==============================================================================
-		cd external
+Run T2 Script to compile with wrapper and create new libdatabase_sqlciipher.so
+(Alternately - run fcads/BuildT2.sh)
+==============================================================================
+	cd external
 
-		. ./buildit.sh 
+	. ./buildit.sh 
 
-		Results:
-		========
-		fcads/dev/android-database-sqlcipher/libs/armeabi/libsqlcipher_android.so(updated)
-		Other targets will be updated as well it they were not removed form Application.mk
+	Results:
+	========
+	fcads/dev/android-database-sqlcipher/libs/armeabi/libsqlcipher_android.so(updated)
+	Other targets will be updated as well it they were not removed form Application.mk
 
 
-	Test on Android
-	=================
+Test on Android
+=================
 
-		cd fcads/dev
+	cd fcads/dev
 
-		Copy .so files from lib dir to project
-			cp -R android-database-sqlcipher/libs ../test/FcadsTestAndroid
+	Copy .so files from lib dir to project
+		cp -R android-database-sqlcipher/libs ../test/FcadsTestAndroid
 
-		Open FcadsTestAndroid in Eclipse
+	Open FcadsTestAndroid in Eclipse
 
-		Refresh project and make sure taht libs are copied over
+	Refresh project and make sure taht libs are copied over
 xxxx
 
 
@@ -187,6 +183,33 @@ xxxx
 			2 - That FIPS can be enabled prperly
 			
 
+********************************
+Appendix A - Update source files:
+********************************
+		Make changes:
+			To fix adroid sdk version issue:
+				Update fcads/dev/android-database-sqlcipher/Makefile 
+					change:
+						android update project -p . to
+						android update project -p . --target 1
+
+				update fcads/dev/android-database-sqlcipher/Makefile to add
+					t2fix:
+						android update project -p . --target 1
+
+			To make it so it only builds arm (Optional)
+				Change fcads/dev/android-database-sqlcipher/jni/Application.mk
+					from: APP_ABI := armeabi armeabi-v7a x86
+					to: APP_ABI := armeabi	  # leave only the targets you want
+
+			CopyT2 supplemental build files to external directory
+				cp SupplementalFiles/*.* android-database-sqlcipher/external
+
+			Results:
+			========
+					fcads/dev/android-database-sqlcipher/external/buildit.sh
+					fcads/dev//android-database-sqlcipher/external/buildA5.sh
+					fcads/dev/android-database-sqlcipher/external/wrapper.c
 
 
 
