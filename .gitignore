@@ -1,2 +1,4 @@
 .DS_Store
-fred/
+dev/openssl-fips-ecp-2.0.2/
+dev/openssl-1.0.1f/
+dev/android-database-sqlcipher/
