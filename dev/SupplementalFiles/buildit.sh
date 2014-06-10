@@ -382,11 +382,36 @@ $CC \
  ./String8.cpp -o String8.o 
 
 
+$CC \
+-MMD -MP -MF \
+../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/wrapper.o.d \
+-fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te \
+-mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g \
+-DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 \
+-I./includes \
+-I./sqlcipher \
+-I./icu4c/i18n \
+-I./icu4c/common \
+-I./platform-system-core/include \
+-I./platform-frameworks-base/include -Iopenssl/include \
+-I$ANDROID_NDK_ROOT/sources/cxx-stl/stlport/stlport -I$ANDROID_NDK_ROOT/sources/cxx-stl//gabi++/include \
+-I. \
+-DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 \
+-DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 \
+-DSQLITE_ENABLE_FTS3_BACKWARDS \
+-DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
+-Wa,--noexecstack -Wformat -Werror=format-security  \
+-frtti     \
+-I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
+ ./wrapper.c -o wrapper.o 
+
+
+
 #$CC \
 $CC \
 -Wl,-soname,libsqlcipher_android.so -shared --sysroot=$ANDROID_NDK_ROOT/platforms/android-3/arch-arm\
  sqlite3_android.o PhonebookIndex.o PhoneNumberUtils.o OldPhoneNumberUtils.o PhoneticStringUtils.o \
- String16.o String8.o \
+ String16.o String8.o wrapper.o \
  ../obj/local/armeabi/libsqlcipher.a \
  ../obj/local/armeabi/libicui18n.a \
  ./android-libs/armeabi/libcrypto.a \

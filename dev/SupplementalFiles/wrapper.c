@@ -90,6 +90,9 @@ Java_com_demo_sqlcipher_HelloSQLCipherActivity_Scott( JNIEnv* env,
     return testValue;
 }
 
+
+
+
 jint 
 Java_com_demo_sqlcipher_HelloSQLCipherActivity_FIPSFromJNI( JNIEnv* env,
                                               jobject thiz )
@@ -99,9 +102,17 @@ Java_com_demo_sqlcipher_HelloSQLCipherActivity_FIPSFromJNI( JNIEnv* env,
     return MY_FIPS_mode();
 }
 
+jint
+Java_com_demo_sqlcipher_HelloSQLCipherActivity_FIPSFromJNIfred( JNIEnv* env,
+                                                           jobject thiz )
+{
+    int testValue = 101;
+    
+    return MY_FIPS_mode();
+}
 
 jint
-Java_com_demo_sqlcipher_MainActivity_FIPSFromJNI( JNIEnv* env,
+Java_com_example_fcadstestandroidapp_MainActivity_FIPSFromJNI( JNIEnv* env,
                                               jobject thiz )
 {
   int testValue = 101;
