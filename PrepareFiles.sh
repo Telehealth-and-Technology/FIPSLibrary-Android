@@ -1,5 +1,6 @@
 
 cd dev
+export START_DIR="$PWD"
 
 echo "Unzipping openssl-1.0.1f.tar.gz, and openssl-fips-ecp-2.0.2.tar.gz"
 gunzip -c openssl-fips-ecp-2.0.2.tar.gz | tar xf -

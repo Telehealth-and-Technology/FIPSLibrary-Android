@@ -1,5 +1,13 @@
 set -x
-cd dev/openssl-fips-ecp-2.0.2
+
+if [ -z "$START_DIR" ]; then
+
+	cd dev/openssl-fips-ecp-2.0.2
+else
+	echo "START_DIR defined"
+	cd $START_DIR
+fi
+
 . ../Setenv-android.sh &&
 echo "*****************************"
 ./config &&
