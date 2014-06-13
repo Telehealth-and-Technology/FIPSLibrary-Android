@@ -1,0 +1,3 @@
+** Developer should replace XXX with the name of the project that uses this library **
+
+Product XXXX uses an embedded FIPS 140-2-validated cryptographic module (Certificate#1747) running on a Android 4.0 platform per FIPS 140-2 Implementation Guidance section G.5 guidelines.

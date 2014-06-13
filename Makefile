@@ -18,38 +18,57 @@ RELEASE_DIR := "SQLCipher for Android ${LATEST_TAG}"
 CHANGE_LOG_HEADER := "Changes included in the ${LATEST_TAG} release of SQLCipher for Android:"
 README := ${RELEASE_DIR}/README
 
+
+
 help:
-	#  Commands:
-	#       getCannedFiles - Grabs canned files from a local director
-	#       prepare        - Unzips packages and moved=s files to appropriate places for build"
-	#       fips           - Builds and installs the offocial FIPS module (fipscanister.o)
-	#		ssl            - Builds the fips compatible ssl package using fip module produces here
-	#       sqlcipher      - Builds the bulk of the sqlcipher files
-	#       t2             - Links the official openssl capable build into libraries that android can load
-	#                        also installs the libraries in the android test project
+	#  Build Commands:
+	#    prepare     - Unzips packages and moved=s files to appropriate places for build"
+	#    fips        - Builds and installs the offocial FIPS module (fipscanister.o)
+	#    ssl         - Builds the fips compatible ssl package using fip module produces here
+	#    sqlcipher   - Builds the bulk of the sqlcipher files
+	#    t2          - Links the official openssl capable build into libraries that android can load
+	#                  also installs the libraries in the android test project
+	# Release Commands
+	#    doRelease   - Prepares and creates a release
+	#
+	# Clean Commands
+	#    clean       - Cleans binary/object files
+	#    cleanAll    - Cleans binary/object files AND android-database-sqlcipher
+
+
+
+doRelease:
+	. ./doRelease.sh
+
+buildAllLocal:	copyLocalFipsFiles copyLocalSqlCipherFiles prepare fips ssl sqlcipher t2 check
+
+buildAll:	prepare fips ssl sqlcipher t2 check
+
+cleanAll: clean cleanCannedFiles
 
 clean:
 	echo "Cleaning files" && \
 	cd ${DEV_DIR} && \
 	rm -rfd openssl-fips-ecp-2.0.2 && \
 	rm -rfd openssl-1.0.1f && \
+	rm -rf openssl-fips-ecp-2.0.2.tar.gz && \
+	rm -rf openssl-1.0.1f.tar.gz && \
 	rm -rfd android-database-sqlcipher/libs/armeabi/libsqlcipher_android.so && \
 	rm -rfd ${TEST_DIR}/FcadsTestAndroidApp/libs
 
 cleanCannedFiles:
 	rm -rfd ${SQLCIPHER_DIR}
 
+check:
+	. ./checkArtifacts.sh
 
-getCannedFiles:
-	echo "Copying canned files from local resources at /Users/scoleman/dev/OpenSSLTestCompiles/5-28-14FcadsResources"
-	cp /Users/scoleman/dev/OpenSSLTestCompiles/5-28-14FcadsResources/*.gz dev
-	cp -r /Users/scoleman/dev/OpenSSLTestCompiles/5-28-14FcadsResources/android-database-sqlcipher* dev/
+copyLocalFipsFiles:
+	cp localFipsSslFiles/openssl-1.0.1f.tar.gz dev
+	cp localFipsSslFiles/openssl-fips-ecp-2.0.2.tar.gz dev
 
-scott1:
-	if test -d ${TEST_DIR}/FcadsTestAndroidApp/libs ; then echo "hello there"; fi && \
-	if test -d ${SQLCIPHER_DIR} ; then echo "hi there"; fi
-
-
+copyLocalSqlCipherFiles:
+	echo "Copying canned files from local resources at /Users/scoleman/release/sqlCipherDownload_6-12_14/android-database-sqlcipher"
+	cp -r /Users/scoleman/release/sqlCipherDownload_6-12_14/android-database-sqlcipher* dev/
 
 prepare:
 	cd ${DEV_DIR} && \

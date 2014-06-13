@@ -1,0 +1,7 @@
+** Developer should replace XXX with the name of the project that uses this library **
+
+Application name: XXX
+
+1.	A record of the HMAC SHA-1 digest of the fipscanister.o that was embedded in the application (see FIPS140-2ObjectModuleRecordV1.0.txt).
+2.	An assertion that the application does not utilize any cryptographic implementations other that those provided by the FIPS Object Module or contained in the FIPS capable OpenSSL 1.0.1 libraries (where non-FIPS algorithms are disabled in FIPS mode).
+3.	Application XXX upon initialization, calls FCADS function FIPSFromJNI() which in turn calls the fips object module FIPS_mode_set(). The output of this cal is checked for an integer value of 1 which indicates that the tips module has be initialized properly and self-tests have been run.

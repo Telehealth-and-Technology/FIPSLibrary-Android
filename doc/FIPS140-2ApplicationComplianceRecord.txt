@@ -1,6 +1,0 @@
-To be completed by applicatioin developer:
-
-1.	A record of the HMAC SHA-1 digest of the fipscanister.o that was embedded in the application.
-2.	An assertion that the application does not utilize any cryptographic implementations other that those provided by the FIPS Object Module or contained in the FIPS capable OpenSSL 1.0.1 libraries (where non-FIPS algorithms are disabled in FIPS mode).
-3.	A description of how the application clearly indicates when FIPS mode is enabled
-(assuming that FIPS mode is a runtime selectable option). Note that the application must call FIPS_mode_set(), whether that call is triggered by runtime options or not.
