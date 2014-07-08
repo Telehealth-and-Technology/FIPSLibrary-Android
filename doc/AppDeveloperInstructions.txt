@@ -1,0 +1,21 @@
+Instructions for end application users of the FCADS libraries.
+=============================================================
+
+1. Copy files to your development directory
+	dev/android-database-sqlcipher/libs
+
+
+2. In the initialization of your app, call FIPSFromJNI(), confirm return value is 1
+	This sets FIPS mode, initializes FIPS and runs self tests
+      Ex:
+	int result = FIPSFromJNI();	
+	if (j == 1) {
+		Log.i("mytag", "PASSED - successfully enabled FIPS!" );
+
+	}
+3. User sqlcipher database just as you would sqlite
+	See: http://sqlcipher.net/sqlcipher-for-android
+	
+4. When application is complete, create the following FIPS documentation files from templates:
+	doc/FIPS140-2ApplicationComplianceStatementTemplate.txt
+	doc/FIPS140-2ApplicationComplianceRecordTemplate.txt

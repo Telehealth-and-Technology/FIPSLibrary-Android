@@ -42,7 +42,8 @@ doRelease:
 
 buildAllLocal:	copyLocalFipsFiles copyLocalSqlCipherFiles prepare fips ssl sqlcipher t2 check
 
-buildAll:	prepare fips ssl sqlcipher t2 check
+buildAll:
+	. ./buildAll.sh
 
 cleanAll: clean cleanCannedFiles
 

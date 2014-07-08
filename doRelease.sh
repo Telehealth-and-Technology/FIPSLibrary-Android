@@ -1,5 +1,5 @@
 ReleaseName="testReleaseName"
-  read -p "Enter your release name: " ReleaseName
+  read -p "Enter your release name (Ex: V1.1_06_13-2014): " ReleaseName
 
 
 
@@ -39,6 +39,9 @@ cp -r dev/SupplementalFiles* $docDst/source
 
 #copy tewst files
 cp -r test $docDst/test
+
+#Remove lib build instructions so they dont confuse end app developers
+rm -f release/$ReleaseName/doc/FcadsLibBuildInstructions.txt
 
 #--------------------------------------------------
 #build the FIPS140-2ObjectModuleRecord.txt file
