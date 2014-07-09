@@ -1,12 +1,42 @@
+/*****************************************************************
+MainActivity
+
+Copyright (C) 2011-2014 The National Center for Telehealth and 
+Technology
+
+Eclipse Public License 1.0 (EPL-1.0)
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the Eclipse Public License as
+published by the Free Software Foundation, version 1.0 of the 
+License.
+
+The Eclipse Public License is a reciprocal license, under 
+Section 3. REQUIREMENTS iv) states that source code for the 
+Program is available from such Contributor, and informs licensees 
+how to obtain it in a reasonable manner on or through a medium 
+customarily used for software exchange.
+
+Post your updates and modifications to our GitHub or email to 
+t2@tee2.org.
+
+This library is distributed WITHOUT ANY WARRANTY; without 
+the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+PARTICULAR PURPOSE.  See the Eclipse Public License 1.0 (EPL-1.0)
+for more details.
+ 
+You should have received a copy of the Eclipse Public License
+along with this library; if not, 
+visit http://www.opensource.org/licenses/EPL-1.0
+
+*****************************************************************/
+
 package com.example.fcadstestandroidapp;
 
 import java.io.File;
-
-
-
-
 import java.util.ArrayList;
 import java.util.List;
+import com.t2.fcads.FipsWrapper;
 
 import net.sqlcipher.database.SQLiteDatabase;
 import android.app.Activity;
@@ -21,8 +51,7 @@ public class MainActivity extends Activity
 	TextView textViewMain;
 	List<String> textLines;
 	
-    public native int  FIPSFromJNI();
-
+    public native int  FIPSmode();
     
     
     /** Called when the activity is first created. */
@@ -41,11 +70,13 @@ public class MainActivity extends Activity
         
        // MY_FIPS_mode();
         updateView("Checking FIPS signature");     
-        updateView("Calling FIPS_mode");        
-		int j = FIPSFromJNI();	
-		Log.e("TAG", "FIPS_mode returned " + j);
-		updateView("FIPS_mode returned " + j);  
-		if (j == 1) {
+        updateView("Calling FIPS_mode");      
+        
+        FipsWrapper fipsWrapper = FipsWrapper.getInstance();
+        int result = fipsWrapper.doFIPSmode();	
+		Log.e("TAG", "FIPS_mode returned " + result);
+		updateView("FIPS_mode returned " + result);  
+		if (result == 1) {
 			Log.i("mytag", "PASSED - successfully enabled FIPS!" );
 			updateView("PASSED - successfully enabled FIPS!");
 		}
