@@ -118,7 +118,7 @@ jint
 Java_com_demo_sqlcipher_HelloSQLCipherActivity_Scott( JNIEnv* env,
                                               jobject thiz )
 {
-    return testValue;
+    return MY_FIPS_mode();
 }
 
 
