@@ -1,0 +1,21 @@
+Using the FCADS Android FIPS compliant library in an android project:
+=====================================================================
+
+1. Retrieve library from release folder:
+2. Copy lib files to your android project
+	android-database-sqlcipher
+		x86
+			libstlport_shared.so
+			libsqlcipher_android.so
+			libdatabase_sqlcipher.so
+		armabi
+			libstlport_shared.so
+			libsqlcipher_android.so
+			libdatabase_sqlcipher.so
+		armabiv7
+			libstlport_shared.so
+			libsqlcipher_android.so
+			libdatabase_sqlcipher.so
+		sqlcipher.jar
+		guava-r09.jar
+		commons-codec.jar

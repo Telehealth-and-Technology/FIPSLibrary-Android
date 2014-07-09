@@ -1,3 +1,35 @@
+/*****************************************************************
+wrapper.c
+
+Copyright (C) 2011-2014 The National Center for Telehealth and 
+Technology
+
+Eclipse Public License 1.0 (EPL-1.0)
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the Eclipse Public License as
+published by the Free Software Foundation, version 1.0 of the 
+License.
+
+The Eclipse Public License is a reciprocal license, under 
+Section 3. REQUIREMENTS iv) states that source code for the 
+Program is available from such Contributor, and informs licensees 
+how to obtain it in a reasonable manner on or through a medium 
+customarily used for software exchange.
+
+Post your updates and modifications to our GitHub or email to 
+t2@tee2.org.
+
+This library is distributed WITHOUT ANY WARRANTY; without 
+the implied warranty of MERCHANTABILITY or FITNESS FOR A 
+PARTICULAR PURPOSE.  See the Eclipse Public License 1.0 (EPL-1.0)
+for more details.
+ 
+You should have received a copy of the Eclipse Public License
+along with this library; if not, 
+visit http://www.opensource.org/licenses/EPL-1.0
+
+*****************************************************************/
 #include <string.h>
 #include <jni.h>
 #include <openssl/evp.h>
@@ -69,24 +101,23 @@ int MY_FIPS_mode()
       ERR_print_errors_fp(stderr);
     }
   }
-
-
-
-      //  LOGI("accelerometer: x=%d ", 27);
- 
-       // int ret = 22233;
-
-	//int mode = mode = FIPS_mode();
-
    return mode;
 }
 
+// This is the official interface for this module
+jint
+Java_com_t2_fcads_FipsWrapper_FIPSmode( JNIEnv* env,
+                                              jobject thiz )
+{
+        return MY_FIPS_mode();
+}
+
+
+// The rest of these interfaces are used for testing and development 
 jint 
 Java_com_demo_sqlcipher_HelloSQLCipherActivity_Scott( JNIEnv* env,
                                               jobject thiz )
 {
-  int testValue = 101;
-    
     return testValue;
 }
 
@@ -97,8 +128,6 @@ jint
 Java_com_demo_sqlcipher_HelloSQLCipherActivity_FIPSFromJNI( JNIEnv* env,
                                               jobject thiz )
 {
-  int testValue = 101;
-    
     return MY_FIPS_mode();
 }
 
@@ -106,8 +135,6 @@ jint
 Java_com_demo_sqlcipher_HelloSQLCipherActivity_FIPSFromJNIfred( JNIEnv* env,
                                                            jobject thiz )
 {
-    int testValue = 101;
-    
     return MY_FIPS_mode();
 }
 
@@ -115,8 +142,13 @@ jint
 Java_com_example_fcadstestandroidapp_MainActivity_FIPSFromJNI( JNIEnv* env,
                                               jobject thiz )
 {
-  int testValue = 101;
-    
+    return MY_FIPS_mode();
+}
+
+jint
+Java_com_example_fcadstestandroidapp_MainActivity_FIPSmode( JNIEnv* env,
+                                              jobject thiz )
+{
     return MY_FIPS_mode();
 }
 
@@ -126,8 +158,6 @@ jint
 Java_com_example_t2testjniwrapper_MainActivity_FIPSFromJNI( JNIEnv* env,
                                               jobject thiz )
 {
-	int testValue = 101;
-    
     return MY_FIPS_mode();
 }
 
@@ -136,8 +166,6 @@ Java_com_example_t2testjniwrapper_MainActivity_FIPSFromJNI( JNIEnv* env,
 jstring
 Java_com_example_t2testjniwrapper_MainActivity_testFromJNI( JNIEnv* env,
                                                jobject thiz )
-{
-    
-    
+{ 
     return (*env)->NewStringUTF(env, "This is a test string for The weekend1");
 }

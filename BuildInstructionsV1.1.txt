@@ -24,7 +24,8 @@ Retrieve source files
 
 	1a. Clone the T2 fcads project from git:
 	----------------------------------------
-		git clone ssh://scoleman@git.t2.local/git/mobile/android/fcads.git
+		git clone ../fcads.git
+		cd fcads
 
 		Results: 
 		========
@@ -70,7 +71,7 @@ Retrieve source files
 		---------
 		This one assumes you have a canned set of files on your local drive at:
 			~/release/sqlCipherDownload_6-12_14/android-database-sqlcipher
-		use command: make copyLocalFipsFiles
+		use command: make copyLocalSqlCipherFiles
 
 
 	Results: 
