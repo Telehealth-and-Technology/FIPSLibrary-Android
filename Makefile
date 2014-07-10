@@ -55,6 +55,8 @@ clean:
 	rm -rf openssl-fips-ecp-2.0.2.tar.gz && \
 	rm -rf openssl-1.0.1f.tar.gz && \
 	rm -rfd android-database-sqlcipher/libs/armeabi/libsqlcipher_android.so && \
+	rm -rfd android-database-sqlcipher/libs/armeabi-v7a/libsqlcipher_android.so && \
+	rm -rfd android-database-sqlcipher/libs/x86/libsqlcipher_android.so && \
 	rm -rfd ${TEST_DIR}/FcadsTestAndroidApp/libs
 
 cleanCannedFiles:

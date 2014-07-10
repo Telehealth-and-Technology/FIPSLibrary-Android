@@ -424,5 +424,7 @@ $CC \
  -o libsqlcipher_android.so
 
 cp libsqlcipher_android.so ../libs/armeabi
+cp libsqlcipher_android.so ../libs/armeabi-v7a
+cp libsqlcipher_android.so ../libs/x86
 
 set +x	
