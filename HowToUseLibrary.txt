@@ -2,7 +2,7 @@ Using the FCADS Android FIPS compliant library in an android project:
 =====================================================================
 
 1. Retrieve library from release folder:
-2. Copy lib files to your android project
+2. Copy lib files to your android project libs directory
 	android-database-sqlcipher
 		x86
 			libstlport_shared.so
@@ -19,3 +19,23 @@ Using the FCADS Android FIPS compliant library in an android project:
 		sqlcipher.jar
 		guava-r09.jar
 		commons-codec.jar
+
+3. Create a JAVA wrapper for the uni functions:
+	See example wrapper FipsWrapper.java in test/FcadsTestAndroidApp folder
+	It MUST be in package: com.t2.fcafds
+	IT MUST be named FipsWrapper.java
+		Declare jni function: public native int  FIPSmode();
+		Create a wrapper function that calls FIPSmode()
+
+4. In your application,  call your wrapper function
+	ex: int result = fipsWrapper.doFIPSmode();
+	IF the result = 1 then FIPS mode has successfully been initialized and self
+        tests have successfully been run.
+
+5. User sqlcipher database just as you would sqlite
+	See: http://sqlcipher.net/sqlcipher-for-android
+	
+6. When application is complete, create the following FIPS documentation files from templates:
+	doc/FIPS140-2ApplicationComplianceStatementTemplate.txt
+	doc/FIPS140-2ApplicationComplianceRecordTemplate.txt
+
