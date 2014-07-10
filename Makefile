@@ -70,8 +70,8 @@ copyLocalFipsFiles:
 	cp localFipsSslFiles/openssl-fips-ecp-2.0.2.tar.gz dev
 
 copyLocalSqlCipherFiles:
-	echo "Copying canned files from local resources at /Users/scoleman/release/sqlCipherDownload_6-12_14/android-database-sqlcipher"
-	cp -r /Users/scoleman/release/sqlCipherDownload_6-12_14/android-database-sqlcipher* dev/
+	echo "Copying canned files from local resources at /Users/scoleman/release/sqlCipherDownload_7-9-2014/android-database-sqlcipher"
+	cp -r /Users/scoleman/release/sqlCipherDownload_7-9-2014/android-database-sqlcipher* dev/
 
 prepare:
 	cd ${DEV_DIR} && \
