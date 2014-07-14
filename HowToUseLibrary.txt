@@ -27,15 +27,30 @@ Using the FCADS Android FIPS compliant library in an android project:
 		Declare jni function: public native int  FIPSmode();
 		Create a wrapper function that calls FIPSmode()
 
-4. In your application,  call your wrapper function
+4. In your application, call SQLiteDatabase.LoadLibs(context);
+	This will load the JNI libraries
+	NOTE: if you fail to do this, when to try to do step 6 you will get a
+	linker error.
+	
+
+5. In your application,  call your wrapper function
 	ex: int result = fipsWrapper.doFIPSmode();
 	IF the result = 1 then FIPS mode has successfully been initialized and self
         tests have successfully been run.
 
-5. User sqlcipher database just as you would sqlite
+6. User sqlcipher database just as you would sqlite
 	See: http://sqlcipher.net/sqlcipher-for-android
 	
-6. When application is complete, create the following FIPS documentation files from templates:
+7. When application is complete, create the following FIPS documentation files from templates:
 	doc/FIPS140-2ApplicationComplianceStatementTemplate.txt
 	doc/FIPS140-2ApplicationComplianceRecordTemplate.txt
+
+A note about encryption keys:
+------------------------------
+
+When initialized with a passphrase SQLCipher derives the key data using PBKDF2 (OpenSSL’s PKCS5_PBKDF2_HMAC_SHA1). Each database is initialized with a unique random salt in the first 16 bytes of the file. This salt is used for key derivation and it ensures that even if two databases are created using the same password, they will not have the same encryption key. The default configuration uses 64000 iterations for key derivation (this can be changed at runtime using “PRAGMA kdf_iter”).
+
+The key used to calculate page HMACs is different that the encryption key. It is derived from the encryption key and using PBKDF2 with 2 iterations and a variation of the random database salt. 
+
+If use of a passphrase is undesirable, an application may provide raw binary key data (for instance to support vaulted keys, or the use of PKI based key exchange).
 
