@@ -55,13 +55,19 @@ public class FipsWrapper {
      * calls the native function FIPSmode
      * 
      * @return return value from jni FIPSmode
+     *         1 = success
      */
     public int doFIPSmode() {
     	return FIPSmode();
     }
 
     
-    public String doT2FIPSVersion() {
+    /**
+     * calls the native function T2FIPSVersion
+     * 
+     * @return return value from jni T2FIPSVersion - Version number of T2 FIPS build
+     * 
+     */    public String doT2FIPSVersion() {
     	return T2FIPSVersion();
     }
 }
