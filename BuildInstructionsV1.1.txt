@@ -24,7 +24,7 @@ Retrieve source files
 
 	1a. Clone the T2 fcads project from git:
 	----------------------------------------
-		git clone ../fcads.git
+		git clone git.t2.local:/git/mobile/crossplatform/fcads.git
 		cd fcads
 
 		Results: 
@@ -64,7 +64,7 @@ Retrieve source files
 
 		Option 2:
 		---------
-		Copy canned files from enclave at /Volumes/shares/Groups/Tech Team/Current Projects/Android-FIPS/resources/android-database-sqlcipher
+		Copy canned files from enclave at /Volumes/shares/Groups/Tech Team/Current Projects/FIPS/resources/android-database-sqlcipher
 		to fcads/dev/
 
 		Option 3:

@@ -112,6 +112,14 @@ Java_com_t2_fcads_FipsWrapper_FIPSmode( JNIEnv* env,
         return MY_FIPS_mode();
 }
 
+jstring
+Java_com_t2_fcads_FipsWrapper_T2FIPSVersion( JNIEnv* env,
+                                              jobject thiz )
+{
+    return (*env)->NewStringUTF(env, "1.3.0");
+}
+
+
 
 // The rest of these interfaces are used for testing and development 
 jint 

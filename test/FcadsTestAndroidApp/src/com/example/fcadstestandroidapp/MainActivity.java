@@ -75,6 +75,9 @@ public class MainActivity extends Activity
         
         FipsWrapper fipsWrapper = FipsWrapper.getInstance();
         int result = fipsWrapper.doFIPSmode();	
+        String t2FipsVersion = fipsWrapper.doT2FIPSVersion();
+        Log.d("TAG", "T2 FIPS Version = " + t2FipsVersion);
+        updateView("T2 FIPS Version = " + t2FipsVersion);
 		Log.e("TAG", "FIPS_mode returned " + result);
 		updateView("FIPS_mode returned " + result);  
 		if (result == 1) {

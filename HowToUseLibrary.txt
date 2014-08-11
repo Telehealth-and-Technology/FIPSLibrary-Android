@@ -27,6 +27,10 @@ Using the FCADS Android FIPS compliant library in an android project:
 		Declare jni function: public native int  FIPSmode();
 		Create a wrapper function that calls FIPSmode()
 
+		Declare jni function: public native String  T2FIPSVersion();
+		Create a wrapper function that calls T2FIPSVersion()
+
+
 4. In your application, call SQLiteDatabase.LoadLibs(context);
 	This will load the JNI libraries
 	NOTE: if you fail to do this, when to try to do step 6 you will get a
@@ -37,6 +41,9 @@ Using the FCADS Android FIPS compliant library in an android project:
 	ex: int result = fipsWrapper.doFIPSmode();
 	IF the result = 1 then FIPS mode has successfully been initialized and self
         tests have successfully been run.
+
+        String version = fipsWrapper.doT2FIPSVersion()
+        this will get the version (ex: 1.3.0)
 
 6. User sqlcipher database just as you would sqlite
 	See: http://sqlcipher.net/sqlcipher-for-android

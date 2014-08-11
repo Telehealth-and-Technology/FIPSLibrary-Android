@@ -42,7 +42,8 @@ package com.t2.fcads;
 public class FipsWrapper {
 	private static FipsWrapper instance = null;
 	public native int  FIPSmode();
-    
+	public native String  T2FIPSVersion();
+	
 	public static FipsWrapper getInstance() {
 		if (instance == null) {
 			instance = new FipsWrapper();
@@ -59,4 +60,8 @@ public class FipsWrapper {
     	return FIPSmode();
     }
 
+    
+    public String doT2FIPSVersion() {
+    	return T2FIPSVersion();
+    }
 }
