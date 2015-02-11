@@ -98,6 +98,7 @@ public class FipsWrapper {
 	public native int  initializeLogin(String pin, String answers);
 	public native void  prepare(boolean useTestVectors);
 	public native void  init();
+	public native void  cleanup();
 	public native String getDatabaseKeyUsingPin(String pin);
 	public native int checkAnswers(String answers);
 	public native int checkPin(String pin);
@@ -112,6 +113,13 @@ public class FipsWrapper {
 	}
 	
 	
+	@Override
+	protected void finalize() throws Throwable {
+		cleanup();
+		super.finalize();
+	}
+
+
 	static Context context;
 	
 	public static void setContext(Context cxt) {
@@ -140,8 +148,6 @@ public class FipsWrapper {
 	public void doPrepare(boolean useTestVectors) {
 		prepare(useTestVectors);
 	}
-	
-	
 	
 	public int doInitializeLogin(String pin, String answers)  {
 		return initializeLogin(pin, answers);
@@ -188,11 +194,14 @@ public class FipsWrapper {
      * 
      * @return return value from jni T2FIPSVersion - Version number of T2 FIPS build
      * 
-     */    public String doT2FIPSVersion() {
+     */    
+    public String doT2FIPSVersion() {
     	return T2FIPSVersion();
     }
      
      
+ // Routines for native code to call for preferences
+    
 	static void putString(String key, String value) {
 		SharedPreferences sp = context.getSharedPreferences("FIPS_VARS", Context.MODE_PRIVATE);
 		sp.edit().putString(key, value).commit();

@@ -88,7 +88,7 @@ visit http://www.opensource.org/licenses/EPL-1.0
 #define APPNAME "wrapper"
 
 
-
+#define ENCRYPT_PREFERENCES 1
 
 #define boolean int
 #define TRUE 1
@@ -140,6 +140,8 @@ boolean useTestVectors;
 boolean verboseLogging;
 
 
+
+
 /*!
  * @typedef T2Key
  * @discussion Structure containing elements necessary for an encryption key
@@ -154,21 +156,49 @@ typedef struct {
     unsigned char key[MAX_KEY_LENGTH], iv[MAX_KEY_LENGTH];
 } T2Key;
 
+// Key used to encrypt user preferences preferences - putData() and putString()
+T2Key preferencesKey;
+unsigned char *preferencesSalt;
+#define PREFERENCES_SALT {0x39, 0x30, 0x00, 0x00, 0x31, 0xD4, 0x00, 0x00}
+#define PREFERENCES_PASSWORD "preferencespassword"
 
-// Function prototypes
-void logAsHexString(unsigned char * bin, unsigned int binsz, char * message);
-void generateMasterOrRemoteKeyAndSave(JNIEnv* env, T2Key * RIKey, T2Key * LockingKey, const char * keyType);
-unsigned char * encryptUsingKey_malloc(T2Key * credentials, unsigned char * pUencryptedText, int *outLength);
-unsigned char * decryptUsingKey_malloc(T2Key * credentials, unsigned char * encryptedText);
-int key_init(unsigned char * key_data, int key_data_len, unsigned char * salt, T2Key * aCredentials);
-unsigned char * aes_decrypt_malloc(EVP_CIPHER_CTX * decryptContext, unsigned char * ciphertext, int *len);
-unsigned char * aes_encrypt_malloc(EVP_CIPHER_CTX * encryptContext , unsigned char * plaintext, int * len);
-unsigned char * binAsHexString_malloc(unsigned char * bin, unsigned int binsz);
-int getRIKeyUsing(JNIEnv* env, T2Key * RiKey, char * answersOrPin, char * keyType);
-int checkPin_I(JNIEnv* env, unsigned char *pin);
-int checkAnswers_I(JNIEnv* env, unsigned char *answers);
+
+// -------------------- Function prototypes -----------------------
+//   ======= External FIPS methods =================
+jint Java_com_t2_fcads_FipsWrapper_FIPSmode( JNIEnv* env, jobject thiz );
+jstring Java_com_t2_fcads_FipsWrapper_T2FIPSVersion( JNIEnv* env, jobject thiz );
+
+//   ======= External T2Crypto methods =================
 jint Java_com_t2_fcads_FipsWrapper_checkPin( JNIEnv* env,jobject thiz, jstring jPin);
 jint Java_com_t2_fcads_FipsWrapper_checkAnswers( JNIEnv* env,jobject thiz, jstring jAnswers);
+void Java_com_t2_fcads_FipsWrapper_init(JNIEnv* env,jobject thiz);
+void Java_com_t2_fcads_FipsWrapper_setVerboseLogging(JNIEnv* env,jobject thiz, jboolean jvl);
+void Java_com_t2_fcads_FipsWrapper_prepare( JNIEnv* env,jobject thiz, jboolean testVectors);
+jint Java_com_t2_fcads_FipsWrapper_initializeLogin( JNIEnv* env,jobject thiz, jstring jPin,jstring jAnswers);
+jstring Java_com_t2_fcads_FipsWrapper_getDatabaseKeyUsingPin(JNIEnv* env, jobject thiz, jstring jPin); 
+jint Java_com_t2_fcads_FipsWrapper_isInitialized( JNIEnv* env,jobject thiz );
+void Java_com_t2_fcads_FipsWrapper_deInitializeLogin( JNIEnv* env,jobject thiz );
+void Java_com_t2_fcads_FipsWrapper_cleanup(JNIEnv* env,jobject thiz);
+jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,jstring jOldPin,jstring jNewPin);
+jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject thiz, jstring jNewPin,jstring jAnswers);
+
+//   ======= Internal methods =================
+int checkPin_I(JNIEnv* env, unsigned char *pin);
+int checkAnswers_I(JNIEnv* env, unsigned char *answers);
+void generateMasterOrRemoteKeyAndSave(JNIEnv* env, T2Key * RIKey, T2Key * LockingKey, const char * keyType);
+unsigned char * encryptUsingKey_malloc(T2Key * credentials, unsigned char * pUencryptedText, int *outLength);
+unsigned char * encryptUsingKey_malloc1(T2Key * credentials, unsigned char * pUencryptedText, int inLength, int * outLength);
+unsigned char * decryptUsingKey_malloc(T2Key * credentials, unsigned char * encryptedText);
+unsigned char * decryptUsingKey_malloc1(T2Key * credentials, unsigned char * encryptedText, int * inLength);
+int key_init(unsigned char * key_data, int key_data_len, unsigned char * salt, T2Key * aCredentials);
+int getRIKeyUsing(JNIEnv* env, T2Key * RiKey, char * answersOrPin, char * keyType);
+unsigned char * aes_decrypt_malloc(EVP_CIPHER_CTX * decryptContext, unsigned char * ciphertext, int *len);
+unsigned char * aes_encrypt_malloc(EVP_CIPHER_CTX * encryptContext , unsigned char * plaintext, int * len);
+void logAsHexString(unsigned char * bin, unsigned int binsz, char * message);
+unsigned char * binAsHexString_malloc(unsigned char * bin, unsigned int binsz);
+
+
+
 
 // Macro to throw java exction from "c" code
 #define THROW_T2_EXCEPTION(_LABEL_) \
@@ -251,9 +281,9 @@ const char * getString(JNIEnv* env, const char *pKey) {
     return;
   }
 
-  jstring returnedSalt = (*env)->CallStaticObjectMethod(env, cls, id, key);
+  jstring returnedString = (*env)->CallStaticObjectMethod(env, cls, id, key);
 
-  const char *utfChars = (*env)->GetStringUTFChars(env, returnedSalt, 0);
+  const char *utfChars = (*env)->GetStringUTFChars(env, returnedString, 0);
 
   return utfChars;
 
@@ -279,22 +309,32 @@ void putData(JNIEnv* env, const char *pKey, const char *pValue, int data_size ) 
     return;
   }
 
-  jstring key = (*env)->NewStringUTF(env, pKey);
 
-  jbyteArray retArray;
-  if(!retArray) {
-    retArray = (*env)->NewByteArray(env, data_size);    
-  }
+  #ifdef ENCRYPT_PREFERENCES
 
-  if((*env)->GetArrayLength(env, retArray) != data_size) {
-      (*env)->DeleteLocalRef(env, retArray);
-      retArray = (*env)->NewByteArray(env, data_size);
-  }
+    // Need to encrypt the data before saving
+    int outLength;
+    unsigned char *encryptedData = encryptUsingKey_malloc1(&preferencesKey, (unsigned char *) pValue, data_size, &outLength);
 
-  void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)retArray, 0);
-  memcpy(temp, pValue, data_size);
+      // Now convert to jni variables and proceed
+    jstring key = (*env)->NewStringUTF(env, pKey);
+    jbyteArray retArray = (*env)->NewByteArray(env, outLength);
+    void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)retArray, 0);
+    memcpy(temp, encryptedData, outLength);
+    free(encryptedData);
+
+  #else
+
+    // Now convert to jni variables and proceed
+    jstring key = (*env)->NewStringUTF(env, pKey);
+    jbyteArray retArray = (*env)->NewByteArray(env, data_size)
+    void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)retArray, 0);
+    memcpy(temp, pValue, data_size);
+
+  #endif
+
+
   (*env)->ReleasePrimitiveArrayCritical(env, retArray, temp, 0);
-
   (*env)->CallStaticVoidMethod(env, cls, id, key, retArray);
 } 
 
@@ -305,7 +345,7 @@ void putData(JNIEnv* env, const char *pKey, const char *pValue, int data_size ) 
  * @param pKey Key Key of bytes to retrieve
  * @return  Bytes associated with key
  */
-char * getData(JNIEnv* env, const char *pKey, int * length) {
+char * getData_malloc(JNIEnv* env, const char *pKey, int * length) {
   jclass cls = (*env)->FindClass(env, "com/t2/fcads/FipsWrapper");
   if (cls == 0) {
       T2Assert((cls != 0), "Can't find class FipsWrapper");
@@ -323,11 +363,23 @@ char * getData(JNIEnv* env, const char *pKey, int * length) {
 
   jbyteArray ar = (*env)->CallStaticObjectMethod(env, cls, id, key);
   jboolean isCopy;
-  char *returnedValue = (*env)->GetByteArrayElements(env, ar, &isCopy);
+  char *returnedElements = (*env)->GetByteArrayElements(env, ar, &isCopy);
   *length = (*env)->GetArrayLength(env, ar);
 
+  char *returnedValue  = malloc(sizeof(char) * *length);
+  memcpy(returnedValue, returnedElements, *length);
+  (*env)->ReleaseByteArrayElements(env, ar, returnedElements, JNI_ABORT);
 
-  return returnedValue;
+  #ifdef ENCRYPT_PREFERENCES 
+
+    // Need to decrypt the data before saving
+    unsigned char *decryptedData = decryptUsingKey_malloc1(&preferencesKey, returnedValue, length);
+    return decryptedData;
+
+  #else
+    return returnedValue;    
+  #endif
+
 }
 
 void clearAllData(JNIEnv* env) {
@@ -378,12 +430,42 @@ void Java_com_t2_fcads_FipsWrapper_setVerboseLogging(JNIEnv* env,jobject thiz, j
   verboseLogging = vl;
 }
 
+// MUST be the last thing called
+void Java_com_t2_fcads_FipsWrapper_cleanup(JNIEnv* env,jobject thiz) {
+  EVP_CIPHER_CTX_cleanup(&preferencesKey.encryptContext);
+  EVP_CIPHER_CTX_cleanup(&preferencesKey.decryptContext);
+}
 
+// MUST be called before anything else!
+void Java_com_t2_fcads_FipsWrapper_init(JNIEnv* env,jobject thiz) {
 
-void Java_com_t2_fcads_FipsWrapper_init( ) {
-  verboseLogging = T2False;
   LOGI("INFO: Initializing");
   _salt = malloc(sizeof(unsigned char) * SALT_LENGTH);
+
+  // Now set up key used for saving preference data 
+  char *RIKeyBytes;
+  int RIKeyBytesLen;
+  RIKeyBytes = malloc(sizeof(char) * strlen(PREFERENCES_PASSWORD));
+  T2Assert((RIKeyBytes != NULL), "Memory allocation error for RIKey!");
+      
+  preferencesSalt = malloc(sizeof(unsigned char) * SALT_LENGTH);
+  T2Assert(preferencesSalt != NULL, "Memory allocation error - Memory not allocated")
+
+  unsigned char tmp[] = PREFERENCES_SALT;
+  memcpy(preferencesSalt,tmp,SALT_LENGTH);
+      
+  char tmp1[] = PREFERENCES_PASSWORD;
+  strcpy(RIKeyBytes, tmp1);
+  RIKeyBytesLen = strlen(RIKeyBytes);
+
+
+  LOGI("INFO: *** Generating RIKey ***");
+  if ((key_init((unsigned char*) RIKeyBytes, RIKeyBytesLen, (unsigned char *) preferencesSalt, &preferencesKey))) {
+      free(RIKeyBytes);
+      T2Assert(0, "ERROR: initializing preferences key");
+      return;
+  }
+  free(RIKeyBytes);
 }
 
 
@@ -470,12 +552,6 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,
     
     _initializedPin = (unsigned char*) newPin;
 
-    // Encrypt the PIN and save to NVM
-    // NSMutableData *encryptedPIN = [self encryptUsingKey:rIKey_1 :newPin];
-    // NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    // [defaults setObject:encryptedPIN forKey:KEY_DATABASE_PIN];
-    // [defaults synchronize];
-
     int outLength;
     unsigned char *encryptedPin = encryptUsingKey_malloc(rIKey_1, (unsigned char *) newPin, &outLength);
     LOGI("outLength = %d", outLength);
@@ -484,8 +560,6 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,
     putData(env, KEY_DATABASE_PIN, encryptedPin, outLength );
     free(encryptedPin);
 
-
-    
     EVP_CIPHER_CTX_cleanup(&rIKey_1->encryptContext);
     EVP_CIPHER_CTX_cleanup(&rIKey_1->decryptContext);
     EVP_CIPHER_CTX_cleanup(&LockingKey.encryptContext);
@@ -496,7 +570,6 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,
     (*env)->ReleaseStringUTFChars(env, jNewPin, newPin);
 
     return T2Success;
-
 }
 
 jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject thiz, 
@@ -742,26 +815,13 @@ jint Java_com_t2_fcads_FipsWrapper_initializeLogin( JNIEnv* env,jobject thiz,
 
 jint Java_com_t2_fcads_FipsWrapper_isInitialized( JNIEnv* env,jobject thiz ) {
     int length;
-    unsigned char *masterKey = getData(env, KEY_MASTER_KEY, &length);
-    logAsHexString(masterKey, length, "Masterkey =  ");
-    if (strcmp(masterKey, "") == 0)  {
-      return T2False;
-    } else {
-      return T2True;
-    }
-}
-
-jstring Java_com_t2_fcads_FipsWrapper_keyInit( JNIEnv* env, jobject thiz, jint jKeyLen, jstring jSalt, jstring jCredentials ) {
-
-    int keyLen = (int) jKeyLen;
-    const char *salt = (*env)->GetStringUTFChars(env, jSalt, 0);
-    const char *credentials = (*env)->GetStringUTFChars(env, jCredentials, 0);
-
-    LOGI("Java_com_t2_fcads_FipsWrapper_keyInit, keyLen = %d, salt = %s, credentials = %s", keyLen, salt, credentials);
-
-    (*env)->ReleaseStringUTFChars(env, jSalt, salt);
-    (*env)->ReleaseStringUTFChars(env, jCredentials, credentials);
-    return (*env)->NewStringUTF(env, "testReturn_keyInit");
+    int retValue = T2True;
+    unsigned char *masterKey = getData_malloc(env, KEY_MASTER_KEY, &length);
+    if (length == 0)  {
+      retValue =  T2False;
+    } 
+    free(masterKey);
+    return retValue;
 }
 
 jstring Java_com_t2_fcads_FipsWrapper_getDatabaseKeyUsingPin(JNIEnv* env, jobject thiz, jstring jPin) {
@@ -908,13 +968,24 @@ unsigned char * aes_decrypt_malloc(EVP_CIPHER_CTX * decryptContext, unsigned cha
     return plaintext;
 }
 
+unsigned char * encryptUsingKey_malloc1(T2Key * credentials, unsigned char * pUencryptedText, int inLength, int * outLength) {
+    unsigned char* szEncryptedText =  aes_encrypt_malloc(&credentials->encryptContext, pUencryptedText, &inLength);
+    *outLength = inLength;
+    return szEncryptedText;
+}
+
 unsigned char * encryptUsingKey_malloc(T2Key * credentials, unsigned char * pUencryptedText, int * outLength) {
-   
     int len1 = strlen(pUencryptedText) + 1; // Make sure we encrypt the terminating 0 also!
     unsigned char* szEncryptedText =  aes_encrypt_malloc(&credentials->encryptContext, pUencryptedText, &len1);
     *outLength = len1;
     return szEncryptedText;
 }
+
+unsigned char * decryptUsingKey_malloc1(T2Key * credentials, unsigned char * encryptedText, int * inLength) {
+    unsigned char* decryptedText =  aes_decrypt_malloc(&credentials->decryptContext, encryptedText, inLength);
+    return decryptedText;
+}
+
 
 unsigned char * decryptUsingKey_malloc(T2Key * credentials, unsigned char * encryptedText) {
     int len1 = strlen(encryptedText) + 1; // Make sure we encrypt the terminating 0 also!
@@ -1041,12 +1112,13 @@ int getRIKeyUsing(JNIEnv* env, T2Key * RiKey, char * answersOrPin, char * keyTyp
     // --------------------------
     LOGI("INFO: ***  Recall %s from NVM ***\n", keyType);
     int length;
-    unsigned char *masterKey = getData(env, keyType, &length);
+    unsigned char *masterKey = getData_malloc(env, keyType, &length);
     logAsHexString(masterKey, length, "INFO: Stored value = ");
     
     // Double check the master key length
     if (length != EVP_aes_256_cbc_Key_LENGTH + EVP_aes_256_cbc_Iv_LENGTH) {
       LOGI(" ERROR master key length incorrect, is: %d, should be: %d", length, EVP_aes_256_cbc_Key_LENGTH + EVP_aes_256_cbc_Iv_LENGTH);
+      free(masterKey);
       return T2Error;
     }
 
@@ -1068,7 +1140,8 @@ int getRIKeyUsing(JNIEnv* env, T2Key * RiKey, char * answersOrPin, char * keyTyp
     keyCredentialsFromBytes((unsigned char*) RIKeyAndIv, EVP_aes_256_cbc_Key_LENGTH, EVP_aes_256_cbc_Iv_LENGTH, RiKey);
     RiKey->ivLength = EVP_aes_256_cbc_Iv_LENGTH;
     RiKey->keyLength = EVP_aes_256_cbc_Key_LENGTH;
-;
+
+    free(masterKey);
     free(RIKeyAndIv);
     
     EVP_CIPHER_CTX_cleanup(&LockingKey.encryptContext);
@@ -1100,7 +1173,7 @@ int checkAnswers_I(JNIEnv* env, unsigned char *answers) {
   
   // Re-initialize salt from nvm
    int length;
-  _salt = getData(env, KEY_SALT, &length);
+  _salt = getData_malloc(env, KEY_SALT, &length);
  
   LOGI("INFO: === checkAnswers ===");
   LOGI("INFO: *** Generating Secondary LockingKey  kdf(%s) ***", answers);
@@ -1117,8 +1190,12 @@ int checkAnswers_I(JNIEnv* env, unsigned char *answers) {
   
   // Read the CHECK from NVM and make sure we can decode it properly
   // if not fail login
-  unsigned char *encryptedCheck = getData(env, KEY_DATABASE_CHECK, &length);
-  if (encryptedCheck == NULL || strcmp(encryptedCheck, "") == 0) {
+  unsigned char *encryptedCheck = getData_malloc(env, KEY_DATABASE_CHECK, &length);
+  if (encryptedCheck == NULL) {
+    return T2Error;
+  }
+  if (strcmp(encryptedCheck, "") == 0) {
+    free (encryptedCheck);
     return T2Error;
   }
   unsigned char *decryptedCheck = decryptUsingKey_malloc(rIKey_1, encryptedCheck);
@@ -1132,6 +1209,7 @@ int checkAnswers_I(JNIEnv* env, unsigned char *answers) {
       LOGI("WARNING: answers does not match");
   }
 
+  free(encryptedCheck);
   free(decryptedCheck);
 
 
@@ -1159,7 +1237,7 @@ int checkPin_I(JNIEnv* env, unsigned char *pin) {
 
     int length;
     // Re-initialize salt from nvm
-    _salt = getData(env, KEY_SALT, &length);
+    _salt = getData_malloc(env, KEY_SALT, &length);
 
     
     LOGI("INFO: === checkPin ===");
@@ -1173,8 +1251,12 @@ int checkPin_I(JNIEnv* env, unsigned char *pin) {
 
     // Read the PIN from NVM and make sure we can decode it properly
     // if not fail login
-    unsigned char *encryptedPin = getData(env, KEY_DATABASE_PIN, &length);
-    if (encryptedPin == NULL || strcmp(encryptedPin, "") == 0) {
+    unsigned char *encryptedPin = getData_malloc(env, KEY_DATABASE_PIN, &length);
+    if (encryptedPin == NULL) {
+      return T2Error;
+    }
+    if (strcmp(encryptedPin, "") == 0) {
+      free(encryptedPin);
       return T2Error;
     }
     unsigned char *decryptedPIN = decryptUsingKey_malloc(rIKey_1, encryptedPin);
@@ -1192,7 +1274,7 @@ int checkPin_I(JNIEnv* env, unsigned char *pin) {
     else {
         LOGI("WARNING: PIN does not match");
     }
-
+    free(encryptedPin);
     free(decryptedPIN);
     return retVal;
 }
