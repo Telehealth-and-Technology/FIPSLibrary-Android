@@ -32,10 +32,22 @@ visit http://www.opensource.org/licenses/EPL-1.0
 *****************************************************************/
 package com.t2.fcads;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+
+import org.apache.commons.codec.binary.Hex;
+
+import com.example.fcadstestandroidapp.MainActivity;
+
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.Signature;
 import android.util.Base64;
 import android.util.Log;
+
+import org.apache.commons.codec.binary.*;
 
 //JNI Stuff
 //Assumptions, The project includes:
@@ -92,6 +104,7 @@ import android.util.Log;
  *
  */
 public class FipsWrapper {
+	private String TAG = FipsWrapper.class.getSimpleName();	
 	private static FipsWrapper instance = null;
 	public native int  FIPSmode();
 	public native String  T2FIPSVersion();
@@ -213,6 +226,11 @@ public class FipsWrapper {
 	}
      
 	static void putData(String key, byte[] values) {
+//		if (key.equals("KEY_DATABASE_PIN")) {
+//			Log.e("tag", " saving checkster = " + new String(Hex.encodeHex(values)));
+//		}
+//		Log.e("tag", " saving data: key =  "  + key + " values = " + new String(Hex.encodeHex(values)));
+		
 		String str = Base64.encodeToString(values,  Base64.NO_WRAP);
 		SharedPreferences sp = context.getSharedPreferences("FIPS_VARS", Context.MODE_PRIVATE);
 		sp.edit().putString(key, str).commit();
@@ -222,6 +240,11 @@ public class FipsWrapper {
 		SharedPreferences sp = context.getSharedPreferences("FIPS_VARS", Context.MODE_PRIVATE);
 		String str = sp.getString(key, "");
 		byte[] tmp = Base64.decode(str, Base64.NO_WRAP);
+		
+//		if (key.equals("KEY_DATABASE_PIN")) {
+//			Log.e("tag", " recalling checkster = " + new String(Hex.encodeHex(tmp)));
+//		}
+//		Log.e("tag", " recalling  data: key =  "  + key + " values = " + new String(Hex.encodeHex(tmp)));
 		return Base64.decode(str, Base64.NO_WRAP);
 	}
      
@@ -230,10 +253,32 @@ public class FipsWrapper {
 		sp.edit().clear().commit();
 	}
 	
-     
-     
-     
-     
+	public static byte[] getPackageBasedSalt() {
+		byte[] defaultSalt = new byte[] {(byte)0x39, (byte)0x30, (byte)0x00, (byte)0x00,(byte) 0x31, (byte)0xD4, (byte)0x00, (byte)0x00};
+		
+		long hash = 0;
+		try {
+			// Calculate a 8 byte hash of the signature
+			Signature[] sigs = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES).signatures;
+			char[] t = sigs[0].toChars();
+			int length = t.length;
+			
+			hash = 5381;
+
+			for (int i = 0; i < length; i++) {
+				hash = ((hash << 5) + hash) + t[i];
+			}
+			Log.i("FipsWrapper", String.format("hash = %x", hash));
+			
+			ByteBuffer buffer = ByteBuffer.allocate(8);
+			buffer.putLong(hash);
+			return buffer.array();
+			
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+			return defaultSalt;
+		}
+	} 
      
      
 }

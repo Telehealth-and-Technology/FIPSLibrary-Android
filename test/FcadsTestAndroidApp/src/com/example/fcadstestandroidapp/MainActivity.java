@@ -43,6 +43,8 @@ import net.sqlcipher.database.SQLiteDatabase;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.database.Cursor;
 import net.sqlcipher.database.SQLiteException;
 import android.os.Bundle;
@@ -67,6 +69,7 @@ public class MainActivity extends Activity
 	private int testPassCount = 0;
 	private int testFailCount = 0;
 	private int testTotalCount = 0;
+	int iterations = 0;
 	
     
     /** Called when the activity is first created. */
@@ -106,8 +109,11 @@ public class MainActivity extends Activity
 			updateView("FAILED - was NOT able to enable FIPS!");
 		}
 
-		fipsWrapper.doPrepare(true);		// Tell it to use test vectors for now
+		// ---------------------------------------------------------------------------------------
+		final int NUM_ITERATIONS = 1000;
+		fipsWrapper.doPrepare(false);		// Tell it to use test vectors for now
 		fipsWrapper.doSetVerboseLogging(false);
+		// ---------------------------------------------------------------------------------------
 		
 		// Test t2Crypto
 		String pin = "One";
@@ -118,60 +124,75 @@ public class MainActivity extends Activity
 		String badAnswers = "TwoThreeFour1";
 		String badPin = "TOne";
 
+
+
 		
-		int iterations = 0;
 		
-		
-		while(iterations++ < 5) {
+		while(iterations++ < NUM_ITERATIONS) {
 		
 		Log.d(TAG, "---------------------- Testsing T2Crypto functionality - Iteration " + iterations + "  ---------------------");
 	
-		
-	
+			int ret;
+			String testDescription;
+			
 			try {
 				
+				testDescription = startTest("Test 1 - doIsInitialized");
 				fipsWrapper.doDeInitializeLogin();
-				int ret = fipsWrapper.doIsInitialized();
-				assertT2Test(ret == T2False, "doIsInitialized");
-				
-				ret = fipsWrapper.doInitializeLogin(pin, answers);
-				assertT2Test(ret == T2Success, "doInitializeLogin");
-				
 				ret = fipsWrapper.doIsInitialized();
-				assertT2Test(ret == T2True, "doIsInitialized");
+				assertT2Test(ret == T2False, testDescription);
+				
+				testDescription = startTest("Test 2 - doInitializeLogin");
+				ret = fipsWrapper.doInitializeLogin(pin, answers);
+				assertT2Test(ret == T2Success, testDescription );
+	
+				testDescription = startTest("Test 3 - doIsInitialized");
+				ret = fipsWrapper.doIsInitialized();
+				assertT2Test(ret == T2True, testDescription );
 	
 				
 				String key = fipsWrapper.doGetDatabaseKeyUsingPin(pin);
 				Log.d(TAG,"key = " + key);
 	
+				testDescription = startTest("Test 4 - check answers (bad answers)");
 				ret = fipsWrapper.doCheckAnswers(badAnswers);
-				assertT2Test(ret == T2Error, "check answers (bad answers)");
+				assertT2Test(ret == T2Error, testDescription );
 				
+				testDescription = startTest("Test 5 - check answers (good answers)");
 				ret = fipsWrapper.doCheckAnswers(answers);
-				assertT2Test(ret == T2Success, "check answers (good answers)");
+				assertT2Test(ret == T2Success, testDescription );
 				
+				testDescription = startTest("Test 6 - check pin (bad pin)");
 				ret = fipsWrapper.doCheckPin(badPin);
-				assertT2Test(ret == T2Error, "check pin (bad pin)");		
+				assertT2Test(ret == T2Error, testDescription );		
 				
+				testDescription = startTest("Test 7 - check pin (good pin)");
 				ret = fipsWrapper.doCheckPin(pin);
-				assertT2Test(ret == T2Success, "check pin (good pin)");		
+				assertT2Test(ret == T2Success, testDescription);		
 				
-				fipsWrapper.changePinUsingPin(pin, newPin1);
+				testDescription = startTest("Test 8 - change pin using pin");
+				ret = fipsWrapper.changePinUsingPin(pin, newPin1);
+				assertT2Test(ret == T2Success, testDescription );
 				
+				testDescription = startTest("Test 9 - check pin (good pin)");
 				ret = fipsWrapper.doCheckPin(newPin1);
-				assertT2Test(ret == T2Success, "check answers (good pin)");	
+				assertT2Test(ret == T2Success, testDescription );	
 				
+				testDescription = startTest("Test 10 - check pin (bad pin)");
 				ret = fipsWrapper.doCheckPin(pin);
-				assertT2Test(ret == T2Error, "check pin (bad pin)");				
+				assertT2Test(ret == T2Error, testDescription );				
 				
+				testDescription = startTest("Test 11 - changePinUsingAnswers");
 				ret  = fipsWrapper.changePinUsingAnswers(newPin3, answers);
-				assertT2Test(ret == T2Success, "changePinUsingAnswers");	
+				assertT2Test(ret == T2Success, testDescription );	
 				
+				testDescription = startTest("Test 12 - check pin (bad pin)");
 				ret = fipsWrapper.doCheckPin(newPin1);
-				assertT2Test(ret == T2Error, "check answers (bad pin)");	
+				assertT2Test(ret == T2Error, testDescription );	
 				
+				testDescription = startTest("Test 13 - check pin (good pin)");
 				ret = fipsWrapper.doCheckPin(newPin3);
-				assertT2Test(ret == T2Success, "check pin (good pin)");			
+				assertT2Test(ret == T2Success, testDescription) ;			
 				
 				
 			} catch (Exception e) {
@@ -180,10 +201,11 @@ public class MainActivity extends Activity
 			}
 	
 			Log.i(TAG, "-------------------------------------------------------------");
-			Log.i(TAG, "  Unit Test Summary");
+			Log.i(TAG, "  Iteration " + iterations + " - Unit Test Summary");
 			Log.i(TAG, "-------------------------------------------------------------");
-			Log.i(TAG, "     Tests passed: " + testPassCount);
-			Log.i(TAG, "     Tests failed: " + testFailCount);
+			Log.i(TAG, "   Iteration " + iterations + " -   Iterations Performed: " + iterations);
+			Log.i(TAG, "   Iteration " + iterations + " -   Tests passed: " + testPassCount);
+			Log.i(TAG, "   Iteration " + iterations + " -   Tests failed: " + testFailCount);
 			if (testPassCount == testTotalCount) {
 				Log.i(TAG, "   ++ ALL TESTS PASSED ++ ");
 			}
@@ -202,16 +224,20 @@ public class MainActivity extends Activity
 
 		
     }
-    
+ 
+    private String startTest(String testDescription) {
+		Log.d(TAG," ------ Starting test " + testDescription);
+    	return testDescription;
+    }
     
     private void assertT2Test(boolean result, String testDescription) {
     	testTotalCount++;
 		if (result) {
-			Log.d(TAG,"PASSED - " + testDescription);
+			Log.d(TAG,"PASSED - Iteration " + iterations + ", " + testDescription);
 			testPassCount++;
 		}
 		else {
-			Log.e(TAG,"*FAIL* - " + testDescription);
+			Log.e(TAG,"xxFAILxx - Iteration " + iterations + ", " + testDescription);
 			testFailCount++;
 		}	
     }

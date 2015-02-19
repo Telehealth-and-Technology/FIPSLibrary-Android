@@ -88,7 +88,7 @@ visit http://www.opensource.org/licenses/EPL-1.0
 #define APPNAME "wrapper"
 
 
-#define ENCRYPT_PREFERENCES 1
+#define ENCRYPT_PREFERENCES
 
 #define boolean int
 #define TRUE 1
@@ -115,8 +115,19 @@ unsigned char * formattedKey[256];
 #define EVP_aes_256_cbc_Key_LENGTH 32
 #define EVP_aes_256_cbc_Iv_LENGTH 16
 
-#define CANNNED_SALT {0x39, 0x30, 0x00, 0x00, 0x31, 0xD4, 0x00, 0x00}
-#define CANNED_RI_KEY_BYTES "password"
+// #define CANNED_RI_KEY_BYTES_LENGTH strlen(CANNED_RI_KEY_BYTES)
+// #define CANNNED_SALT {0x39, 0x30, 0x00, 0x00, 0x31, 0xD4, 0x00, 0x00}
+// #define CANNED_RI_KEY_BYTES "password"
+
+
+// Note: this next set fails when using the wrong malloc routines
+#define CANNED_RI_KEY_BYTES_LENGTH MAX_KEY_LENGTH
+#define CANNNED_SALT {0x93, 0x0e, 0x4b, 0x4f, 0x72, 0x62, 0xaf, 0x75} 
+#define CANNED_RI_KEY_BYTES {0x57, 0x1b, 0x2d, 0x38, 0x26, 0x52, 0xdd, 0x42, 0xfe, 0x15, 0x5f, 0xbf, 0x1f, 0x8d, 0x2c, 0x46, 0xc7, 0xc0, 0x67, 0xdb, 0x29, 0xed, 0xa3, 0x01, 0x55, 0x4e, 0x7f, 0x0c, 0x35, 0x57, 0x0e, 0x87} 
+
+
+
+
 
 #define KEY_MASTER_KEY "MasterKey"
 #define KEY_BACKUP_KEY "BackupKey"
@@ -124,6 +135,8 @@ unsigned char * formattedKey[256];
 #define KEY_DATABASE_CHECK "KEY_DATABASE_CHECK"
 
 const char KEY_SALT[] = "KEY_SALT";
+unsigned char mainSalt[SALT_LENGTH];
+unsigned char *_salt = &mainSalt[0];
 
 #define KCHECK_VALUE "check"
 
@@ -133,9 +146,7 @@ int const T2Success = 0;
 int const T2True = 1;
 int const T2False = 0;
 
-int larry = 0;
 
-unsigned char *_salt;
 boolean useTestVectors;
 boolean verboseLogging;
 
@@ -186,9 +197,9 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject th
 int checkPin_I(JNIEnv* env, unsigned char *pin);
 int checkAnswers_I(JNIEnv* env, unsigned char *answers);
 void generateMasterOrRemoteKeyAndSave(JNIEnv* env, T2Key * RIKey, T2Key * LockingKey, const char * keyType);
-unsigned char * encryptUsingKey_malloc(T2Key * credentials, unsigned char * pUencryptedText, int *outLength);
-unsigned char * encryptUsingKey_malloc1(T2Key * credentials, unsigned char * pUencryptedText, int inLength, int * outLength);
-unsigned char * decryptUsingKey_malloc(T2Key * credentials, unsigned char * encryptedText);
+char * generateMasterOrRemoteKey_malloc(JNIEnv* env, T2Key * RIKey, T2Key * LockingKey, const char * keyType);
+unsigned char * encryptStringUsingKey_malloc(T2Key * credentials, unsigned char * pUencryptedText, int *outLength);
+unsigned char * encryptBinaryUsingKey_malloc1(T2Key * credentials, unsigned char * pUencryptedText, int inLength, int * outLength);
 unsigned char * decryptUsingKey_malloc1(T2Key * credentials, unsigned char * encryptedText, int * inLength);
 int key_init(unsigned char * key_data, int key_data_len, unsigned char * salt, T2Key * aCredentials);
 int getRIKeyUsing(JNIEnv* env, T2Key * RiKey, char * answersOrPin, char * keyType);
@@ -196,7 +207,7 @@ unsigned char * aes_decrypt_malloc(EVP_CIPHER_CTX * decryptContext, unsigned cha
 unsigned char * aes_encrypt_malloc(EVP_CIPHER_CTX * encryptContext , unsigned char * plaintext, int * len);
 void logAsHexString(unsigned char * bin, unsigned int binsz, char * message);
 unsigned char * binAsHexString_malloc(unsigned char * bin, unsigned int binsz);
-
+unsigned char * hexStringAsBin_malloc(unsigned char * hex, unsigned int *stringLength);
 
 
 
@@ -227,6 +238,11 @@ unsigned char * binAsHexString_malloc(unsigned char * bin, unsigned int binsz);
     } while (0);
   
 
+#define LOGE(...) \
+    do { \
+    ((void)__android_log_print(ANDROID_LOG_ERROR, "native-activity", __VA_ARGS__));  \
+    } while (0);
+  
 
 
 // --------------------------------------------------------------
@@ -310,24 +326,60 @@ void putData(JNIEnv* env, const char *pKey, const char *pValue, int data_size ) 
   }
 
 
+  // // Test hex conversion
+  // unsigned char testBinary[] = {0,1,2,3,4,5,6,7,8,9,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10};
+  // logAsHexString((unsigned char *)testBinary, 17, "  today  binary ");
+  // char *hex =  binAsHexString_malloc(testBinary, 17);
+  // if (hex != NULL) {
+  //   logAsHexString((unsigned char *)hex, strlen(hex), "  today  hex ");
+
+  //   int resultLength = strlen(hex);
+  //   LOGI("resultLength = %d", resultLength);
+  //   unsigned char *resultBinary = hexStringAsBin_malloc(hex, &resultLength);
+  //   if (resultBinary != NULL) {
+  //     logAsHexString((unsigned char *)resultBinary, resultLength, "  recovered binary ");
+  //     free(resultBinary);
+  //   }
+  //   free(hex);
+  // }
+
+
+
+
+
   #ifdef ENCRYPT_PREFERENCES
+
+    // Need to encrypt the key string before saving
+    int encryptedKeyLength;
+    unsigned char *encryptedKey = encryptBinaryUsingKey_malloc1(&preferencesKey, (unsigned char *) pKey, strlen(pKey), &encryptedKeyLength);
+    T2Assert((encryptedKey != NULL), "Memory allocation error");
+ 
+    // the encrypted key is BINARY - we need to make a string out of it, this is a cheap way
+    char *encryptedKeyHex =  binAsHexString_malloc(encryptedKey, encryptedKeyLength);
+    T2Assert((encryptedKeyHex != NULL), "Memory allocation error");
+
 
     // Need to encrypt the data before saving
     int outLength;
-    unsigned char *encryptedData = encryptUsingKey_malloc1(&preferencesKey, (unsigned char *) pValue, data_size, &outLength);
+    unsigned char *encryptedData = encryptBinaryUsingKey_malloc1(&preferencesKey, (unsigned char *) pValue, data_size, &outLength);
+    T2Assert((encryptedData != NULL), "Memory allocation error");
 
       // Now convert to jni variables and proceed
-    jstring key = (*env)->NewStringUTF(env, pKey);
+    jstring key = (*env)->NewStringUTF(env, encryptedKeyHex);
+//    jstring key = (*env)->NewStringUTF(env, pKey);
     jbyteArray retArray = (*env)->NewByteArray(env, outLength);
     void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)retArray, 0);
     memcpy(temp, encryptedData, outLength);
+
     free(encryptedData);
+    free(encryptedKey);
+    free(encryptedKeyHex);
 
   #else
 
     // Now convert to jni variables and proceed
     jstring key = (*env)->NewStringUTF(env, pKey);
-    jbyteArray retArray = (*env)->NewByteArray(env, data_size)
+    jbyteArray retArray = (*env)->NewByteArray(env, data_size);
     void *temp = (*env)->GetPrimitiveArrayCritical(env, (jarray)retArray, 0);
     memcpy(temp, pValue, data_size);
 
@@ -336,6 +388,7 @@ void putData(JNIEnv* env, const char *pKey, const char *pValue, int data_size ) 
 
   (*env)->ReleasePrimitiveArrayCritical(env, retArray, temp, 0);
   (*env)->CallStaticVoidMethod(env, cls, id, key, retArray);
+
 } 
 
 /*!
@@ -358,7 +411,18 @@ char * getData_malloc(JNIEnv* env, const char *pKey, int * length) {
     return;
   }
 
-  jstring key = (*env)->NewStringUTF(env, pKey);
+
+    // Need to encrypt the key string before saving
+    int encryptedKeyLength;
+    unsigned char *encryptedKey = encryptBinaryUsingKey_malloc1(&preferencesKey, (unsigned char *) pKey, strlen(pKey), &encryptedKeyLength);
+    T2Assert((encryptedKey != NULL), "Memory allocation error");
+ 
+    // the encrypted key is BINARY - we need to make a string out of it, this is a cheap way
+    char *encryptedKeyHex =  binAsHexString_malloc(encryptedKey, encryptedKeyLength);
+    T2Assert((encryptedKeyHex != NULL), "Memory allocation error");
+
+    jstring key = (*env)->NewStringUTF(env, encryptedKeyHex);
+  //jstring key = (*env)->NewStringUTF(env, pKey);
 
 
   jbyteArray ar = (*env)->CallStaticObjectMethod(env, cls, id, key);
@@ -367,13 +431,21 @@ char * getData_malloc(JNIEnv* env, const char *pKey, int * length) {
   *length = (*env)->GetArrayLength(env, ar);
 
   char *returnedValue  = malloc(sizeof(char) * *length);
+  T2Assert(returnedValue != NULL , "ERROR: memory allocation");
+
   memcpy(returnedValue, returnedElements, *length);
+
+
   (*env)->ReleaseByteArrayElements(env, ar, returnedElements, JNI_ABORT);
 
   #ifdef ENCRYPT_PREFERENCES 
+    free(encryptedKey);
+    free(encryptedKeyHex);
 
     // Need to decrypt the data before saving
     unsigned char *decryptedData = decryptUsingKey_malloc1(&preferencesKey, returnedValue, length);
+    T2Assert((decryptedData != NULL), "Memory allocation error");
+    free(returnedValue);
     return decryptedData;
 
   #else
@@ -398,28 +470,31 @@ void clearAllData(JNIEnv* env) {
   (*env)->CallStaticVoidMethod(env, cls, id);
 } 
 
+char * getPackageBasedSalt_malloc(JNIEnv* env, int * length) {
+  jclass cls = (*env)->FindClass(env, "com/t2/fcads/FipsWrapper");
+  if (cls == 0) {
+      T2Assert((cls != 0), "Can't find class FipsWrapper");
+      return;
+  }
 
+  jmethodID id = (*env)->GetStaticMethodID(env, cls, "getPackageBasedSalt", "()[B");
+  if (id == 0) {
+    T2Assert((cls != 0), "Can't find method clearAllData");
+    return;
+  }
 
-// void testDataMEthods(JNIEnv* env) {
-//       // Test putString, getString, putData, and getData
-//     const char testStringKey[] = "StringKey";
-//     const char testStringValue[] = "Test 1";
+  jbyteArray ar = (*env)->CallStaticObjectMethod(env, cls, id);
+  jboolean isCopy;
+  char *returnedElements = (*env)->GetByteArrayElements(env, ar, &isCopy);
+  *length = (*env)->GetArrayLength(env, ar);
 
-//     const char testDataKey[] = "DataKey";
-//     const char testDataValue[] = {'s', 'c', 'o', 't', 0};
-//     int testDataValueSize = sizeof(testDataValue);
+  char *returnedValue  = malloc(sizeof(char) * *length);
+  T2Assert(returnedValue != NULL , "ERROR: memory allocation");
 
-//     LOGI("sending to putString  %s", testStringValue);
-//     putString(env, testStringKey, testStringValue );
-//     const char *pReturnString = getString(env, testStringKey);
-//     LOGI("getString returned  %s", pReturnString);
-
-//     LOGI("sending to putData  %s", testDataValue);
-//     putData(env, testDataKey, testDataValue, testDataValueSize );
-//     char *pReturnBytes = getData(env, testDataKey);
-//     LOGI("getData returned  %s", pReturnBytes);
-
-// }
+  memcpy(returnedValue, returnedElements, *length);
+  (*env)->ReleaseByteArrayElements(env, ar, returnedElements, JNI_ABORT);
+  return returnedValue;
+} 
 
 // --------------------------------------------------------------
 // ------------ t2crypto methods
@@ -434,13 +509,16 @@ void Java_com_t2_fcads_FipsWrapper_setVerboseLogging(JNIEnv* env,jobject thiz, j
 void Java_com_t2_fcads_FipsWrapper_cleanup(JNIEnv* env,jobject thiz) {
   EVP_CIPHER_CTX_cleanup(&preferencesKey.encryptContext);
   EVP_CIPHER_CTX_cleanup(&preferencesKey.decryptContext);
+
+  if (preferencesSalt != NULL) {
+    free(preferencesSalt);
+  }
 }
 
 // MUST be called before anything else!
 void Java_com_t2_fcads_FipsWrapper_init(JNIEnv* env,jobject thiz) {
 
   LOGI("INFO: Initializing");
-  _salt = malloc(sizeof(unsigned char) * SALT_LENGTH);
 
   // Now set up key used for saving preference data 
   char *RIKeyBytes;
@@ -459,7 +537,7 @@ void Java_com_t2_fcads_FipsWrapper_init(JNIEnv* env,jobject thiz) {
   RIKeyBytesLen = strlen(RIKeyBytes);
 
 
-  LOGI("INFO: *** Generating RIKey ***");
+  LOGI("INFO: *** Generating preferencesKey ***");
   if ((key_init((unsigned char*) RIKeyBytes, RIKeyBytesLen, (unsigned char *) preferencesSalt, &preferencesKey))) {
       free(RIKeyBytes);
       T2Assert(0, "ERROR: initializing preferences key");
@@ -495,6 +573,56 @@ void Java_com_t2_fcads_FipsWrapper_deInitializeLogin( JNIEnv* env,jobject thiz )
 
 }
 
+int ALTcheckPin_I(JNIEnv* env, unsigned char *pin) {
+    int retVal = T2Error;
+    // T2Key acredential;
+    // T2Key *rIKey_1 = &acredential;
+    // T2Key LockingKey;
+
+    // // Generate the RIKey based on pin and Master Key
+    // int result = getRIKeyUsing(env, rIKey_1, (char*) pin, (char *) KEY_MASTER_KEY);
+    // if (result != T2Success) {
+    //   return result;
+    // }
+
+    // // Generate LockingKey = kdf(PIN)
+    // // ------------------------------
+    // LOGI("INFO: *** Generating LockingKey kdf(%s) **n", pin);
+    // {
+    //     unsigned char *key_data = (unsigned char *)pin;
+    //     int key_data_len = strlen(pin);
+        
+    //     /* gen key and iv. init the cipher ctx object */
+    //     if (key_init(key_data, key_data_len, (unsigned char *)_salt, &LockingKey)) {
+
+    //         T2Assert(FALSE, "ERROR: initializing key");
+
+    //         return T2Error;
+    //     }
+    // }
+
+
+
+    // // Generate MasterKey = encrypt(RI Key, LockingKey)
+    // // ------------------------------
+    // LOGI("INFO: *** Generating and saving to NVM MasterKey ***");
+    // char *rawMasterKey = generateMasterOrRemoteKey_malloc(env, rIKey_1, &LockingKey, KEY_MASTER_KEY);
+
+   
+
+    // // if (strcmp(decryptedPIN, pin) == 0) {
+    // //     _initializedPin = pin;
+    // //     retVal = T2Success;
+    // // }
+    // // else {
+    // //     LOGI("WARNING: PIN does not match");
+    // // }
+    // // free(encryptedPin);
+    // // free(decryptedPIN);
+
+    // retVal = T2Success;
+    return retVal;
+}
 
 
 jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz, 
@@ -553,12 +681,15 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,
     _initializedPin = (unsigned char*) newPin;
 
     int outLength;
-    unsigned char *encryptedPin = encryptUsingKey_malloc(rIKey_1, (unsigned char *) newPin, &outLength);
+    unsigned char *encryptedPin = encryptStringUsingKey_malloc(rIKey_1, (unsigned char *) newPin, &outLength);
+    T2Assert((encryptedPin != NULL), "Memory allocation error");
+
     LOGI("outLength = %d", outLength);
      logAsHexString(encryptedPin, outLength, "    Encrypted pin ");
 
     putData(env, KEY_DATABASE_PIN, encryptedPin, outLength );
     free(encryptedPin);
+
 
     EVP_CIPHER_CTX_cleanup(&rIKey_1->encryptContext);
     EVP_CIPHER_CTX_cleanup(&rIKey_1->decryptContext);
@@ -627,7 +758,9 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject th
     _initializedPin = (unsigned char*)newPin;
     
     int outLength;
-    unsigned char *encryptedPin = encryptUsingKey_malloc(rIKey_1, (unsigned char *) newPin, &outLength);
+    unsigned char *encryptedPin = encryptStringUsingKey_malloc(rIKey_1, (unsigned char *) newPin, &outLength);
+    T2Assert((encryptedPin != NULL), "Memory allocation error");
+
     LOGI("outLength = %d", outLength);
      logAsHexString(encryptedPin, outLength, "    Encrypted pin ");
 
@@ -689,32 +822,53 @@ jint Java_com_t2_fcads_FipsWrapper_initializeLogin( JNIEnv* env,jobject thiz,
 
     if (useTestVectors) {
       LOGI(" -- Using test vectors for key ---");
-      RIKeyBytes = malloc(sizeof(char) * strlen(CANNED_RI_KEY_BYTES));
+      RIKeyBytes = malloc(sizeof(char) * CANNED_RI_KEY_BYTES_LENGTH );
       T2Assert((RIKeyBytes != NULL), "Memory allocation error for RIKey!");
-      
-      T2Assert(_salt != NULL, "Memory allocation error - Memory not allocated")
+
+      RIKeyBytesLen = CANNED_RI_KEY_BYTES_LENGTH; 
+      char tmp1[] = CANNED_RI_KEY_BYTES;
+      memcpy(RIKeyBytes, tmp1, RIKeyBytesLen);
+
+      logAsHexString(RIKeyBytes, CANNED_RI_KEY_BYTES_LENGTH, "xx     Password =  ");
+
+
       unsigned char tmp[] = CANNNED_SALT;
       memcpy(_salt,tmp,SALT_LENGTH);
+      logAsHexString(_salt, SALT_LENGTH, "xx    salt =  ");
       
-      char tmp1[] = CANNED_RI_KEY_BYTES;
-      strcpy(RIKeyBytes, tmp1);
-      RIKeyBytesLen = strlen(RIKeyBytes);
+
+
     }
     else {
         LOGI(" -- Using random vectors for key ---");
-        RAND_poll();
-        // Note _salt is malloc'ed in init but key may be different length so we need to do that here
-        int result = RAND_bytes(_salt, SALT_LENGTH);
-        T2Assert(result == OpenSSLSuccess, "ERROR: - Can't calculate random salt");
+        //RAND_poll();
+        //int result = RAND_bytes(_salt, SALT_LENGTH);
+        //T2Assert(result == OpenSSLSuccess, "ERROR: - Can't calculate random salt");
         
+        // Get salt based on package name
+        int length;
+        char *tmp = getPackageBasedSalt_malloc(env, &length);
+        T2Assert(length  == SALT_LENGTH, "ERROR: - Incorrect salt length received from application");
+        memcpy(_salt,tmp,SALT_LENGTH);
+        logAsHexString(_salt, length, "xx    salt =  ");
+        free(tmp);
+
+        // Get random password for RiKey
         RIKeyBytes = malloc(sizeof(char) * MAX_KEY_LENGTH);
-        result = RAND_bytes((unsigned char*)RIKeyBytes, MAX_KEY_LENGTH);
-        T2Assert(result == OpenSSLSuccess, "ERROR: - Can't calculate RIKeyBytes");
         RIKeyBytesLen = MAX_KEY_LENGTH;
+        T2Assert(RIKeyBytes != NULL , "ERROR: memory allocation");
+        int result = RAND_bytes((unsigned char*)RIKeyBytes, RIKeyBytesLen);
+        T2Assert(result == OpenSSLSuccess, "ERROR: - Can't calculate RIKeyBytes");
+
+        logAsHexString(RIKeyBytes, RIKeyBytesLen, "xx     Password =  ");
+
+
+
     }
 
-    // Now save the salt
-    // TOTO: need to  encrypt it??
+        
+
+    // Now save salt to nvm
     putData(env, KEY_SALT, _salt, SALT_LENGTH );
 
     // Generate RIKey
@@ -723,16 +877,19 @@ jint Java_com_t2_fcads_FipsWrapper_initializeLogin( JNIEnv* env,jobject thiz,
     // the pin and answers respectively.
     // -----------------
     LOGI("INFO: *** Generating RIKey ***");
+
     /* gen key and iv. init the cipher ctx object */
     if ((key_init((unsigned char*) RIKeyBytes, RIKeyBytesLen, (unsigned char *) _salt, &RIKey))) {
-        free(RIKeyBytes);
         T2Assert(0, "ERROR: initializing key");
+        free(RIKeyBytes);
         // Clean up jni variables
         (*env)->ReleaseStringUTFChars(env, jPin, pin);
         (*env)->ReleaseStringUTFChars(env, jAnswers, answers);            
         return T2Error;
     }
+
     free(RIKeyBytes);
+
 
     // Generate LockingKey = kdf(PIN)
     // ------------------------------
@@ -784,22 +941,32 @@ jint Java_com_t2_fcads_FipsWrapper_initializeLogin( JNIEnv* env,jobject thiz,
     LOGI("INFO: *** Generating and saving to nvm BackupKey ***");
     generateMasterOrRemoteKeyAndSave(env, &RIKey, &SecondaryLockingKey, KEY_BACKUP_KEY);
     
-
-
-
     // Encrypt the PIN and save to NVM
     int outLength;
-    unsigned char *encryptedPin = encryptUsingKey_malloc(&RIKey, (unsigned char *) pin, &outLength);
-    LOGI("outLength = %d", outLength);
-     logAsHexString(encryptedPin, outLength, "    Encrypted pin ");
+    unsigned char *encryptedPin = encryptStringUsingKey_malloc(&RIKey, (unsigned char *) pin, &outLength); // OK to use this version because we know pin is zero terminated!
+    T2Assert((encryptedPin != NULL), "Memory allocation error");
 
+    LOGI("outLength = %d", outLength);
+    logAsHexString(encryptedPin, outLength, "    Encrypted pin ");
+    
     putData(env, KEY_DATABASE_PIN, encryptedPin, outLength );
     free(encryptedPin);
 
-    unsigned char *encryptedCheck = encryptUsingKey_malloc(&RIKey, (unsigned char *) KCHECK_VALUE, &outLength);
+    unsigned char *encryptedCheck = encryptBinaryUsingKey_malloc1(&RIKey, (unsigned char *) KCHECK_VALUE, strlen(KCHECK_VALUE), &outLength); // check is NOT zero terminated
+    T2Assert((encryptedCheck != NULL), "Memory allocation error");
+
     putData(env, KEY_DATABASE_CHECK, encryptedCheck, outLength );
+
+    // Use this for testing that decrypt works properly
+    // LOGI("outLength length = %d", outLength);
+    // unsigned char *decryptedCheck = decryptUsingKey_malloc1(&RIKey, encryptedCheck, &outLength);
+    // logAsHexString(decryptedCheck, outLength, " xx   decryptedCheck = ");
+    // LOGI("decryptedCheck length = %d", outLength);
+    // free(decryptedCheck);
     free(encryptedCheck);
-    
+
+
+
     EVP_CIPHER_CTX_cleanup(&RIKey.encryptContext);
     EVP_CIPHER_CTX_cleanup(&RIKey.decryptContext);
     EVP_CIPHER_CTX_cleanup(&LockingKey.encryptContext);
@@ -846,6 +1013,7 @@ jstring Java_com_t2_fcads_FipsWrapper_getDatabaseKeyUsingPin(JNIEnv* env, jobjec
           // Now create the database key by appending the key and iv
 
           unsigned char *RIKeyAndIv = malloc((RIKey->keyLength + RIKey->ivLength) + 1);
+          T2Assert(RIKeyAndIv != NULL , "ERROR: memory allocation");
           int i;
           for (i = 0; i < RIKey->keyLength; i++) {
               RIKeyAndIv[i] = RIKey->key[i];
@@ -855,15 +1023,18 @@ jstring Java_com_t2_fcads_FipsWrapper_getDatabaseKeyUsingPin(JNIEnv* env, jobjec
           }
           RIKeyAndIv[RIKey->keyLength + RIKey->ivLength] = 0; // Terminate it with a zero
         
-          unsigned char *result = binAsHexString_malloc(RIKeyAndIv, RIKey->keyLength + RIKey->ivLength);
+          unsigned char *key = binAsHexString_malloc(RIKeyAndIv, RIKey->keyLength + RIKey->ivLength);
         
-          // Note that the format of this string is specific
-          // IT tells SQLCipher to use this key directly instead of
-          // using it as a password to derive a key from 
-           sprintf((char*) formattedKey, "x'%s'", result);
+          if (key != NULL && strlen(key) < 256 - 4) {
+            // Note that the format of this string is specific
+            // IT tells SQLCipher to use this key directly instead of
+            // using it as a password to derive a key from 
+            sprintf((char*) formattedKey, "x'%s'", key);
+          }
 
-          free(result);
-          free(RIKeyAndIv);
+
+          if (key != NULL) free(key);
+          if (RIKeyAndIv != NULL) free(RIKeyAndIv);
           EVP_CIPHER_CTX_cleanup(&RIKey->encryptContext);
           EVP_CIPHER_CTX_cleanup(&RIKey->decryptContext);
 
@@ -940,6 +1111,11 @@ unsigned char * aes_encrypt_malloc(EVP_CIPHER_CTX * encryptContext , unsigned ch
     /* max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes */
     int c_len = *len + AES_BLOCK_SIZE, f_len = 0;
     unsigned char *pCiphertext = malloc(c_len);
+    if (pCiphertext == NULL) {
+      LOGE("xxFailxx Memory allocation error");
+      return NULL;
+    }
+
     
     /* allows reusing of 'encryptContext' for multiple encryption cycles */
     EVP_EncryptInit_ex(encryptContext, NULL, NULL, NULL, NULL);
@@ -959,22 +1135,27 @@ unsigned char * aes_decrypt_malloc(EVP_CIPHER_CTX * decryptContext, unsigned cha
     /* plaintext will always be equal to or lesser than length of ciphertext*/
     int p_len = *len, f_len = 0;
     unsigned char *plaintext = malloc(p_len);
-    
+    if (plaintext == NULL) {
+      LOGE("xxFailxx Memory allocation error");
+      return NULL;
+    }
+
     EVP_DecryptInit_ex(decryptContext, NULL, NULL, NULL, NULL);
     EVP_DecryptUpdate(decryptContext, plaintext, &p_len, ciphertext, *len);
     EVP_DecryptFinal_ex(decryptContext, plaintext+p_len, &f_len);
-    
+
     *len = p_len + f_len;
+
     return plaintext;
 }
 
-unsigned char * encryptUsingKey_malloc1(T2Key * credentials, unsigned char * pUencryptedText, int inLength, int * outLength) {
+unsigned char * encryptBinaryUsingKey_malloc1(T2Key * credentials, unsigned char * pUencryptedText, int inLength, int * outLength) {
     unsigned char* szEncryptedText =  aes_encrypt_malloc(&credentials->encryptContext, pUencryptedText, &inLength);
     *outLength = inLength;
     return szEncryptedText;
 }
 
-unsigned char * encryptUsingKey_malloc(T2Key * credentials, unsigned char * pUencryptedText, int * outLength) {
+unsigned char * encryptStringUsingKey_malloc(T2Key * credentials, unsigned char * pUencryptedText, int * outLength) {
     int len1 = strlen(pUencryptedText) + 1; // Make sure we encrypt the terminating 0 also!
     unsigned char* szEncryptedText =  aes_encrypt_malloc(&credentials->encryptContext, pUencryptedText, &len1);
     *outLength = len1;
@@ -986,18 +1167,13 @@ unsigned char * decryptUsingKey_malloc1(T2Key * credentials, unsigned char * enc
     return decryptedText;
 }
 
-
-unsigned char * decryptUsingKey_malloc(T2Key * credentials, unsigned char * encryptedText) {
-    int len1 = strlen(encryptedText) + 1; // Make sure we encrypt the terminating 0 also!
-    unsigned char* decryptedText =  aes_decrypt_malloc(&credentials->decryptContext, encryptedText, &len1);
-    return decryptedText;
-}
-
 void generateMasterOrRemoteKeyAndSave(JNIEnv* env, T2Key * RIKey, T2Key * LockingKey, const char * keyType) {
 
     // This input to encrypt wil be the RIKey (key and iv concatenated)
     int i; 
     unsigned char *RIKeyAndIv = malloc((RIKey->ivLength + RIKey->keyLength) + 1);
+    T2Assert(RIKeyAndIv != NULL , "ERROR: memory allocation");
+
     for (i = 0; i < RIKey->keyLength; i++) {
         RIKeyAndIv[i] = RIKey->key[i];
     }
@@ -1012,7 +1188,7 @@ void generateMasterOrRemoteKeyAndSave(JNIEnv* env, T2Key * RIKey, T2Key * Lockin
      we end up with a legal C string */
     int len = (RIKey->ivLength + RIKey->keyLength) + 1;
     unsigned char *rawMasterKey = aes_encrypt_malloc(&LockingKey->encryptContext, RIKeyAndIv, &len);
- 
+    T2Assert(rawMasterKey != NULL, "Memory Allocation error");
     free (RIKeyAndIv);
 
     logAsHexString((unsigned char *) rawMasterKey, RIKey->ivLength + RIKey->keyLength,  (char *)keyType);
@@ -1023,8 +1199,35 @@ void generateMasterOrRemoteKeyAndSave(JNIEnv* env, T2Key * RIKey, T2Key * Lockin
     LOGI("INFO:   length = %d", RIKey->ivLength + RIKey->keyLength);
 
     putData(env, keyType, rawMasterKey, RIKey->ivLength + RIKey->keyLength);
-    
+
     free(rawMasterKey);
+
+}
+
+char * generateMasterOrRemoteKey_malloc(JNIEnv* env, T2Key * RIKey, T2Key * LockingKey, const char * keyType) {
+
+    // This input to encrypt wil be the RIKey (key and iv concatenated)
+    int i; 
+    unsigned char *RIKeyAndIv = malloc((RIKey->ivLength + RIKey->keyLength) + 1);
+    T2Assert(RIKeyAndIv != NULL , "ERROR: memory allocation");
+
+    for (i = 0; i < RIKey->keyLength; i++) {
+        RIKeyAndIv[i] = RIKey->key[i];
+    }
+    for (i = 0; i < RIKey->ivLength; i++) {
+        RIKeyAndIv[i + RIKey->keyLength] = RIKey->iv[i];
+    }
+    RIKeyAndIv[RIKey->ivLength + RIKey->keyLength] = 0; // Terminate it with a zero
+    
+    /* The enc/dec functions deal with binary data and not C strings. strlen() will
+     return length of the string without counting the '\0' string marker. We always
+     pass in the marker byte to the encrypt/decrypt functions so that after decryption
+     we end up with a legal C string */
+    int len = (RIKey->ivLength + RIKey->keyLength) + 1;
+    unsigned char *rawMasterKey = aes_encrypt_malloc(&LockingKey->encryptContext, RIKeyAndIv, &len);
+    T2Assert(rawMasterKey != NULL, "Memory Allocation error");
+    free (RIKeyAndIv);
+    return rawMasterKey;
 }
 
 int key_init(unsigned char * key_data, int key_data_len, unsigned char * salt, T2Key * aCredentials) {
@@ -1113,7 +1316,7 @@ int getRIKeyUsing(JNIEnv* env, T2Key * RiKey, char * answersOrPin, char * keyTyp
     LOGI("INFO: ***  Recall %s from NVM ***\n", keyType);
     int length;
     unsigned char *masterKey = getData_malloc(env, keyType, &length);
-    logAsHexString(masterKey, length, "INFO: Stored value = ");
+    logAsHexString(masterKey, length, "INFO: masterKey Stored value = ");
     
     // Double check the master key length
     if (length != EVP_aes_256_cbc_Key_LENGTH + EVP_aes_256_cbc_Iv_LENGTH) {
@@ -1123,8 +1326,11 @@ int getRIKeyUsing(JNIEnv* env, T2Key * RiKey, char * answersOrPin, char * keyTyp
     }
 
     int len = length + 1;
-    
+ // TODO check here for alloc
+
     char *RIKeyAndIv = malloc(len);
+    T2Assert(RIKeyAndIv != NULL , "ERROR: memory allocation");
+
     RIKeyAndIv[length] = 0; // Terminate it with a zero
     
     if (strcmp(keyType, KEY_MASTER_KEY) == 0) {
@@ -1172,8 +1378,10 @@ int checkAnswers_I(JNIEnv* env, unsigned char *answers) {
   T2Key *rIKey_1 = &acredential;
   
   // Re-initialize salt from nvm
-   int length;
-  _salt = getData_malloc(env, KEY_SALT, &length);
+  int length;
+  unsigned char *tmp  = getData_malloc(env, KEY_SALT, &length);
+  memcpy(_salt,tmp,SALT_LENGTH);
+  free(tmp);
  
   LOGI("INFO: === checkAnswers ===");
   LOGI("INFO: *** Generating Secondary LockingKey  kdf(%s) ***", answers);
@@ -1191,18 +1399,26 @@ int checkAnswers_I(JNIEnv* env, unsigned char *answers) {
   // Read the CHECK from NVM and make sure we can decode it properly
   // if not fail login
   unsigned char *encryptedCheck = getData_malloc(env, KEY_DATABASE_CHECK, &length);
+  LOGI("encryptedCheck length = %d", length);
+  logAsHexString(encryptedCheck, length, "    encryptedCheck = ");
+
   if (encryptedCheck == NULL) {
     return T2Error;
   }
-  if (strcmp(encryptedCheck, "") == 0) {
+  if (length == 0) {
+    LOGI("xxFailxx - encryptedcheck length is zero!!")
     free (encryptedCheck);
     return T2Error;
   }
-  unsigned char *decryptedCheck = decryptUsingKey_malloc(rIKey_1, encryptedCheck);
+  unsigned char *decryptedCheck = decryptUsingKey_malloc1(rIKey_1, encryptedCheck, &length);
+  T2Assert((decryptedCheck != NULL), "Memory allocation error");
+
+  LOGI("q decryptedCheck length = %d", length);
+  logAsHexString(decryptedCheck, length, "    decryptedCheck = ");
 
   EVP_CIPHER_CTX_cleanup(&rIKey_1->encryptContext);
   EVP_CIPHER_CTX_cleanup(&rIKey_1->decryptContext);
-  if (strcmp(decryptedCheck, KCHECK_VALUE) == 0) {
+  if (length > 0 && memcmp(decryptedCheck, KCHECK_VALUE, length) == 0) {
       retVal = T2Success;
   }
   else {
@@ -1235,9 +1451,12 @@ int checkPin_I(JNIEnv* env, unsigned char *pin) {
     T2Key acredential;
     T2Key *rIKey_1 = &acredential;
 
-    int length;
+   
     // Re-initialize salt from nvm
-    _salt = getData_malloc(env, KEY_SALT, &length);
+    int length;
+    unsigned char *tmp  = getData_malloc(env, KEY_SALT, &length);
+    memcpy(_salt,tmp,SALT_LENGTH);
+    free(tmp);
 
     
     LOGI("INFO: === checkPin ===");
@@ -1253,13 +1472,19 @@ int checkPin_I(JNIEnv* env, unsigned char *pin) {
     // if not fail login
     unsigned char *encryptedPin = getData_malloc(env, KEY_DATABASE_PIN, &length);
     if (encryptedPin == NULL) {
+      LOGI("xxFailxx ---------------- Encrypted pin is NULL!");
       return T2Error;
     }
-    if (strcmp(encryptedPin, "") == 0) {
+
+    if (length == 0) {
+      LOGI("xxFailxx ---------------- Encrypted pin is blank!");
       free(encryptedPin);
       return T2Error;
     }
-    unsigned char *decryptedPIN = decryptUsingKey_malloc(rIKey_1, encryptedPin);
+
+
+    unsigned char *decryptedPIN = decryptUsingKey_malloc1(rIKey_1, encryptedPin, &length);
+    T2Assert((decryptedPIN != NULL), "Memory allocation error");
 
     EVP_CIPHER_CTX_cleanup(&acredential.encryptContext);
     EVP_CIPHER_CTX_cleanup(&acredential.encryptContext);
@@ -1267,7 +1492,11 @@ int checkPin_I(JNIEnv* env, unsigned char *pin) {
     EVP_CIPHER_CTX_cleanup(&rIKey_1->encryptContext);
     EVP_CIPHER_CTX_cleanup(&rIKey_1->decryptContext);
 
-    if (strcmp(decryptedPIN, pin) == 0) {
+    logAsHexString(decryptedPIN, length, "CheckPin: saved pin = ");
+    logAsHexString(pin, strlen(pin), "CheckPin: presented pin = ");
+
+    //if (strcmp(decryptedPIN, pin) == 0) {
+    if (length > 0 && memcmp(decryptedPIN, pin, length) == 0) {
         _initializedPin = pin;
         retVal = T2Success;
     }
@@ -1279,6 +1508,51 @@ int checkPin_I(JNIEnv* env, unsigned char *pin) {
     return retVal;
 }
 
+unsigned char * hexStringAsBin_malloc(unsigned char * hex, unsigned int *stringLength) {
+    
+    unsigned char *result;
+    unsigned int  i;
+    
+    if (!stringLength) {
+        LOGI("No string length!");
+        return NULL;     
+    }
+
+    int inStringLength = *stringLength;
+
+    *stringLength = *stringLength / 2;
+    LOGI("out string length = %d", *stringLength);
+
+    result = malloc(*stringLength );
+    if (result == NULL) {
+      LOGE("xxFAILxx   Unable to allocate memory");
+      return NULL;
+    }
+
+    int resultIndex = 0;
+    unsigned char tmp = 0;;
+    for (i = 0; i < inStringLength; i++) {
+        int digit = hex[i];
+        //LOGI("digit = %x", digit);
+        if (digit >= 0x30 && digit <= 0x39) {
+            tmp = digit - 0x30;
+        } else if (digit >= 0x61 && digit <= 0x66) {
+            tmp = digit - 0x61 + 10;
+        }
+
+        if ((i & 1) == 0) {
+
+            result[resultIndex] = tmp << 4;
+            //LOGI("even - tmp = %x, resultIndex = %d, result[resultIndex] = %x", tmp, resultIndex, result[resultIndex]);
+        } else {
+                 
+            result[resultIndex] |= tmp;
+            //LOGI("odd - tmp = %x, resultIndex = %d, result[resultIndex] = %x", tmp, resultIndex, result[resultIndex]);
+            resultIndex++;
+        }
+    }
+    return result;
+}
 
 unsigned char * binAsHexString_malloc(unsigned char * bin, unsigned int binsz) {
     
@@ -1287,6 +1561,11 @@ unsigned char * binAsHexString_malloc(unsigned char * bin, unsigned int binsz) {
     unsigned int  i;
     
     result = malloc(binsz * 2 + 1);
+    if (result == NULL) {
+      LOGE("xxFAILxx   Unable to allocate memory");
+      return NULL;
+    }
+
     (result)[binsz * 2] = 0;
     
     if (!binsz)
@@ -1308,6 +1587,9 @@ void logAsHexString(unsigned char * bin, unsigned int binsz, char * message) {
     unsigned int  i;
     
     result = (char *)malloc(binsz * 2 + 1);
+    if (result == NULL) {
+      return;
+    }
     (result)[binsz * 2] = 0;
     
     if (!binsz)
@@ -1318,7 +1600,7 @@ void logAsHexString(unsigned char * bin, unsigned int binsz, char * message) {
         (result)[i * 2 + 1] = hex_str[bin[i] & 0x0F];
     }
     
-    printf("   %s = : %s \n", message, result);
+  //  printf("   %s = : %s \n", message, result);
     LOGI("   %s = : %s \n", message, result);
 
 
