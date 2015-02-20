@@ -110,7 +110,7 @@ public class MainActivity extends Activity
 		}
 
 		// ---------------------------------------------------------------------------------------
-		final int NUM_ITERATIONS = 1000;
+		final int NUM_ITERATIONS = 10;
 		fipsWrapper.doPrepare(false);		// Tell it to use test vectors for now
 		fipsWrapper.doSetVerboseLogging(false);
 		// ---------------------------------------------------------------------------------------

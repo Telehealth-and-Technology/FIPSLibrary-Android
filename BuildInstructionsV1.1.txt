@@ -39,11 +39,12 @@ Retrieve source files
 
 		Option 1 (the official way):
 		----------------------------
-			OBtain the official disk and copy $sslFiles, and fipsFiles to the dev directory"
+			OBtain the official disk and copy $sslFiles, and fipsFiles to the dev directory
 
 		Option 2:
 		--------
-  			Copy the files from the local distribution (use command: make copyLocalFipsFiles)"
+  			Copy the files from the local distribution (use command: make copyLocalFipsFiles)
+  			(Alternately, the main build file will offer to copy these files for you if they are missing)
 
 
 		Results: 
@@ -69,9 +70,9 @@ Retrieve source files
 
 		Option 3:
 		---------
-		This one assumes you have a canned set of files on your local drive at:
-			~/release/sqlCipherDownload_6-12_14/android-database-sqlcipher
-		use command: make copyLocalSqlCipherFiles
+		Copy the files from the local distribution (use command cp -r localFipsSslFiles/android-database-sqlcipher ./)
+		(Alternately, the main build file will offer to copy these files for you if they are missing)
+
 
 
 	Results: 
@@ -87,7 +88,8 @@ Retrieve source files
 
 Building
 ==========
-	Automated method (all in one)
+
+	Automated method (all in one)   <---------- Use this one!
 	-----------------------------
 	execute . ./buildAll.sh
 

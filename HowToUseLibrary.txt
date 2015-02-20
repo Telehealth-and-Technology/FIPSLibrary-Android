@@ -2,6 +2,12 @@ Using the FCADS Android FIPS compliant library in an android project:
 =====================================================================
 
 1. Retrieve library from release folder:
+	In the release directory structure the lobrary files are at:
+		./object/android-database-sqlcipher
+
+	In the full build source code directory structure the library files are at:
+		./dev/android-database-sqlcipher/libs
+
 2. Copy lib files to your android project libs directory
 	android-database-sqlcipher
 		x86

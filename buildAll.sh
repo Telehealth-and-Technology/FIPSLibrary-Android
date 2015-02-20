@@ -10,7 +10,7 @@ sqlCipherFiles="1"
 # sets abortBuild = 1 if there are missing files and user chooses to abort build
 checkforFipsFiles()
 {
-  if [ ! -n "$sslFiles" ] ||  [ ! -n "$fipsFiles" ]; then 
+  if [ ! -e "$sslFiles" ] ||  [ ! -e "$fipsFiles" ]; then 
 
       echo ""
       echo "!!!! One or more of the fips download files are missing !!!!!"
@@ -93,6 +93,9 @@ sslFiles="dev/$OPENSSL_BASE.tar.gz"
 fipsFiles="dev/$FIPS_BASE.tar.gz"
 
 
+echo $sslFiles
+echo $fipsFiles
+
 # sqlcipher files
 
 sqlcipherFiles="dev/android-database-sqlcipher"
@@ -141,7 +144,20 @@ else
    echo "" 
 
 
-fi
+ fi
+
+
+
+
+
+
+
+
+
+
+
+
+
 # if [ ! -n "$fipsSslFiles" ]; then 
 
 #   echo ""
