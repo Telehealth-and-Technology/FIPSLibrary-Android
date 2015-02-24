@@ -1,7 +1,7 @@
 /*****************************************************************
 MainActivity
 
-Copyright (C) 2011-2014 The National Center for Telehealth and 
+Copyright (C) 2011-2015 The National Center for Telehealth and 
 Technology
 
 Eclipse Public License 1.0 (EPL-1.0)
@@ -69,8 +69,9 @@ public class MainActivity extends Activity
 	private int testPassCount = 0;
 	private int testFailCount = 0;
 	private int testTotalCount = 0;
-	int iterations = 0;
-	
+	private int iterations = 0;
+	private String testDescription;
+	private boolean databaseTestsPassed = false;
     
     /** Called when the activity is first created. */
     @Override
@@ -84,9 +85,7 @@ public class MainActivity extends Activity
 
         updateView("Initializing sqlcipher");
         InitializeSQLCipher();
-//        reopenDatabase();
-        
-       // MY_FIPS_mode();
+        //        reopenDatabase();
         updateView("Checking FIPS signature");     
         updateView("Calling FIPS_mode");      
         
@@ -95,23 +94,38 @@ public class MainActivity extends Activity
         FipsWrapper.setContext(this);
         
 		Log.d(TAG, "---------------------- Testsing FIPS functionality ---------------------");       
+		testDescription = startTest("Test 1.1");
         int result = fipsWrapper.doFIPSmode();	
         String t2FipsVersion = fipsWrapper.doT2FIPSVersion();
+		assertT2Test(result == 1, testDescription);
+        
+
         Log.d(TAG, "T2 FIPS Version = " + t2FipsVersion);
         updateView("T2 FIPS Version = " + t2FipsVersion);
-		Log.e(TAG, "FIPS_mode returned " + result);
+		
+		Log.d(TAG, "FIPS_mode returned " + result);
 		updateView("FIPS_mode returned " + result);  
-		assertT2Test(result == 1, "enable FIPS!");
 		if (result == 1) {
-			updateView("PASSED - successfully enabled FIPS!");
+			updateView("PASSED - enabled FIPS!");
 		}
 		else {
 			updateView("FAILED - was NOT able to enable FIPS!");
 		}
+		
+		if (databaseTestsPassed == true) {
+			updateView("PASSED - sqlCipher database test");		
+		}
+		else {
+			updateView("Failed - sqlCipher database test");
+		}
 
+		
+		final boolean useTestVectorsFoRiKey = true;
+		final boolean useRandomVectorsFoRiKey = false;
+		
 		// ---------------------------------------------------------------------------------------
-		final int NUM_ITERATIONS = 10;
-		fipsWrapper.doPrepare(false);		// Tell it to use test vectors for now
+		final int NUM_ITERATIONS = 500;
+		fipsWrapper.doPrepare(useRandomVectorsFoRiKey);	
 		fipsWrapper.doSetVerboseLogging(false);
 		// ---------------------------------------------------------------------------------------
 		
@@ -123,8 +137,16 @@ public class MainActivity extends Activity
 		String answers = "TwoThreeFour";
 		String badAnswers = "TwoThreeFour1";
 		String badPin = "TOne";
+		String blankPin = "";
+		String crazyPin = "9q34un 9vq34ute noaerpt9uertv[!%!#$^&^*^%&*))%2032498132064684;asdjjf;fsjfd;fkjkflja;fdjfeie11";
+		String stringToEncrypt = "This is a string to encrypt";
+		String blankStringToEncrypt = "";
+		String longStringToEncrypt = "This is a string to encrypt and this is extra stuff to put in the line - ;aklsdfj;akdjs ;falsdjfljafp8934cp5u4pq34np5v89u34n[pa96unvwp5unpvtun53p89v6u[3490[v5[m09805)***H*H&P*)#*Y#Y&T#&YYP#*N#&B$&T$T$&NT$&$T$&N$$N$&$$N)$N)$&$$$)&$)$&$$N$N*$N*$NPU$*NP*$N hi there";
 
-
+		// Unit test template:		
+		//		testDescription = startTest("Test x");
+		//		assertT2Test(x = x, testDescription);
+		
 
 		
 		
@@ -133,20 +155,20 @@ public class MainActivity extends Activity
 		Log.d(TAG, "---------------------- Testsing T2Crypto functionality - Iteration " + iterations + "  ---------------------");
 	
 			int ret;
-			String testDescription;
+
 			
 			try {
 				
-				testDescription = startTest("Test 1 - doIsInitialized");
+				testDescription = startTest("Test 2.1 - doIsInitialized");
 				fipsWrapper.doDeInitializeLogin();
 				ret = fipsWrapper.doIsInitialized();
 				assertT2Test(ret == T2False, testDescription);
 				
-				testDescription = startTest("Test 2 - doInitializeLogin");
+				testDescription = startTest("Test 2.2 - doInitializeLogin");
 				ret = fipsWrapper.doInitializeLogin(pin, answers);
 				assertT2Test(ret == T2Success, testDescription );
 	
-				testDescription = startTest("Test 3 - doIsInitialized");
+				testDescription = startTest("Test 2.3 - doIsInitialized");
 				ret = fipsWrapper.doIsInitialized();
 				assertT2Test(ret == T2True, testDescription );
 	
@@ -154,45 +176,91 @@ public class MainActivity extends Activity
 				String key = fipsWrapper.doGetDatabaseKeyUsingPin(pin);
 				Log.d(TAG,"key = " + key);
 	
-				testDescription = startTest("Test 4 - check answers (bad answers)");
+				testDescription = startTest("Test 2.4 - check answers (bad answers)");
 				ret = fipsWrapper.doCheckAnswers(badAnswers);
 				assertT2Test(ret == T2Error, testDescription );
 				
-				testDescription = startTest("Test 5 - check answers (good answers)");
+				testDescription = startTest("Test 2.5 - check answers (good answers)");
 				ret = fipsWrapper.doCheckAnswers(answers);
 				assertT2Test(ret == T2Success, testDescription );
 				
-				testDescription = startTest("Test 6 - check pin (bad pin)");
+				testDescription = startTest("Test 2.6 - check pin (bad pin)");
 				ret = fipsWrapper.doCheckPin(badPin);
 				assertT2Test(ret == T2Error, testDescription );		
 				
-				testDescription = startTest("Test 7 - check pin (good pin)");
+				testDescription = startTest("Test 2.7 - check pin (good pin)");
 				ret = fipsWrapper.doCheckPin(pin);
 				assertT2Test(ret == T2Success, testDescription);		
 				
-				testDescription = startTest("Test 8 - change pin using pin");
+				testDescription = startTest("Test 2.8 - change pin using pin");
 				ret = fipsWrapper.changePinUsingPin(pin, newPin1);
 				assertT2Test(ret == T2Success, testDescription );
 				
-				testDescription = startTest("Test 9 - check pin (good pin)");
+				testDescription = startTest("Test 2.9 - check pin (good pin)");
 				ret = fipsWrapper.doCheckPin(newPin1);
 				assertT2Test(ret == T2Success, testDescription );	
 				
-				testDescription = startTest("Test 10 - check pin (bad pin)");
+				testDescription = startTest("Test 2.10 - check pin (bad pin)");
 				ret = fipsWrapper.doCheckPin(pin);
 				assertT2Test(ret == T2Error, testDescription );				
 				
-				testDescription = startTest("Test 11 - changePinUsingAnswers");
+				testDescription = startTest("Test 2.11 - changePinUsingAnswers");
 				ret  = fipsWrapper.changePinUsingAnswers(newPin3, answers);
 				assertT2Test(ret == T2Success, testDescription );	
 				
-				testDescription = startTest("Test 12 - check pin (bad pin)");
+				testDescription = startTest("Test 2.12 - check pin (bad pin)");
 				ret = fipsWrapper.doCheckPin(newPin1);
 				assertT2Test(ret == T2Error, testDescription );	
 				
-				testDescription = startTest("Test 13 - check pin (good pin)");
+				testDescription = startTest("Test 2.13 - check pin (good pin)");
 				ret = fipsWrapper.doCheckPin(newPin3);
 				assertT2Test(ret == T2Success, testDescription) ;			
+				
+				// Check blank pin
+				testDescription = startTest("Test 2.14 - changePinUsingAnswers");
+				ret  = fipsWrapper.changePinUsingAnswers(blankPin, answers);
+				assertT2Test(ret == T2Success, testDescription );	
+				
+				testDescription = startTest("Test 2.15 - check pin (bad pin)");
+				ret = fipsWrapper.doCheckPin(newPin1);
+				assertT2Test(ret == T2Error, testDescription );	
+				
+				testDescription = startTest("Test 2.16 - check pin (good pin)");
+				ret = fipsWrapper.doCheckPin(blankPin);
+				assertT2Test(ret == T2Success, testDescription) ;					
+				
+				// Check crazy pin
+				testDescription = startTest("Test 2.17 - changePinUsingAnswers");
+				ret  = fipsWrapper.changePinUsingAnswers(crazyPin, answers);
+				assertT2Test(ret == T2Success, testDescription );	
+				
+				testDescription = startTest("Test 2.18 - check pin (bad pin)");
+				ret = fipsWrapper.doCheckPin(newPin1);
+				assertT2Test(ret == T2Error, testDescription );	
+				
+				testDescription = startTest("Test 2.19 - check pin (good pin)");
+				ret = fipsWrapper.doCheckPin(crazyPin);
+				assertT2Test(ret == T2Success, testDescription) ;					
+								
+				testDescription = startTest("Test 2.20 - check encrypt/decrypt");
+				String encryptedText = fipsWrapper.doEncrypt(crazyPin, stringToEncrypt);
+				String decryptedText = fipsWrapper.doDecrypt(crazyPin, encryptedText);
+				//Log.d(TAG,"java decryptedText = " + decryptedText);
+				assertT2Test(stringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;					
+								
+				testDescription = startTest("Test 2.21 - check encrypt/decrypt - blank string");
+				encryptedText = fipsWrapper.doEncrypt(crazyPin, blankStringToEncrypt);
+				decryptedText = fipsWrapper.doDecrypt(crazyPin, encryptedText);
+				//Log.d(TAG,"java decryptedText = " + decryptedText);
+				assertT2Test(blankStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;					
+
+				testDescription = startTest("Test 2.22 - check encrypt/decrypt - long string");
+				encryptedText = fipsWrapper.doEncrypt(crazyPin, longStringToEncrypt);
+				decryptedText = fipsWrapper.doDecrypt(crazyPin, encryptedText);
+				//Log.d(TAG,"java decryptedText       = " + decryptedText);
+				assertT2Test(longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;	
+								
+				
 				
 				
 			} catch (Exception e) {
@@ -200,17 +268,19 @@ public class MainActivity extends Activity
 				e.printStackTrace();
 			}
 	
-			Log.i(TAG, "-------------------------------------------------------------");
-			Log.i(TAG, "  Iteration " + iterations + " - Unit Test Summary");
-			Log.i(TAG, "-------------------------------------------------------------");
-			Log.i(TAG, "   Iteration " + iterations + " -   Iterations Performed: " + iterations);
-			Log.i(TAG, "   Iteration " + iterations + " -   Tests passed: " + testPassCount);
-			Log.i(TAG, "   Iteration " + iterations + " -   Tests failed: " + testFailCount);
+			Log.d(TAG, "-------------------------------------------------------------");
+			Log.d(TAG, "  Iteration " + iterations + " - Unit Test Summary");
+			Log.d(TAG, "-------------------------------------------------------------");
+			Log.d(TAG, "   Iteration " + iterations + " -   Iterations Performed: " + iterations);
+			Log.d(TAG, "   Iteration " + iterations + " -   Tests passed: " + testPassCount);
+			Log.d(TAG, "   Iteration " + iterations + " -   Tests failed: " + testFailCount);
 			if (testPassCount == testTotalCount) {
-				Log.i(TAG, "   ++ ALL TESTS PASSED ++ ");
+				Log.d(TAG, "   ++ ALL TESTS PASSED ++ ");
+				updateView("PASSED - All t2Crypto tests");
 			}
 			else {
-				Log.e(TAG, "   ** ONE OF MORE TESTS FAILED! ** ");
+				Log.e(TAG, "   ** ONE OF MORE t2Crypto FAILED! ** ");
+				updateView("** ONE OF MORE t2Crypto FAILED! **");
 			}
 		}
 		
@@ -226,18 +296,18 @@ public class MainActivity extends Activity
     }
  
     private String startTest(String testDescription) {
-		Log.d(TAG," ------ Starting test " + testDescription);
+		Log.d(TAG,testDescription + " ------ Starting test " );
     	return testDescription;
     }
     
     private void assertT2Test(boolean result, String testDescription) {
     	testTotalCount++;
 		if (result) {
-			Log.d(TAG,"PASSED - Iteration " + iterations + ", " + testDescription);
+			Log.d(TAG,"    PASSED - Iteration " + iterations + ", " + testDescription);
 			testPassCount++;
 		}
 		else {
-			Log.e(TAG,"xxFAILxx - Iteration " + iterations + ", " + testDescription);
+			Log.e(TAG,"    xxFAILxx - Iteration " + iterations + ", " + testDescription);
 			testFailCount++;
 		}	
     }
@@ -270,16 +340,28 @@ public class MainActivity extends Activity
 	        values.put("b", "arnie");
 	        database.insert("t1", null, values);
 	        
+	        
+	        Log.d(TAG, "---------------------- Testsing sqlCipher database functionality ---------------------");    
+	        testDescription = startTest("Test 3.1 - writing to and reading from sqlcipher database");
+
+			
 	        String resultA= "";
 	        String query = "select a from t1";
 	        Cursor cursor = database.rawQuery(query,  null);
 	        if (cursor.moveToFirst()) {
 	        	resultA = cursor.getString(0);
 
-	        	Log.i("mytag", "resultA = " + resultA );
+				assertT2Test(resultA.equalsIgnoreCase("fred"), testDescription);
+	        	Log.i(TAG, "resultA = " + resultA );
+	        	
 	        	if (resultA.equalsIgnoreCase("fred")) {
-	        		Log.i("mytag", "PASSED - successfully writing to and reading from sqlcipher database" );
+	        		databaseTestsPassed = true;
+	        	} else {
+	        		databaseTestsPassed = false;
 	        	}
+	        	
+	        	
+	        	
 	        	cursor.close();
 	        }	
 			
@@ -292,7 +374,7 @@ public class MainActivity extends Activity
 		}
     }
 
-    
+    // This can be used to test for database path issues - currently not used
     private void reopenDatabase() {
         SQLiteDatabase.loadLibs(this);
 

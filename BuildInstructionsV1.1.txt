@@ -93,6 +93,13 @@ Building
 	-----------------------------
 	execute . ./buildAll.sh
 
+
+	Note: created deliverable files are in two locations:
+		/usr/local/ssl/...                       OpenSSL files files
+		/dev/android-database-sqlcipher/libs     Compiled libraries
+
+
+
 	Manual method (makefile)
 	-----------------------------
 		Makefile commands:
@@ -233,9 +240,10 @@ Building
 	
 	Then build and run the Test app		
 
-		This tests two things:
-			1 - That that an encrypted database can be created, written to and read for successfylly
-			2 - That FIPS can be enabled prperly
+		This tests three things:
+			1 - That that an encrypted database can be created, written to and read for successfully
+			2 - That FIPS can be enabled properly
+			3 - Extensive unit tests are run which test the T2Crypto functionality (lost password implementation)
 			
 
 ********************************

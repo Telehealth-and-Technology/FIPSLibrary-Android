@@ -1,7 +1,7 @@
 /*****************************************************************
 wrapper.c
 
-Copyright (C) 2011-2014 The National Center for Telehealth and 
+Copyright (C) 2011-2015 The National Center for Telehealth and 
 Technology
 
 Eclipse Public License 1.0 (EPL-1.0)
@@ -37,6 +37,31 @@ visit http://www.opensource.org/licenses/EPL-1.0
 #include <openssl/evp.h>
 #include <android/log.h>
 
+
+// t2Crypto functionality (Lost password functionality)
+
+// (A) Random Intermediate Key (RIKey) is created and database is initialized to use this key.
+// (B) Locking  Key is derived from the PIN using KDF algorithm. Master Key is created by encrypting  
+//     the RIKey with the Locking Key. Master Key is saved to device storage.
+// (D) Secondary Locking key is derived from the Security question answers using KDF algorithm. 
+//     Backup Key is created by encrypting  the RIKey with the Locking Key. Backup Key is saved to device storage.
+// (F) Locking Key is derived from the PIN.
+// (G) RIKey is re-constructed by decrypting the Master Key using the Locking Key.
+//     If the RIKey matches the key that the database was initialized with then Login/Data access is successful.
+// (H) Secondary Locking Key is derived from the Security Question Answers.
+// (G) RIKey is re-constructed by decrypting the Backup Key using the Secondary Locking Key.
+//     If the RIKey matches the key that the database was initialized with then Login/Data access is successful.
+
+
+//    RIKey is never saved anywhere. It is generated at initialization and used. 
+//    When it is needed again it is derived from either the Master Key and PIN, or 
+//    the Backup Key and Sequrity Question Answers.
+
+//    Security Questions stored statically unencrypted 
+//    Answers are not stored direcly but via encrypted Backup Key
+
+
+
 // JNI Stuff
 //     Assumptions, The project includes:
 //         1. A JAVA class FipsWrapper.java in package com.t2.fcads
@@ -45,7 +70,7 @@ visit http://www.opensource.org/licenses/EPL-1.0
 //     To add a static java method that a native routine can call
 //         1. Add method to class com.t2.fcads 
 //             take note of it's signature, it will be used indirectly in the native code
-//             in the method call GetDtaticMethodId.
+//             in the method call GetStaticMethodId.
 //         2. In the native code call like this:
 //             jclass cls = (*env)->FindClass(env, "com/t2/fcads/FipsWrapper");
 //             jmethodID id = (*env)->GetStaticMethodID(env, cls, "clearAllData", "()V");
@@ -84,9 +109,8 @@ visit http://www.opensource.org/licenses/EPL-1.0
 //                 String result = example(new String("string to process"));
 
 
-
+// ----------------- Constants -----------------------
 #define APPNAME "wrapper"
-
 
 #define ENCRYPT_PREFERENCES
 
@@ -94,26 +118,7 @@ visit http://www.opensource.org/licenses/EPL-1.0
 #define TRUE 1
 #define FALSE 0
 #define SIGNATURE_SIZE 20
-
-extern const void*          FIPS_text_start(),  *FIPS_text_end();
-extern const unsigned char  FIPS_rodata_start[], FIPS_rodata_end[];
-extern unsigned char        FIPS_signature[SIGNATURE_SIZE];
-extern unsigned int         FIPS_incore_fingerprint (unsigned char *, unsigned int);
-
-static unsigned char        Calculated_signature[SIGNATURE_SIZE];
-
-int const OpenSSLError = 0;
-int const OpenSSLSuccess = 1;
-unsigned char *_initializedPin;
-
-unsigned char * formattedKey[256];
-
-
-#define MAX_KEY_LENGTH 32
-#define SALT_LENGTH 8
-
-#define EVP_aes_256_cbc_Key_LENGTH 32
-#define EVP_aes_256_cbc_Iv_LENGTH 16
+#define GENERIC_BUFFER_SIZE 1024
 
 // #define CANNED_RI_KEY_BYTES_LENGTH strlen(CANNED_RI_KEY_BYTES)
 // #define CANNNED_SALT {0x39, 0x30, 0x00, 0x00, 0x31, 0xD4, 0x00, 0x00}
@@ -125,20 +130,22 @@ unsigned char * formattedKey[256];
 #define CANNNED_SALT {0x93, 0x0e, 0x4b, 0x4f, 0x72, 0x62, 0xaf, 0x75} 
 #define CANNED_RI_KEY_BYTES {0x57, 0x1b, 0x2d, 0x38, 0x26, 0x52, 0xdd, 0x42, 0xfe, 0x15, 0x5f, 0xbf, 0x1f, 0x8d, 0x2c, 0x46, 0xc7, 0xc0, 0x67, 0xdb, 0x29, 0xed, 0xa3, 0x01, 0x55, 0x4e, 0x7f, 0x0c, 0x35, 0x57, 0x0e, 0x87} 
 
+#define MAX_KEY_LENGTH 32
+#define SALT_LENGTH 8
 
-
-
+#define EVP_aes_256_cbc_Key_LENGTH 32
+#define EVP_aes_256_cbc_Iv_LENGTH 16
 
 #define KEY_MASTER_KEY "MasterKey"
 #define KEY_BACKUP_KEY "BackupKey"
 #define KEY_DATABASE_PIN "KEY_DATABASE_PIN"
 #define KEY_DATABASE_CHECK "KEY_DATABASE_CHECK"
 
-const char KEY_SALT[] = "KEY_SALT";
-unsigned char mainSalt[SALT_LENGTH];
-unsigned char *_salt = &mainSalt[0];
-
 #define KCHECK_VALUE "check"
+const char KEY_SALT[] = "KEY_SALT";
+
+#define PREFERENCES_SALT {0x39, 0x30, 0x00, 0x00, 0x31, 0xD4, 0x00, 0x00}
+#define PREFERENCES_PASSWORD "preferencespassword"
 
 int const T2Error = -1;
 int const T2Success = 0;
@@ -146,13 +153,10 @@ int const T2Success = 0;
 int const T2True = 1;
 int const T2False = 0;
 
+int const OpenSSLError = 0;
+int const OpenSSLSuccess = 1;
 
-boolean useTestVectors;
-boolean verboseLogging;
-
-
-
-
+// ----------------- Data Structures -----------------------
 /*!
  * @typedef T2Key
  * @discussion Structure containing elements necessary for an encryption key
@@ -167,11 +171,25 @@ typedef struct {
     unsigned char key[MAX_KEY_LENGTH], iv[MAX_KEY_LENGTH];
 } T2Key;
 
-// Key used to encrypt user preferences preferences - putData() and putString()
-T2Key preferencesKey;
+// ----------------- External variables -----------------------
+extern const void*          FIPS_text_start(),  *FIPS_text_end();
+extern const unsigned char  FIPS_rodata_start[], FIPS_rodata_end[];
+extern unsigned char        FIPS_signature[SIGNATURE_SIZE];
+extern unsigned int         FIPS_incore_fingerprint (unsigned char *, unsigned int);
+
+// ----------------- Local variables -----------------------
+static unsigned char        Calculated_signature[SIGNATURE_SIZE];
+unsigned char *_initializedPin;
+unsigned char * formattedKey[256];
+unsigned char * genericBuffer[GENERIC_BUFFER_SIZE];
+unsigned char mainSalt[SALT_LENGTH];
+unsigned char *_salt = &mainSalt[0];
 unsigned char *preferencesSalt;
-#define PREFERENCES_SALT {0x39, 0x30, 0x00, 0x00, 0x31, 0xD4, 0x00, 0x00}
-#define PREFERENCES_PASSWORD "preferencespassword"
+boolean useTestVectors;
+boolean verboseLogging;
+
+T2Key preferencesKey; // Key used to encrypt user preferences preferences - putData() and putString()
+
 
 
 // -------------------- Function prototypes -----------------------
@@ -192,6 +210,8 @@ void Java_com_t2_fcads_FipsWrapper_deInitializeLogin( JNIEnv* env,jobject thiz )
 void Java_com_t2_fcads_FipsWrapper_cleanup(JNIEnv* env,jobject thiz);
 jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,jstring jOldPin,jstring jNewPin);
 jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject thiz, jstring jNewPin,jstring jAnswers);
+jstring Java_com_t2_fcads_FipsWrapper_encrypt(JNIEnv* env, jobject thiz, jstring pin, jstring jPlainText);
+jstring Java_com_t2_fcads_FipsWrapper_decrypt(JNIEnv* env, jobject thiz, jstring pin, jstring jCipherText); 
 
 //   ======= Internal methods =================
 int checkPin_I(JNIEnv* env, unsigned char *pin);
@@ -209,7 +229,7 @@ void logAsHexString(unsigned char * bin, unsigned int binsz, char * message);
 unsigned char * binAsHexString_malloc(unsigned char * bin, unsigned int binsz);
 unsigned char * hexStringAsBin_malloc(unsigned char * hex, unsigned int *stringLength);
 
-
+// -------------------- Macros -----------------------
 
 // Macro to throw java exction from "c" code
 #define THROW_T2_EXCEPTION(_LABEL_) \
@@ -324,7 +344,6 @@ void putData(JNIEnv* env, const char *pKey, const char *pValue, int data_size ) 
     T2Assert((cls != 0), "Can't find method putData");
     return;
   }
-
 
   // // Test hex conversion
   // unsigned char testBinary[] = {0,1,2,3,4,5,6,7,8,9,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10};
@@ -454,6 +473,9 @@ char * getData_malloc(JNIEnv* env, const char *pKey, int * length) {
 
 }
 
+/*!
+ * @brief Clears all data from NVM (preferences storage)
+ */
 void clearAllData(JNIEnv* env) {
   jclass cls = (*env)->FindClass(env, "com/t2/fcads/FipsWrapper");
   if (cls == 0) {
@@ -470,6 +492,13 @@ void clearAllData(JNIEnv* env) {
   (*env)->CallStaticVoidMethod(env, cls, id);
 } 
 
+/*!
+ * @brief Retrieves salt based on Android package signature
+ * @discussion Note: sets passed length to the length of the returned character array
+ * @param env Jni environment
+ * @param length Pointer to length variable
+ * @return Salt character array
+ */
 char * getPackageBasedSalt_malloc(JNIEnv* env, int * length) {
   jclass cls = (*env)->FindClass(env, "com/t2/fcads/FipsWrapper");
   if (cls == 0) {
@@ -500,12 +529,24 @@ char * getPackageBasedSalt_malloc(JNIEnv* env, int * length) {
 // ------------ t2crypto methods
 // --------------------------------------------------------------
 
+/*!
+ * @brief Sets verbose logging mode
+ * @discussion 
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jvl Parameter telling too enable or not
+ */
 void Java_com_t2_fcads_FipsWrapper_setVerboseLogging(JNIEnv* env,jobject thiz, jboolean jvl) {
   int vl = (boolean) jvl;
   verboseLogging = vl;
 }
 
 // MUST be the last thing called
+/*!
+ * @brief Cleans up any leftover resources and memory
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ */
 void Java_com_t2_fcads_FipsWrapper_cleanup(JNIEnv* env,jobject thiz) {
   EVP_CIPHER_CTX_cleanup(&preferencesKey.encryptContext);
   EVP_CIPHER_CTX_cleanup(&preferencesKey.decryptContext);
@@ -516,6 +557,11 @@ void Java_com_t2_fcads_FipsWrapper_cleanup(JNIEnv* env,jobject thiz) {
 }
 
 // MUST be called before anything else!
+/*!
+ * @brief Initializes FIPS wrapper
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ */
 void Java_com_t2_fcads_FipsWrapper_init(JNIEnv* env,jobject thiz) {
 
   LOGI("INFO: Initializing");
@@ -548,13 +594,14 @@ void Java_com_t2_fcads_FipsWrapper_init(JNIEnv* env,jobject thiz) {
 
 
 /*!
- * @brief Prepares keys - MUST BE CALLED BEFORE ANYTHING ELSE!
+ * @brief Tells t2Cyrpto whether to use test vectors or random bytes for key generation
  * @param env Jni environment
- * @param textVectors - Boolean telling whtehter to use test vectors or random bytes for key generation
+ * @param thiz Passed jni object
+ * @param textVectors - Boolean telling whether to use test vectors or random bytes for key generation
  * @discussion This may also be called to change use of test vectors or not
   */
 void Java_com_t2_fcads_FipsWrapper_prepare( JNIEnv* env,jobject thiz, jboolean testVectors) {
-   // int useTestVectors = (jboolean)(jTestVectors != JNI_FALSE);
+
     useTestVectors = (boolean) testVectors;
 
     if (useTestVectors) {
@@ -565,7 +612,11 @@ void Java_com_t2_fcads_FipsWrapper_prepare( JNIEnv* env,jobject thiz, jboolean t
     }
 }
 
-
+/*!
+ * @brief Clears all login data
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ */
 void Java_com_t2_fcads_FipsWrapper_deInitializeLogin( JNIEnv* env,jobject thiz ) {
 
   LOGI("Java_com_t2_fcads_FipsWrapper_deInitializeLogin");
@@ -573,58 +624,66 @@ void Java_com_t2_fcads_FipsWrapper_deInitializeLogin( JNIEnv* env,jobject thiz )
 
 }
 
-int ALTcheckPin_I(JNIEnv* env, unsigned char *pin) {
-    int retVal = T2Error;
-    // T2Key acredential;
-    // T2Key *rIKey_1 = &acredential;
-    // T2Key LockingKey;
+// int ALTcheckPin_I(JNIEnv* env, unsigned char *pin) {
+//     int retVal = T2Error;
+//     T2Key acredential;
+//     T2Key *rIKey_1 = &acredential;
+//     T2Key LockingKey;
 
-    // // Generate the RIKey based on pin and Master Key
-    // int result = getRIKeyUsing(env, rIKey_1, (char*) pin, (char *) KEY_MASTER_KEY);
-    // if (result != T2Success) {
-    //   return result;
-    // }
+//     // Generate the RIKey based on pin and Master Key
+//     int result = getRIKeyUsing(env, rIKey_1, (char*) pin, (char *) KEY_MASTER_KEY);
+//     if (result != T2Success) {
+//       return result;
+//     }
 
-    // // Generate LockingKey = kdf(PIN)
-    // // ------------------------------
-    // LOGI("INFO: *** Generating LockingKey kdf(%s) **n", pin);
-    // {
-    //     unsigned char *key_data = (unsigned char *)pin;
-    //     int key_data_len = strlen(pin);
+//     // Generate LockingKey = kdf(PIN)
+//     // ------------------------------
+//     LOGI("INFO: *** Generating LockingKey kdf(%s) **n", pin);
+//     {
+//         unsigned char *key_data = (unsigned char *)pin;
+//         int key_data_len = strlen(pin);
         
-    //     /* gen key and iv. init the cipher ctx object */
-    //     if (key_init(key_data, key_data_len, (unsigned char *)_salt, &LockingKey)) {
+//         /* gen key and iv. init the cipher ctx object */
+//         if (key_init(key_data, key_data_len, (unsigned char *)_salt, &LockingKey)) {
 
-    //         T2Assert(FALSE, "ERROR: initializing key");
+//             T2Assert(FALSE, "ERROR: initializing key");
 
-    //         return T2Error;
-    //     }
-    // }
+//             return T2Error;
+//         }
+//     }
 
 
 
-    // // Generate MasterKey = encrypt(RI Key, LockingKey)
-    // // ------------------------------
-    // LOGI("INFO: *** Generating and saving to NVM MasterKey ***");
-    // char *rawMasterKey = generateMasterOrRemoteKey_malloc(env, rIKey_1, &LockingKey, KEY_MASTER_KEY);
+//     // Generate MasterKey = encrypt(RI Key, LockingKey)
+//     // ------------------------------
+//     LOGI("INFO: *** Generating and saving to NVM MasterKey ***");
+//     char *rawMasterKey = generateMasterOrRemoteKey_malloc(env, rIKey_1, &LockingKey, KEY_MASTER_KEY);
 
    
 
-    // // if (strcmp(decryptedPIN, pin) == 0) {
-    // //     _initializedPin = pin;
-    // //     retVal = T2Success;
-    // // }
-    // // else {
-    // //     LOGI("WARNING: PIN does not match");
-    // // }
-    // // free(encryptedPin);
-    // // free(decryptedPIN);
+//     // if (strcmp(decryptedPIN, pin) == 0) {
+//     //     _initializedPin = pin;
+//     //     retVal = T2Success;
+//     // }
+//     // else {
+//     //     LOGI("WARNING: PIN does not match");
+//     // }
+//     // free(encryptedPin);
+//     // free(decryptedPIN);
 
-    // retVal = T2Success;
-    return retVal;
-}
+//     retVal = T2Success;
+//     return retVal;
+// }
 
-
+/*!
+ * @brief Changes to a new PIN using the previous PIN to authenticate
+ * @discussion Generates and saves new masterKey
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jOldPin Previous Pin
+ * @param jNewPin New Pin
+ * @return T2Success or T2Error
+ */
 jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz, 
           jstring jOldPin,
           jstring jNewPin
@@ -703,6 +762,15 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,
     return T2Success;
 }
 
+/*!
+ * @brief Changes to a new PIN using ANSWERS to authenticate
+ * @discussion Generates and saves new backup key
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jNewPin New pin
+ * @param jAnswers Answers used to initialize t2Ctrypto
+ * @return T2Success or T2Error
+ */
 jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject thiz, 
           jstring jNewPin,
           jstring jAnswers
@@ -781,16 +849,17 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject th
 }
 
 /*!
- * @brief performs initialization and login using pin and answers
- * @param env Jni environment
+ * @brief Performs initialization and login using pin and answers
  * @discussion This will set up the encrypted Master Key and Backup Key
  *             and save them  to NVM
+ * @param env Jni environment
+ * @param thiz Passed jni object
  * @param jpin User supplied pin
  * @param jAnswers User supplied answers
  * @answers Concatenated answers
  * @result Master Key is saved to NVM
  * @result Backup Key is saved to NVM
- * @return T2Success if successful
+ * @return  T2Success or T2Error
  */
 jint Java_com_t2_fcads_FipsWrapper_initializeLogin( JNIEnv* env,jobject thiz, 
           jstring jPin,
@@ -835,10 +904,7 @@ jint Java_com_t2_fcads_FipsWrapper_initializeLogin( JNIEnv* env,jobject thiz,
       unsigned char tmp[] = CANNNED_SALT;
       memcpy(_salt,tmp,SALT_LENGTH);
       logAsHexString(_salt, SALT_LENGTH, "xx    salt =  ");
-      
-
-
-    }
+     }
     else {
         LOGI(" -- Using random vectors for key ---");
         //RAND_poll();
@@ -862,11 +928,8 @@ jint Java_com_t2_fcads_FipsWrapper_initializeLogin( JNIEnv* env,jobject thiz,
 
         logAsHexString(RIKeyBytes, RIKeyBytesLen, "xx     Password =  ");
 
-
-
     }
-
-        
+   
 
     // Now save salt to nvm
     putData(env, KEY_SALT, _salt, SALT_LENGTH );
@@ -980,6 +1043,12 @@ jint Java_com_t2_fcads_FipsWrapper_initializeLogin( JNIEnv* env,jobject thiz,
     return T2Success;
 }
 
+/*!
+ * @brief Checks to see if t2Crytp has been previously initialized
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @return  T2True or T2False
+ */
 jint Java_com_t2_fcads_FipsWrapper_isInitialized( JNIEnv* env,jobject thiz ) {
     int length;
     int retValue = T2True;
@@ -991,6 +1060,119 @@ jint Java_com_t2_fcads_FipsWrapper_isInitialized( JNIEnv* env,jobject thiz ) {
     return retValue;
 }
 
+/*!
+ * @brief Encrypts string using given pin
+ * @discussion 
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jPin Password use
+ * @param jPlainText Text to encrypt
+ * @return  Encrypted string (or blank string if error)
+ */
+jstring Java_com_t2_fcads_FipsWrapper_encrypt(JNIEnv* env, jobject thiz, jstring jPin, jstring jPlainText) {
+    T2Key aRIKey;
+    T2Key *RIKey = &aRIKey;    
+    genericBuffer[0] = 0;   // Clear out generic buffer in case we fail
+    int result;
+
+    if (!Java_com_t2_fcads_FipsWrapper_isInitialized(env, thiz)) {
+      return "";
+    }
+
+    // Retrieve jni variables
+    const char *plainText= (*env)->GetStringUTFChars(env, jPlainText, 0);
+    const char *pin= (*env)->GetStringUTFChars(env, jPin, 0);
+
+    // get the RIKey based in the given pin
+    result = getRIKeyUsing(env, RIKey, (char *)pin, (char *) KEY_MASTER_KEY);
+    if (result == T2Success) {
+
+      int outLength;
+      unsigned char *encryptedString = encryptStringUsingKey_malloc(RIKey, (unsigned char *) plainText, &outLength);
+      T2Assert((encryptedString != NULL), "Memory allocation error");
+
+      // Note: we can't return the encrhypted string directoy because JAVA will try to 
+      // interpret it as a string and fail UTF-8 conversion if any of the encrypted characters
+      // have the high bit set. Therefore we must return a hex string equivalent of the binary
+      unsigned char *tmp = binAsHexString_malloc(encryptedString, outLength);
+      T2Assert((tmp != NULL), "Memory allocation error");
+     
+      if (strlen(tmp) < GENERIC_BUFFER_SIZE) {
+          sprintf((char*) genericBuffer, "%s", tmp);
+      } else {
+          LOGE("String to encrypt is too large!");
+      }
+      free(tmp);
+    }
+
+    // Clean up jni variables
+    (*env)->ReleaseStringUTFChars(env, jPin, pin);
+    (*env)->ReleaseStringUTFChars(env, jPlainText, plainText);
+    return (*env)->NewStringUTF(env, (char*)genericBuffer);
+
+}
+
+/*!
+ * @brief Decrypts a string using given pin
+ * @discussion 
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jPin Password use
+ * @param jCipherText Text to decrypt
+ * @return  Decrypted string (or blank string if error)
+ */
+jstring Java_com_t2_fcads_FipsWrapper_decrypt(JNIEnv* env, jobject thiz, jstring jPin, jstring jCipherText) {
+    T2Key aRIKey;
+    T2Key *RIKey = &aRIKey;    
+    genericBuffer[0] = 0;   // Clear out generic buffer in case we fail
+    int result;
+
+    if (!Java_com_t2_fcads_FipsWrapper_isInitialized(env, thiz)) {
+      return "";
+    }
+
+    // Retrieve jni variables
+    // Note: re are receiving a hex string equivilant of the encrypted binary
+    const char *cipherText= (*env)->GetStringUTFChars(env, jCipherText, 0);
+    const char *pin= (*env)->GetStringUTFChars(env, jPin, 0);
+
+    // get the RIKey based in the given pin
+    result = getRIKeyUsing(env, RIKey, (char *)pin, (char *) KEY_MASTER_KEY);
+    if (result == T2Success) {
+      int resultLength = strlen(cipherText);
+
+      unsigned char *resultBinary = hexStringAsBin_malloc((char*)cipherText, &resultLength);
+      if (resultBinary != NULL) {
+
+        unsigned char *decrypted = decryptUsingKey_malloc1(RIKey, (char*)resultBinary, &resultLength);
+        T2Assert((decrypted != NULL), "Memory allocation error");
+
+        if (resultLength < GENERIC_BUFFER_SIZE) {
+            memcpy(genericBuffer, decrypted, resultLength);
+        } else {
+          LOGE("String to decrypt is too large!");
+        }
+        free(resultBinary);
+
+      }
+    }
+
+    // Clean up jni variables
+    (*env)->ReleaseStringUTFChars(env, jPin, pin);
+    (*env)->ReleaseStringUTFChars(env, jCipherText, cipherText);
+    return (*env)->NewStringUTF(env, (char*)genericBuffer);
+
+}
+
+
+/*!
+ * @brief Retrieves database key (to use in SqlCipher) using PIN to authenticate
+ * @discussion 
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jPin Password to authenticate with (should match most recent password)
+ * @return  Database key
+ */
 jstring Java_com_t2_fcads_FipsWrapper_getDatabaseKeyUsingPin(JNIEnv* env, jobject thiz, jstring jPin) {
 
     T2Key aRIKey;
@@ -1051,18 +1233,39 @@ jstring Java_com_t2_fcads_FipsWrapper_getDatabaseKeyUsingPin(JNIEnv* env, jobjec
 // ------------------------------------
 // FIPS  Interface Routines
 // ------------------------------------
+
+/*!
+ * @brief Returns the current FIPS mode 
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @return  1 = in FIPS mode, 0 = Not in FIPS mode
+ */
 jint Java_com_t2_fcads_FipsWrapper_FIPSmode( JNIEnv* env, jobject thiz ) {
     return MY_FIPS_mode();
 }
 
+/*!
+ * @brief Returns the current t2Wrapper version
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @return Version string
+ */
 jstring Java_com_t2_fcads_FipsWrapper_T2FIPSVersion( JNIEnv* env, jobject thiz ) {
-    return (*env)->NewStringUTF(env, "1.3.0");
+    return (*env)->NewStringUTF(env, "1.4.0");
 }
 
-// ------------------------------------
-// Internal Routines
-// ------------------------------------
 
+
+
+
+// -----------------------------------------------------------------------------------------------------------
+// Internal Routines
+// -----------------------------------------------------------------------------------------------------------
+
+/*!
+ * @brief Returns the current FIPS mode 
+ * @return  1 = in FIPS mode, 0 = Not in FIPS mode
+ */
 int MY_FIPS_mode() {
     int i;
     int len = 0;
@@ -1106,13 +1309,19 @@ int MY_FIPS_mode() {
    return mode;
 }
 
-
+/*!
+ * @brief encrypts plain text
+ * @param encryptContext Encryption context
+ * @param plaintext bytes to encrypt
+ * @param len Length of input (also gets set as length of output)
+ * @return  encrypted bytes
+ */
 unsigned char * aes_encrypt_malloc(EVP_CIPHER_CTX * encryptContext , unsigned char * plaintext, int * len) {
     /* max ciphertext len for a n bytes of plaintext is n + AES_BLOCK_SIZE -1 bytes */
     int c_len = *len + AES_BLOCK_SIZE, f_len = 0;
     unsigned char *pCiphertext = malloc(c_len);
     if (pCiphertext == NULL) {
-      LOGE("xxFailxx Memory allocation error");
+      
       return NULL;
     }
 
@@ -1131,6 +1340,14 @@ unsigned char * aes_encrypt_malloc(EVP_CIPHER_CTX * encryptContext , unsigned ch
     return pCiphertext;
 }
 
+/*!
+ * @brief Decrypts encrypted test
+ * @discussion 
+ * @param decryptContext Decryption context
+ * @param ciphertext bytes to decrypt
+ * @param len Length of input (also gets set as length of output)
+ * @return  Decrypted bytes
+ */
 unsigned char * aes_decrypt_malloc(EVP_CIPHER_CTX * decryptContext, unsigned char * ciphertext, int *len) {
     /* plaintext will always be equal to or lesser than length of ciphertext*/
     int p_len = *len, f_len = 0;
@@ -1149,12 +1366,29 @@ unsigned char * aes_decrypt_malloc(EVP_CIPHER_CTX * decryptContext, unsigned cha
     return plaintext;
 }
 
+/*!
+ * @brief Encrypts binary array using a T2Key
+ * @discussion 
+ * @param credentials T2Key credentials to use in encrypt/decrypt functions
+ * @param  pUencryptedText bytes to encrypt
+ * @param inLength Length of input byte array
+ * @param outlength Gets set to length of output
+ * @return  Encrypted bytes
+ */
 unsigned char * encryptBinaryUsingKey_malloc1(T2Key * credentials, unsigned char * pUencryptedText, int inLength, int * outLength) {
     unsigned char* szEncryptedText =  aes_encrypt_malloc(&credentials->encryptContext, pUencryptedText, &inLength);
     *outLength = inLength;
     return szEncryptedText;
 }
 
+/*!
+ * @brief encrypts string using a T2Key
+ * @discussion ** Note that the plaintext input to this routine MUST be zero terminated
+ * @param credentials T2Key credentials to use in encrypt/decrypt functions
+ * @param pUencryptedText Zero terminated input string
+ * @param outlength Gets set to length of output
+ * @return  Encrypted text
+ */
 unsigned char * encryptStringUsingKey_malloc(T2Key * credentials, unsigned char * pUencryptedText, int * outLength) {
     int len1 = strlen(pUencryptedText) + 1; // Make sure we encrypt the terminating 0 also!
     unsigned char* szEncryptedText =  aes_encrypt_malloc(&credentials->encryptContext, pUencryptedText, &len1);
@@ -1162,11 +1396,27 @@ unsigned char * encryptStringUsingKey_malloc(T2Key * credentials, unsigned char 
     return szEncryptedText;
 }
 
+/*!
+ * @brief Decrypts binary array using a T2Key
+ * @discussion 
+ * @param credentials T2Key credentials to use in encrypt/decrypt functions
+ * @param encryptedText Bytes to decrypt
+ * @param inLength length if input (Also gets set to length of output)
+ * @return  Decrypted binary
+ */
 unsigned char * decryptUsingKey_malloc1(T2Key * credentials, unsigned char * encryptedText, int * inLength) {
     unsigned char* decryptedText =  aes_decrypt_malloc(&credentials->decryptContext, encryptedText, inLength);
     return decryptedText;
 }
 
+/*!
+ * @brief Generates master or remote key from T2Key and saves to NVM
+ * @discussion The master/remote key is a string consisting of the concatenated key and iv or a T2Key
+ * @param env Jni environment
+ * @param RIKey
+ * @param LockingKLey Locking key (for master key) or Secondary locking key key (for Backup key)
+ * @param KeyType Text indicating master or remote key
+ */
 void generateMasterOrRemoteKeyAndSave(JNIEnv* env, T2Key * RIKey, T2Key * LockingKey, const char * keyType) {
 
     // This input to encrypt wil be the RIKey (key and iv concatenated)
@@ -1204,6 +1454,14 @@ void generateMasterOrRemoteKeyAndSave(JNIEnv* env, T2Key * RIKey, T2Key * Lockin
 
 }
 
+/*!
+ * @discussion The master/remote key is a string consisting of the concatenated key and iv or a T2Key
+ * @param env Jni environment
+ * @param RIKey
+ * @param LockingKLey Locking key (for master key) or Secondary locking key key (for Backup key)
+ * @param KeyType Text indicating master or remote key
+ * @return Master or Remove key text
+ */
 char * generateMasterOrRemoteKey_malloc(JNIEnv* env, T2Key * RIKey, T2Key * LockingKey, const char * keyType) {
 
     // This input to encrypt wil be the RIKey (key and iv concatenated)
@@ -1230,6 +1488,16 @@ char * generateMasterOrRemoteKey_malloc(JNIEnv* env, T2Key * RIKey, T2Key * Lock
     return rawMasterKey;
 }
 
+/*!
+ * @brief Initializes a T2Key based on a password
+ * @discussion Performs KDF function on a password and salt to initialize a T2Key. 
+     This is used to generate a T2Key from a password (or pin)
+ * @param key_data Password to use in KDF function
+ * @param key_data_len Length of password
+ * @param salt Salt to use in KDF function
+ * @param aCredentials T2Key to initialize
+ * @return  T2Success or T2Error
+ */
 int key_init(unsigned char * key_data, int key_data_len, unsigned char * salt, T2Key * aCredentials) {
     int i, nrounds = 5;
     
@@ -1262,6 +1530,15 @@ int key_init(unsigned char * key_data, int key_data_len, unsigned char * salt, T
     return T2Success;
 }
 
+/*!
+ * @brief Initializes a T2Key based on bytes from masterkey or backup key
+ * @discussion Performs KDF function on a password and salt to initialize a T2Key. 
+     This is used to generate a T2Key from the bytes of a masterkey or a backup key
+ * @param key_data Password to use in KDF function
+ * @param key_data_len Length of password
+ * @param aCredentials T2Key to initialize
+ * @return   T2Success or T2Error
+ */
 int keyCredentialsFromBytes(unsigned char * key_data, int key_data_len, int iv_data_len, T2Key * aCredentials) {
 
     int i;
@@ -1286,7 +1563,13 @@ int keyCredentialsFromBytes(unsigned char * key_data, int key_data_len, int iv_d
     return T2Success;
 }
 
-
+/*!
+ * @brief Retrieves an RIKey (Random Intermediate Key) based on answers or pin
+ * @discussion The RIKey is NEVER saved in NVM, it must always be recovered using the pin or answers
+ * @param 
+ * @param 
+ * @return T2Success or T2Error
+ */
 int getRIKeyUsing(JNIEnv* env, T2Key * RiKey, char * answersOrPin, char * keyType) {
     int retVal = T2Success;
     T2Key LockingKey;
@@ -1356,6 +1639,14 @@ int getRIKeyUsing(JNIEnv* env, T2Key * RiKey, char * answersOrPin, char * keyTyp
     return retVal;
 }
 
+/*!
+ * @brief Checks to see if the answers give and the same answers used to initialize t2Cypto
+ * @discussion 
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jAnswers Answers to check
+ * @return  T2Success if answers are correct or T2Error if not
+ */
 jint Java_com_t2_fcads_FipsWrapper_checkAnswers( JNIEnv* env,jobject thiz, jstring jAnswers) {
   int retVal = T2Error;
 
@@ -1372,6 +1663,13 @@ jint Java_com_t2_fcads_FipsWrapper_checkAnswers( JNIEnv* env,jobject thiz, jstri
   return retVal;
 }
 
+/*!
+ * @brief Internal version of Java_com_t2_fcads_FipsWrapper_checkAnswers
+ * @discussion 
+ * @param env Jni environment
+ * @param jAnswers Answers to check
+ * @return  T2Success if answers are correct or T2Error if not  
+ */
 int checkAnswers_I(JNIEnv* env, unsigned char *answers) {
   int retVal = T2Error;
   T2Key acredential;
@@ -1432,7 +1730,14 @@ int checkAnswers_I(JNIEnv* env, unsigned char *answers) {
   return retVal;
 }
 
-
+/*!
+ * @brief Checks pin or password to see if it matches the latest pin or password set
+ * @discussion 
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jPin Pin to check
+ * @return  T2Success if pin is correct or T2Error if not
+ */
 jint Java_com_t2_fcads_FipsWrapper_checkPin( JNIEnv* env,jobject thiz, jstring jPin) {
   if (!Java_com_t2_fcads_FipsWrapper_isInitialized(env, thiz)) {
     return T2Error;
@@ -1446,6 +1751,12 @@ jint Java_com_t2_fcads_FipsWrapper_checkPin( JNIEnv* env,jobject thiz, jstring j
   return retVal;
 }
 
+/*!
+ * @brief Internal version of Java_com_t2_fcads_FipsWrapper_checkPin
+ * @discussion 
+ * @param jPin Pin to check
+ * @return  T2Success if pin is correct or T2Error if not 
+ */
 int checkPin_I(JNIEnv* env, unsigned char *pin) {
     int retVal = T2Error;
     T2Key acredential;
@@ -1508,6 +1819,12 @@ int checkPin_I(JNIEnv* env, unsigned char *pin) {
     return retVal;
 }
 
+/*!
+ * @brief Utility to covet Hex string to binary
+ * @param hex String to covert
+ * @param stringLength Length of input (Also gets set to length of output)
+ * @return  Binary representation of input string
+ */
 unsigned char * hexStringAsBin_malloc(unsigned char * hex, unsigned int *stringLength) {
     
     unsigned char *result;
@@ -1521,7 +1838,6 @@ unsigned char * hexStringAsBin_malloc(unsigned char * hex, unsigned int *stringL
     int inStringLength = *stringLength;
 
     *stringLength = *stringLength / 2;
-    LOGI("out string length = %d", *stringLength);
 
     result = malloc(*stringLength );
     if (result == NULL) {
@@ -1554,6 +1870,13 @@ unsigned char * hexStringAsBin_malloc(unsigned char * hex, unsigned int *stringL
     return result;
 }
 
+/*!
+ * @brief Utility to convert binary array to a Hex string
+ * @discussion 
+ * @param binary array to covert
+ * @param binsz Length of input (Also gets set to length of output)
+ * @return  Hex representation of bytes  
+ */
 unsigned char * binAsHexString_malloc(unsigned char * bin, unsigned int binsz) {
     
     unsigned char *result;
@@ -1580,6 +1903,12 @@ unsigned char * binAsHexString_malloc(unsigned char * bin, unsigned int binsz) {
     
 }
 
+/*!
+ * @brief Utility to log a binary array as a string
+ * @param binary array to log
+ * @param binsz Length of input
+ * @param message Message to prepend to log line
+ */
 void logAsHexString(unsigned char * bin, unsigned int binsz, char * message) {
 
     char *result;
@@ -1599,11 +1928,8 @@ void logAsHexString(unsigned char * bin, unsigned int binsz, char * message) {
         (result)[i * 2 + 0] = hex_str[bin[i] >> 4  ];
         (result)[i * 2 + 1] = hex_str[bin[i] & 0x0F];
     }
-    
-  //  printf("   %s = : %s \n", message, result);
+
     LOGI("   %s = : %s \n", message, result);
-
-
     free(result);
    
 }
