@@ -124,9 +124,9 @@ public class MainActivity extends Activity
 		final boolean useRandomVectorsFoRiKey = false;
 		
 		// ---------------------------------------------------------------------------------------
-		final int NUM_ITERATIONS = 500;
+		final int NUM_ITERATIONS = 1;
 		fipsWrapper.doPrepare(useRandomVectorsFoRiKey);	
-		fipsWrapper.doSetVerboseLogging(false);
+		fipsWrapper.doSetVerboseLogging(true);
 		// ---------------------------------------------------------------------------------------
 		
 		// Test t2Crypto
@@ -329,11 +329,22 @@ public class MainActivity extends Activity
         SQLiteDatabase database;
 		try {
 			
-			// Now create the database file and the database
+
+			
+			// Now create the database file and the database	
+			String dbDirPath = getDatabasePath(DATABASE_NAME).getParent();
+			File dbDirFile = this.getApplicationContext().getDatabasePath(dbDirPath);
+			boolean result = dbDirFile.mkdirs();	// Note: we MUST create the directoryt path for this version of SQLCiphert
 			File databaseFile = this.getApplicationContext().getDatabasePath(DATABASE_NAME);
-			database = SQLiteDatabase.openOrCreateDatabase(databaseFile, PASSWORD, null);
+			database = SQLiteDatabase.openOrCreateDatabase(databaseFile, PASSWORD, null);			
+			
 			
 
+
+			
+	        // Create a database table
+	        database.execSQL("create table if not exists t1(a, b)");
+	        
 	        // Do a quick check to make sure we can write to and read from database
 	        ContentValues values = new ContentValues();
 	        values.put("a", "fred");
@@ -371,6 +382,8 @@ public class MainActivity extends Activity
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Log.e(TAG,"    xxFAILxx - Iteration " + iterations + ", " + testDescription);
+			testFailCount++;
 		}
     }
 

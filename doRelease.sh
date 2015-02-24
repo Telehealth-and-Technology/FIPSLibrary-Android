@@ -13,8 +13,7 @@ sslDst="release/$ReleaseName/object/openssl"
 sqlcipherBinSev="dev/android-database-sqlcipher/libs"
 sqlcipherBinDst=release/$ReleaseName/object/android-database-sqlcipher
 
-doc1Src="*.txt"
-docSrc="doc"
+
 docDst="release/$ReleaseName/"
 
 mkdir -p release
@@ -31,8 +30,9 @@ cp -f $sslSrc $sslDst
 cp -r $sqlcipherBinSev* $sqlcipherBinDst
 
 #copy doc files
-cp -r $docSrc* $docDst
-cp -r $doc1Src* $docDst/doc
+cp -r doc* $docDst
+cp -r *.txt* $docDst/doc
+cp -r *.log* $docDst/doc
 
 #copy source files
 cp -r dev/SupplementalFiles* $docDst/source
