@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NoteCipher</string>
+    <string name="no_notes">No Notes Yet</string>
+    <string name="menu_insert">Add Note</string>
+    <string name="menu_delete">Delete Item</string>
+    <string name="menu_rekey">Change PIN</string>
+    <string name="menu_share">Share...</string>
+    <string name="menu_view">Export Image</string>
+    <string name="menu_save">Save Note</string>
+    <string name="menu_lock">Lock Notes</string>
+    <string name="title">Summary</string>
+    <string name="body">Note Text</string>
+    <string name="confirm">Save Note</string>
+    <string name="edit_note">Edit Note</string>
+    <string name="confirm_delete">Do you want to delete the original, unencrypted file?</string>
+    <string name="on_import">Imported new file</string>
+    <string name="err_size">Imported file size is too large</string>
+    <string name="err_export">Error exporting image</string>
+    <string name="on_start">Tap anywhere to create a new note</string>
+    <string name="err_pin">Unable to unlock your notes. Are you sure you entered the right PIN?</string>
+    <string name="button_ok">Okay</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="rekey_message">Enter a *new* PIN (this will re-encrypt all existing notes to this PIN)</string>
+    <string name="do_rekey">Updating your notes with the new PIN (patience...)</string>
+    <string name="enter_pin">Enter your PIN:</string>
+    <string name="new_pin">Welcome! Enter a numerical PIN to secure your notes</string>
+    
+</resources>
