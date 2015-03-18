@@ -108,6 +108,11 @@ if [ "$abortBuild" == 1 ]; then
   echo "******** Aborting build ************"
 
 else
+
+     echo "----------------------------------------------------------------------------------------------------------"
+     echo "Compiling fipswrapper project"
+     echo "----------------------------------------------------------------------------------------------------------"
+    make buildfipswrapper
     echo ""
     echo "--- All files present and accounted for, proceeding with build ---"
     echo ""

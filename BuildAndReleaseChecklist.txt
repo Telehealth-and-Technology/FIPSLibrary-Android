@@ -1,0 +1,26 @@
+Android FCADS release checklist
+
+
+Pre-Release
+===========
+	Perform any code and or documentation changes changes.
+
+    Update version number in VErsionNumber.txt, and  dev/SupplementalFiles/wrapper.c      
+
+
+    Do complete build/clean all
+
+    Confirm release integrity by running Native Android test app (FcadsTestAndroidApp)
+        Log and device display should indicate all unit tests passed
+
+    Clean and update git:
+        In Eclipse do clean of FcadsTestAndroidApp
+        Remove any Release directories
+        Clean all source directories
+            sudo make clean
+
+
+
+
+Release
+========

@@ -20,6 +20,7 @@ mkdir -p release
 mkdir -p release/$ReleaseName
 mkdir -p release/$ReleaseName/source
 mkdir -p release/$ReleaseName/object
+mkdir -p release/$ReleaseName/object/fipsWrapper
 mkdir -p release/$ReleaseName/object/usr/local/ssl
 mkdir -p release/$ReleaseName/doc
 mkdir -p $sslDst
@@ -28,6 +29,8 @@ mkdir -p $sslDst
 cp -r $fipsDir* release/$ReleaseName/object/usr/local/ssl
 cp -f $sslSrc $sslDst 
 cp -r $sqlcipherBinSev* $sqlcipherBinDst
+cp -r "dev/FipsWrapper/bin/fipswrapper.jar" "release/$ReleaseName/object/fipsWrapper"
+
 
 #copy doc files
 cp -r doc* $docDst

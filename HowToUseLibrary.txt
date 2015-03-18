@@ -25,17 +25,7 @@ Using the FCADS Android FIPS compliant library in an android project:
 		sqlcipher.jar
 		guava-r09.jar
 		commons-codec.jar
-
-3. Create a JAVA wrapper for the uni functions:
-	See example wrapper FipsWrapper.java in test/FcadsTestAndroidApp folder
-	It MUST be in package: com.t2.fcafds
-	IT MUST be named FipsWrapper.java
-		Declare jni function: public native int  FIPSmode();
-		Create a wrapper function that calls FIPSmode()
-
-		Declare jni function: public native String  T2FIPSVersion();
-		Create a wrapper function that calls T2FIPSVersion()
-
+		fipswrapper.jar     <----- new as of V1.4.1 -We use this instead of copying fipswrapper.java into source tree!
 
 4. In your application, call SQLiteDatabase.LoadLibs(context);
 	This will load the JNI libraries

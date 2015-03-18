@@ -47,7 +47,22 @@ buildAll:
 
 cleanAll: clean cleanCannedFiles
 
+cleanfipswrapper:
+	echo "cleaning fipswrapper files" && \
+	cd dev/fipswrapper && \
+	./clean.sh
+	cd ../..
+
+
+buildfipswrapper:
+	echo "Building fipswrapper files" && \
+	cd dev/fipswrapper && \
+	ant debug	
+	cp dev/fipswrapper/bin/fipswrapper.jar test/FcadsTestAndroidApp/libs
+
+
 clean:
+	make cleanfipswrapper
 	echo "Cleaning files" && \
 	cd ${DEV_DIR} && \
 	rm -rfd openssl-fips-ecp-2.0.2 && \
@@ -57,7 +72,12 @@ clean:
 	rm -rfd android-database-sqlcipher/libs/armeabi/libsqlcipher_android.so && \
 	rm -rfd android-database-sqlcipher/libs/armeabi-v7a/libsqlcipher_android.so && \
 	rm -rfd android-database-sqlcipher/libs/x86/libsqlcipher_android.so && \
-	rm -rfd ${TEST_DIR}/FcadsTestAndroidApp/libs
+	rm -rfd ${TEST_DIR}/FcadsTestAndroidApp/libs/*.*
+	rm -rfd ${TEST_DIR}/FcadsTestAndroidApp/libs/armeabi/*.*
+	rm -rfd ${TEST_DIR}/FcadsTestAndroidApp/libs/armeabi-v7a/*.*
+	rm -rfd ${TEST_DIR}/FcadsTestAndroidApp/libs/x86/*.*
+
+
 
 cleanCannedFiles:
 	rm -rfd ${SQLCIPHER_DIR}
