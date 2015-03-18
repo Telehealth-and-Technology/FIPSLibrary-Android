@@ -1060,16 +1060,139 @@ jint Java_com_t2_fcads_FipsWrapper_isInitialized( JNIEnv* env,jobject thiz ) {
     return retValue;
 }
 
+// This one uses pIN as wraw (doesn't use previously initialized RIKey
+
 /*!
  * @brief Encrypts string using given pin
- * @discussion 
+ * @discussion Note that this method does NOT depend on T2Crypto being previously initialized
+ *   meaning is doesn't use masterKey
  * @param env Jni environment
  * @param thiz Passed jni object
  * @param jPin Password use
  * @param jPlainText Text to encrypt
  * @return  Encrypted string (or blank string if error)
  */
-jstring Java_com_t2_fcads_FipsWrapper_encrypt(JNIEnv* env, jobject thiz, jstring jPin, jstring jPlainText) {
+jstring Java_com_t2_fcads_FipsWrapper_encryptRaw(JNIEnv* env, jobject thiz, jstring jPin, jstring jPlainText) {
+    T2Key RawKey;
+    genericBuffer[0] = 0;   // Clear out generic buffer in case we fail
+    int result;
+
+       // Retrieve jni variables
+    const char *plainText= (*env)->GetStringUTFChars(env, jPlainText, 0);
+    const char *pin= (*env)->GetStringUTFChars(env, jPin, 0);
+ 
+
+    // Generate RawKey = kdf(PIN)
+    // ------------------------------
+    unsigned char *key_data = (unsigned char *)pin;
+    int key_data_len = strlen(pin);
+    
+    /* gen key and iv. init the cipher ctx object */
+    if (key_init(key_data, key_data_len, (unsigned char *)_salt, &RawKey)) {
+        T2Assert(FALSE, "ERROR: initializing key");
+        // Clean up jni variables
+        (*env)->ReleaseStringUTFChars(env, jPin, pin);
+        (*env)->ReleaseStringUTFChars(env, jPlainText, plainText);            
+        return NULL;
+    } else {
+
+      int outLength;
+      unsigned char *encryptedString = encryptStringUsingKey_malloc(&RawKey, (unsigned char *) plainText, &outLength);
+      T2Assert((encryptedString != NULL), "Memory allocation error");
+
+      // Note: we can't return the encrhypted string directoy because JAVA will try to 
+      // interpret it as a string and fail UTF-8 conversion if any of the encrypted characters
+      // have the high bit set. Therefore we must return a hex string equivalent of the binary
+      unsigned char *tmp = binAsHexString_malloc(encryptedString, outLength);
+      T2Assert((tmp != NULL), "Memory allocation error");
+     
+      if (strlen(tmp) < GENERIC_BUFFER_SIZE) {
+          sprintf((char*) genericBuffer, "%s", tmp);
+      } else {
+          LOGE("String to encrypt is too large!");
+      }
+      free(tmp);
+
+      // Clean up jni variables
+      (*env)->ReleaseStringUTFChars(env, jPin, pin);
+      (*env)->ReleaseStringUTFChars(env, jPlainText, plainText);
+      return (*env)->NewStringUTF(env, (char*)genericBuffer);
+
+    }
+}
+
+/*!
+ * @brief Decrypts a string using given pin
+ * @discussion Note that this method does NOT depend on T2Crypto being previously initialized
+ *   meaning  masterKey MUST have been [previously initialized!] 
+ * @param thiz Passed jni object
+ * @param jPin Password use
+ * @param jCipherText Text to decrypt
+ * @return  Decrypted string (or blank string if error)
+ */
+jstring Java_com_t2_fcads_FipsWrapper_decryptRaw(JNIEnv* env, jobject thiz, jstring jPin, jstring jCipherText) {
+    T2Key RawKey;   
+    genericBuffer[0] = 0;   // Clear out generic buffer in case we fail
+    int result;
+
+
+    // Retrieve jni variables
+    // Note: re are receiving a hex string equivilant of the encrypted binary
+    const char *cipherText= (*env)->GetStringUTFChars(env, jCipherText, 0);
+    const char *pin= (*env)->GetStringUTFChars(env, jPin, 0);
+
+    unsigned char *key_data = (unsigned char *)pin;
+    int key_data_len = strlen(pin);
+    
+    // Generate RawKey = kdf(PIN)
+    // ------------------------------
+
+    /* gen key and iv. init the cipher ctx object */
+    if (key_init(key_data, key_data_len, (unsigned char *)_salt, &RawKey)) {
+        T2Assert(FALSE, "ERROR: initializing key");
+        // Clean up jni variables
+        (*env)->ReleaseStringUTFChars(env, jPin, pin);
+        (*env)->ReleaseStringUTFChars(env, jCipherText, cipherText);          
+        return NULL;
+    } else {
+
+      int resultLength = strlen(cipherText);
+
+
+      unsigned char *resultBinary = hexStringAsBin_malloc((char*)cipherText, &resultLength);
+      if (resultBinary != NULL) {
+
+        unsigned char *decrypted = decryptUsingKey_malloc1(&RawKey, (char*)resultBinary, &resultLength);
+        
+        T2Assert((decrypted != NULL), "Memory allocation error");
+
+        if (resultLength < GENERIC_BUFFER_SIZE) {
+            memcpy(genericBuffer, decrypted, resultLength);
+        } else {
+          LOGE("String to decrypt is too large!");
+        }
+        free(resultBinary);
+
+        // Clean up jni variables
+        (*env)->ReleaseStringUTFChars(env, jPin, pin);
+        (*env)->ReleaseStringUTFChars(env, jCipherText, cipherText);
+        return (*env)->NewStringUTF(env, (char*)genericBuffer);
+
+      }
+    }
+}
+
+/*!
+ * @brief Encrypts string using given pin
+ * @discussion Note that this method DOES depend on T2Crypto being previously initialized
+ *   meaning  masterKey MUST have been [previously initialized!]
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jPin Password use
+ * @param jPlainText Text to encrypt
+ * @return  Encrypted string (or blank string if error)
+ */
+jstring Java_com_t2_fcads_FipsWrapper_encryptUsingT2Crypto(JNIEnv* env, jobject thiz, jstring jPin, jstring jPlainText) {
     T2Key aRIKey;
     T2Key *RIKey = &aRIKey;    
     genericBuffer[0] = 0;   // Clear out generic buffer in case we fail
@@ -1112,16 +1235,19 @@ jstring Java_com_t2_fcads_FipsWrapper_encrypt(JNIEnv* env, jobject thiz, jstring
 
 }
 
+
+
+
 /*!
  * @brief Decrypts a string using given pin
- * @discussion 
- * @param env Jni environment
+ * @discussion Note that this method does NOT depend on T2Crypto being previously initialized
+ *   meaning is doesn't use masterKey
  * @param thiz Passed jni object
  * @param jPin Password use
  * @param jCipherText Text to decrypt
  * @return  Decrypted string (or blank string if error)
  */
-jstring Java_com_t2_fcads_FipsWrapper_decrypt(JNIEnv* env, jobject thiz, jstring jPin, jstring jCipherText) {
+jstring Java_com_t2_fcads_FipsWrapper_decryptUsingT2Crypto(JNIEnv* env, jobject thiz, jstring jPin, jstring jCipherText) {
     T2Key aRIKey;
     T2Key *RIKey = &aRIKey;    
     genericBuffer[0] = 0;   // Clear out generic buffer in case we fail
