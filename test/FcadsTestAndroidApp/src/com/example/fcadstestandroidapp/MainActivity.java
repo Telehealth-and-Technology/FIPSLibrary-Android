@@ -89,7 +89,7 @@ public class MainActivity extends Activity
         updateView("Checking FIPS signature");     
         updateView("Calling FIPS_mode");      
         
-        FipsWrapper fipsWrapper = FipsWrapper.getInstance();
+        FipsWrapper fipsWrapper = FipsWrapper.getInstance(this);
         
         FipsWrapper.setContext(this);
         
