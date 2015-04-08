@@ -33,6 +33,7 @@ visit http://www.opensource.org/licenses/EPL-1.0
 package com.t2.fcads;
 
 import java.nio.ByteBuffer;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -150,8 +151,9 @@ public class FipsWrapper {
 	/**
 	 * @return Instance of FipsWrapper
 	 */
-	public static FipsWrapper getInstance() {
+	public static FipsWrapper getInstance(Context cxt) {
 		if (instance == null) {
+			context = cxt;
 			instance = new FipsWrapper();
 		}
 		return instance;
@@ -405,10 +407,23 @@ public class FipsWrapper {
 	 * @param values Value to save to NVM
 	 */
 	static void putData(String key, byte[] values) {
-		String str = Base64.encodeToString(values, Base64.NO_WRAP);
-		SharedPreferences sp = context.getSharedPreferences("FIPS_VARS",
-				Context.MODE_PRIVATE);
-		sp.edit().putString(key, str).commit();
+		
+		
+		String str;
+		SharedPreferences sp;
+		try {
+			str = Base64.encodeToString(values, Base64.NO_WRAP);
+			sp = context.getSharedPreferences("FIPS_VARS",
+					Context.MODE_PRIVATE);
+			
+			sp.edit().putString(key, str).commit();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+
 	}
 
 	/**
@@ -445,30 +460,30 @@ public class FipsWrapper {
 		byte[] defaultSalt = new byte[] { (byte) 0x39, (byte) 0x30,
 				(byte) 0x00, (byte) 0x00, (byte) 0x31, (byte) 0xD4,
 				(byte) 0x00, (byte) 0x00 };
-
-		long hash = 0;
-		try {
-			// Calculate a 8 byte hash of the signature
-			Signature[] sigs = context.getPackageManager().getPackageInfo(
-					context.getPackageName(), PackageManager.GET_SIGNATURES).signatures;
-			char[] t = sigs[0].toChars();
-			int length = t.length;
-
-			hash = 5381;
-
-			for (int i = 0; i < length; i++) {
-				hash = ((hash << 5) + hash) + t[i];
-			}
-			Log.i("FipsWrapper", String.format("salt = %x", hash));
-
-			ByteBuffer buffer = ByteBuffer.allocate(8);
-			buffer.putLong(hash);
-			return buffer.array();
-
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-			return defaultSalt;
-		}
+		return defaultSalt;
+//		long hash = 0;
+//		try {
+//			// Calculate a 8 byte hash of the signature
+//			Signature[] sigs = context.getPackageManager().getPackageInfo(
+//					context.getPackageName(), PackageManager.GET_SIGNATURES).signatures;
+//			char[] t = sigs[0].toChars();
+//			int length = t.length;
+//
+//			hash = 5381;
+//
+//			for (int i = 0; i < length; i++) {
+//				hash = ((hash << 5) + hash) + t[i];
+//			}
+//			Log.i("FipsWrapper", String.format("salt = %x", hash));
+//
+//			ByteBuffer buffer = ByteBuffer.allocate(8);
+//			buffer.putLong(hash);
+//			return buffer.array();
+//
+//		} catch (NameNotFoundException e) {
+//			e.printStackTrace();
+//			return defaultSalt;
+//		}
 	}
 
 }

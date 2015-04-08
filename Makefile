@@ -53,6 +53,8 @@ cleanfipswrapper:
 	./clean.sh
 	cd ../..
 
+clean
+
 
 buildfipswrapper:
 	echo "Building fipswrapper files" && \

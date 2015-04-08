@@ -7,9 +7,6 @@ Pre-Release
 
     Update version number in VErsionNumber.txt, and  dev/SupplementalFiles/wrapper.c      
 
-
-    Do complete build/clean all
-
     Confirm release integrity by running Native Android test app (FcadsTestAndroidApp)
         Log and device display should indicate all unit tests passed
 
@@ -19,8 +16,20 @@ Pre-Release
         Clean all source directories
             sudo make clean
 
+        commit to git
+
+    Build from scratch to endure integrity
+        ./BuildAll.sh
+
+        (Save log file of build in SuccessfulBuildAllLog.txt
 
 
+
+    Confirm release integrity by running Native Android test app (FcadsTestAndroidApp)
+        Log and device display should indicate all unit tests passed
+        Save log files as:
+        SuccessfulUnitTest1PassVerbose.log
+        SuccessfulUnitTest500Pass.log
 
 Release
 ========
