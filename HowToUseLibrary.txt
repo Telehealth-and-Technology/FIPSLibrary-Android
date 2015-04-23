@@ -1,15 +1,17 @@
 Using the FCADS Android FIPS compliant library in an android project:
 =====================================================================
 
-1. Retrieve library from release folder:
+1. Retrieve librarys and assets from release folder:
 	In the release directory structure the library files are at:
-		./object/android-database-sqlcipher
+		./object/android/libs
+		./object/android/assets
 
 	In the full build source code directory structure the library files are at:
 		./dev/android-database-sqlcipher/libs
+		./dev/android-database-sqlcipher/assets
+
 
 2. Copy lib files to your android project libs directory
-	android-database-sqlcipher
 		x86
 			libstlport_shared.so
 			libsqlcipher_android.so
@@ -26,6 +28,9 @@ Using the FCADS Android FIPS compliant library in an android project:
 		guava-r09.jar
 		commons-codec.jar
 		fipswrapper.jar     <----- new as of V1.4.1 -We use this instead of copying fipswrapper.java into source tree!
+
+2a. Copy assets files into your android project assets directory (Don't unzip it!)
+		icudt46l.zip
 
 4. In your application, call SQLiteDatabase.LoadLibs(context);
 	This will load the JNI libraries

@@ -1,437 +1,477 @@
-
-11-23 07:25:25.343: D/MainActivity(3906): ---------------------- Testsing sqlCipher database functionality ---------------------
-11-23 07:25:25.343: D/MainActivity(3906): Test 3.1 - writing to and reading from sqlcipher database ------ Starting test 
-11-23 07:25:25.353: D/MainActivity(3906):     PASSED - Iteration 0, Test 3.1 - writing to and reading from sqlcipher database
-11-23 07:25:25.353: I/MainActivity(3906): resultA = fred
-11-23 07:25:25.363: D/MainActivity(3906): ---------------------- Testsing FIPS functionality ---------------------
-11-23 07:25:25.363: D/MainActivity(3906): Test 1.1 ------ Starting test 
-11-23 07:25:25.463: D/MainActivity(3906):     PASSED - Iteration 0, Test 1.1
-11-23 07:25:25.463: D/MainActivity(3906): T2 FIPS Version = 1.4.0
-11-23 07:25:25.463: D/MainActivity(3906): FIPS_mode returned 1
-11-23 07:25:25.503: D/MainActivity(3906): ---------------------- Testsing T2Crypto functionality - Iteration 1  ---------------------
-11-23 07:25:25.503: D/MainActivity(3906): Test 2.1 - doIsInitialized ------ Starting test 
-11-23 07:25:25.503: I/native-activity(3906): Java_com_t2_fcads_FipsWrapper_deInitializeLogin
-11-23 07:25:25.553: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.1 - doIsInitialized
-11-23 07:25:25.553: D/MainActivity(3906): Test 2.2 - doInitializeLogin ------ Starting test 
-11-23 07:25:25.553: I/native-activity(3906):  -- Using random vectors for key ---
-11-23 07:25:25.553: I/FipsWrapper(3906): salt = 930e4b4f7262af75
-11-23 07:25:25.553: I/native-activity(3906):    xx    salt =   = : 930e4b4f7262af75 
-11-23 07:25:25.553: I/native-activity(3906):    xx     Password =   = : 190933ad71d48a6d01ef2d6744df35552fd1bdbcca4aa8509ab189a432ebcc4d 
-11-23 07:25:25.583: I/native-activity(3906): INFO: *** Generating RIKey ***
-11-23 07:25:25.583: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.583: I/native-activity(3906):         iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.583: I/native-activity(3906): INFO: *** Generating LockingKey kdf(One) **n
-11-23 07:25:25.583: I/native-activity(3906):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
-11-23 07:25:25.583: I/native-activity(3906):         iv = : 3469df45b8a74913db89cb352a54367d 
-11-23 07:25:25.583: I/native-activity(3906): INFO: *** Generating SecondaryLockingKey ***
-11-23 07:25:25.583: I/native-activity(3906):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
-11-23 07:25:25.583: I/native-activity(3906):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
-11-23 07:25:25.583: I/native-activity(3906): INFO: *** Generating and saving to NVM MasterKey ***
-11-23 07:25:25.583: I/native-activity(3906):    MasterKey = : 3c46f6effd2965d6baf8f6c8a8c6f268caa533e5de1632c472c0b69a23fad6af565adf9302aab4bef88204172c7b785e 
-11-23 07:25:25.583: I/native-activity(3906): INFO:   *** Save MasterKey Key to User Preferences ***
-11-23 07:25:25.583: I/native-activity(3906): INFO:   length = 48
-11-23 07:25:25.603: I/native-activity(3906): INFO: *** Generating and saving to nvm BackupKey ***
-11-23 07:25:25.603: I/native-activity(3906):    BackupKey = : 408bfccfc5c54f76de7ddfba1135a80c20dccd12ee015d641e40754b6dcd568d5f7b45d9e9e138a69a363e28a97287ea 
-11-23 07:25:25.603: I/native-activity(3906): INFO:   *** Save BackupKey Key to User Preferences ***
-11-23 07:25:25.603: I/native-activity(3906): INFO:   length = 48
-11-23 07:25:25.623: I/native-activity(3906): outLength = 16
-11-23 07:25:25.623: I/native-activity(3906):        Encrypted pin  = : b634203ece42b600e3b91b4ea8d81492 
-11-23 07:25:25.663: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.2 - doInitializeLogin
-11-23 07:25:25.663: D/MainActivity(3906): Test 2.3 - doIsInitialized ------ Starting test 
-11-23 07:25:25.663: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.3 - doIsInitialized
-11-23 07:25:25.663: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.663: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(One) ***
-11-23 07:25:25.663: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.663: I/native-activity(3906):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
-11-23 07:25:25.663: I/native-activity(3906):         iv = : 3469df45b8a74913db89cb352a54367d 
-11-23 07:25:25.663: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.663: I/native-activity(3906):    INFO: masterKey Stored value =  = : 3c46f6effd2965d6baf8f6c8a8c6f268caa533e5de1632c472c0b69a23fad6af565adf9302aab4bef88204172c7b785e 
-11-23 07:25:25.663: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.663: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.663: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.663: I/native-activity(3906):    CheckPin: saved pin =  = : 4f6e6500 
-11-23 07:25:25.663: I/native-activity(3906):    CheckPin: presented pin =  = : 4f6e65 
-11-23 07:25:25.663: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.663: I/native-activity(3906):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
-11-23 07:25:25.663: I/native-activity(3906):         iv = : 3469df45b8a74913db89cb352a54367d 
-11-23 07:25:25.663: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.663: I/native-activity(3906):    INFO: masterKey Stored value =  = : 3c46f6effd2965d6baf8f6c8a8c6f268caa533e5de1632c472c0b69a23fad6af565adf9302aab4bef88204172c7b785e 
-11-23 07:25:25.663: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.663: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.663: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.663: D/MainActivity(3906): key = x'ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077f42e1cca30dee45f1afa07c4f5732a6a'
-11-23 07:25:25.663: D/MainActivity(3906): Test 2.4 - check answers (bad answers) ------ Starting test 
-11-23 07:25:25.663: I/native-activity(3906): INFO: === checkAnswers ===
-11-23 07:25:25.663: I/native-activity(3906): INFO: *** Generating Secondary LockingKey  kdf(TwoThreeFour1) ***
-11-23 07:25:25.663: I/native-activity(3906): INFO: ***  Generate Secondarylocking key ***
-11-23 07:25:25.663: I/native-activity(3906):        key = : 5b6ecdc8cfee8efa9a97fd8bc1390e447241f5cf79a112620e64eb1340ef5bb4 
-11-23 07:25:25.663: I/native-activity(3906):         iv = : 7566de079c6b0d76661fdc2ba91c26eb 
-11-23 07:25:25.663: I/native-activity(3906): INFO: ***  Recall BackupKey from NVM ***
-11-23 07:25:25.663: I/native-activity(3906):    INFO: masterKey Stored value =  = : 408bfccfc5c54f76de7ddfba1135a80c20dccd12ee015d641e40754b6dcd568d5f7b45d9e9e138a69a363e28a97287ea 
-11-23 07:25:25.663: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
-11-23 07:25:25.663: I/native-activity(3906):        key = : a6afb185ad27a6d06802623371f10ff00bf57f3a3fcee2d051a93da120a3a26f 
-11-23 07:25:25.663: I/native-activity(3906):       iv = : 53ee7df97522a47f42e47aec7c51a037 
-11-23 07:25:25.673: I/native-activity(3906): encryptedCheck length = 16
-11-23 07:25:25.673: I/native-activity(3906):        encryptedCheck =  = : 4d583051361d13dca2bff9e43e7bc491 
-11-23 07:25:25.673: I/native-activity(3906): q decryptedCheck length = 0
-11-23 07:25:25.673: I/native-activity(3906): WARNING: answers does not match
-11-23 07:25:25.673: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.4 - check answers (bad answers)
-11-23 07:25:25.673: D/MainActivity(3906): Test 2.5 - check answers (good answers) ------ Starting test 
-11-23 07:25:25.673: I/native-activity(3906): INFO: === checkAnswers ===
-11-23 07:25:25.673: I/native-activity(3906): INFO: *** Generating Secondary LockingKey  kdf(TwoThreeFour) ***
-11-23 07:25:25.673: I/native-activity(3906): INFO: ***  Generate Secondarylocking key ***
-11-23 07:25:25.673: I/native-activity(3906):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
-11-23 07:25:25.673: I/native-activity(3906):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
-11-23 07:25:25.673: I/native-activity(3906): INFO: ***  Recall BackupKey from NVM ***
-11-23 07:25:25.673: I/native-activity(3906):    INFO: masterKey Stored value =  = : 408bfccfc5c54f76de7ddfba1135a80c20dccd12ee015d641e40754b6dcd568d5f7b45d9e9e138a69a363e28a97287ea 
-11-23 07:25:25.673: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
-11-23 07:25:25.673: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.673: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.673: I/native-activity(3906): encryptedCheck length = 16
-11-23 07:25:25.673: I/native-activity(3906):        encryptedCheck =  = : 4d583051361d13dca2bff9e43e7bc491 
-11-23 07:25:25.673: I/native-activity(3906): q decryptedCheck length = 5
-11-23 07:25:25.673: I/native-activity(3906):        decryptedCheck =  = : 636865636b 
-11-23 07:25:25.673: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.5 - check answers (good answers)
-11-23 07:25:25.673: D/MainActivity(3906): Test 2.6 - check pin (bad pin) ------ Starting test 
-11-23 07:25:25.683: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.683: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(TOne) ***
-11-23 07:25:25.683: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.683: I/native-activity(3906):        key = : 0d70f0b1f1d87aba0a044f5e09d99d7ace5bd5308c70e81541a97bea372e6678 
-11-23 07:25:25.683: I/native-activity(3906):         iv = : bb28d322a4c0bb0fdf5c2311abbda21b 
-11-23 07:25:25.683: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.683: I/native-activity(3906):    INFO: masterKey Stored value =  = : 3c46f6effd2965d6baf8f6c8a8c6f268caa533e5de1632c472c0b69a23fad6af565adf9302aab4bef88204172c7b785e 
-11-23 07:25:25.683: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.683: I/native-activity(3906):        key = : df405b44628370b399c46d2f6ff11aef2b43945fa2389c666062c215ebf35abc 
-11-23 07:25:25.683: I/native-activity(3906):       iv = : a7e73fc67dcd4efad11d620e1a3b2281 
-11-23 07:25:25.683: I/native-activity(3906):    CheckPin: presented pin =  = : 544f6e65 
-11-23 07:25:25.683: I/native-activity(3906): WARNING: PIN does not match
-11-23 07:25:25.683: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.6 - check pin (bad pin)
-11-23 07:25:25.683: D/MainActivity(3906): Test 2.7 - check pin (good pin) ------ Starting test 
-11-23 07:25:25.683: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.683: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(One) ***
-11-23 07:25:25.683: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.683: I/native-activity(3906):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
-11-23 07:25:25.683: I/native-activity(3906):         iv = : 3469df45b8a74913db89cb352a54367d 
-11-23 07:25:25.683: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.683: I/native-activity(3906):    INFO: masterKey Stored value =  = : 3c46f6effd2965d6baf8f6c8a8c6f268caa533e5de1632c472c0b69a23fad6af565adf9302aab4bef88204172c7b785e 
-11-23 07:25:25.683: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.683: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.683: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.683: I/native-activity(3906):    CheckPin: saved pin =  = : 4f6e6500 
-11-23 07:25:25.683: I/native-activity(3906):    CheckPin: presented pin =  = : 4f6e65 
-11-23 07:25:25.683: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.7 - check pin (good pin)
-11-23 07:25:25.683: D/MainActivity(3906): Test 2.8 - change pin using pin ------ Starting test 
-11-23 07:25:25.683: I/native-activity(3906): Java_com_t2_fcads_FipsWrapper_changePinUsingPin
-11-23 07:25:25.683: I/native-activity(3906): INFO: === changePinUsingPin ===
-11-23 07:25:25.693: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.693: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(One) ***
-11-23 07:25:25.693: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.693: I/native-activity(3906):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
-11-23 07:25:25.693: I/native-activity(3906):         iv = : 3469df45b8a74913db89cb352a54367d 
-11-23 07:25:25.693: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.693: I/native-activity(3906):    INFO: masterKey Stored value =  = : 3c46f6effd2965d6baf8f6c8a8c6f268caa533e5de1632c472c0b69a23fad6af565adf9302aab4bef88204172c7b785e 
-11-23 07:25:25.693: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.693: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.693: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.693: I/native-activity(3906):    CheckPin: saved pin =  = : 4f6e6500 
-11-23 07:25:25.693: I/native-activity(3906):    CheckPin: presented pin =  = : 4f6e65 
-11-23 07:25:25.693: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.693: I/native-activity(3906):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
-11-23 07:25:25.693: I/native-activity(3906):         iv = : 3469df45b8a74913db89cb352a54367d 
-11-23 07:25:25.693: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.693: I/native-activity(3906):    INFO: masterKey Stored value =  = : 3c46f6effd2965d6baf8f6c8a8c6f268caa533e5de1632c472c0b69a23fad6af565adf9302aab4bef88204172c7b785e 
-11-23 07:25:25.693: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.693: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.693: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.693: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(tWo) ***
-11-23 07:25:25.693: I/native-activity(3906):        key = : 6a40a66c3309095460ee02c1dde45c51a1fc9d124cc84a47b0ca11151f489922 
-11-23 07:25:25.693: I/native-activity(3906):         iv = : 663d64467dd5a20dba15744ff76c78da 
-11-23 07:25:25.693: I/native-activity(3906): INFO: *** Generating and saving to NVM MasterKey ***
-11-23 07:25:25.693: I/native-activity(3906):    MasterKey = : 5f816b80898640a8e897411fbe3dc1de04228f54bb56b535a99302ba3f0e03a6d632899e8e89527002a48cc47d626d15 
-11-23 07:25:25.693: I/native-activity(3906): INFO:   *** Save MasterKey Key to User Preferences ***
-11-23 07:25:25.693: I/native-activity(3906): INFO:   length = 48
-11-23 07:25:25.713: I/native-activity(3906): outLength = 16
-11-23 07:25:25.713: I/native-activity(3906):        Encrypted pin  = : 672865d7af317bf7e10e366b267a2d80 
-11-23 07:25:25.753: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.8 - change pin using pin
-11-23 07:25:25.753: D/MainActivity(3906): Test 2.9 - check pin (good pin) ------ Starting test 
-11-23 07:25:25.753: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.753: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(tWo) ***
-11-23 07:25:25.753: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.753: I/native-activity(3906):        key = : 6a40a66c3309095460ee02c1dde45c51a1fc9d124cc84a47b0ca11151f489922 
-11-23 07:25:25.753: I/native-activity(3906):         iv = : 663d64467dd5a20dba15744ff76c78da 
-11-23 07:25:25.753: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.763: I/native-activity(3906):    INFO: masterKey Stored value =  = : 5f816b80898640a8e897411fbe3dc1de04228f54bb56b535a99302ba3f0e03a6d632899e8e89527002a48cc47d626d15 
-11-23 07:25:25.763: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.763: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.763: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.763: I/native-activity(3906):    CheckPin: saved pin =  = : 74576f00 
-11-23 07:25:25.763: I/native-activity(3906):    CheckPin: presented pin =  = : 74576f 
-11-23 07:25:25.763: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.9 - check pin (good pin)
-11-23 07:25:25.763: D/MainActivity(3906): Test 2.10 - check pin (bad pin) ------ Starting test 
-11-23 07:25:25.763: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.763: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(One) ***
-11-23 07:25:25.763: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.763: I/native-activity(3906):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
-11-23 07:25:25.763: I/native-activity(3906):         iv = : 3469df45b8a74913db89cb352a54367d 
-11-23 07:25:25.763: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.763: I/native-activity(3906):    INFO: masterKey Stored value =  = : 5f816b80898640a8e897411fbe3dc1de04228f54bb56b535a99302ba3f0e03a6d632899e8e89527002a48cc47d626d15 
-11-23 07:25:25.763: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.763: I/native-activity(3906):        key = : d041e7a2dae0d37c8d25fca8380fd7b028c71776cd02a2599c1f47d4fb3fa3a6 
-11-23 07:25:25.763: I/native-activity(3906):       iv = : 5dce652e3eaa63a519ba2b80248661a5 
-11-23 07:25:25.763: I/native-activity(3906):    CheckPin: presented pin =  = : 4f6e65 
-11-23 07:25:25.763: I/native-activity(3906): WARNING: PIN does not match
-11-23 07:25:25.763: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.10 - check pin (bad pin)
-11-23 07:25:25.763: D/MainActivity(3906): Test 2.11 - changePinUsingAnswers ------ Starting test 
-11-23 07:25:25.763: I/native-activity(3906): Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers
-11-23 07:25:25.763: I/native-activity(3906): INFO: === checkAnswers ===
-11-23 07:25:25.763: I/native-activity(3906): INFO: *** Generating Secondary LockingKey  kdf(TwoThreeFour) ***
-11-23 07:25:25.763: I/native-activity(3906): INFO: ***  Generate Secondarylocking key ***
-11-23 07:25:25.763: I/native-activity(3906):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
-11-23 07:25:25.763: I/native-activity(3906):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
-11-23 07:25:25.763: I/native-activity(3906): INFO: ***  Recall BackupKey from NVM ***
-11-23 07:25:25.763: I/native-activity(3906):    INFO: masterKey Stored value =  = : 408bfccfc5c54f76de7ddfba1135a80c20dccd12ee015d641e40754b6dcd568d5f7b45d9e9e138a69a363e28a97287ea 
-11-23 07:25:25.763: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
-11-23 07:25:25.763: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.763: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.773: I/native-activity(3906): encryptedCheck length = 16
-11-23 07:25:25.773: I/native-activity(3906):        encryptedCheck =  = : 4d583051361d13dca2bff9e43e7bc491 
-11-23 07:25:25.773: I/native-activity(3906): q decryptedCheck length = 5
-11-23 07:25:25.773: I/native-activity(3906):        decryptedCheck =  = : 636865636b 
-11-23 07:25:25.773: I/native-activity(3906): INFO: === changePinUsingAnswers ===
-11-23 07:25:25.773: I/native-activity(3906): INFO: *** getRIKeyUsing answers and backup key TwoThreeFour ***
-11-23 07:25:25.773: I/native-activity(3906): INFO: ***  Generate Secondarylocking key ***
-11-23 07:25:25.773: I/native-activity(3906):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
-11-23 07:25:25.773: I/native-activity(3906):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
-11-23 07:25:25.773: I/native-activity(3906): INFO: ***  Recall BackupKey from NVM ***
-11-23 07:25:25.773: I/native-activity(3906):    INFO: masterKey Stored value =  = : 408bfccfc5c54f76de7ddfba1135a80c20dccd12ee015d641e40754b6dcd568d5f7b45d9e9e138a69a363e28a97287ea 
-11-23 07:25:25.773: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
-11-23 07:25:25.773: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.773: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.773: I/native-activity(3906): INFO: *** Generating New LockingKey  kdf(Password is  is four) ***
-11-23 07:25:25.773: I/native-activity(3906):        key = : c3d7897acdb1a4c6bdab44f1d32a312150a6f5dd024809bb95fc910f6c813a02 
-11-23 07:25:25.773: I/native-activity(3906):         iv = : 3f31f80c17a5ae6190cea9975f1db971 
-11-23 07:25:25.773: I/native-activity(3906): INFO: *** Generating and saving to NVM  new MasterKey ***
-11-23 07:25:25.773: I/native-activity(3906):    MasterKey = : 660a2e637d01188e79642a35727a98a08ae05d44c90333ccd75819d214f68a371e689be390152b78fc368dc6903ed4aa 
-11-23 07:25:25.773: I/native-activity(3906): INFO:   *** Save MasterKey Key to User Preferences ***
-11-23 07:25:25.773: I/native-activity(3906): INFO:   length = 48
-11-23 07:25:25.793: I/native-activity(3906): outLength = 32
-11-23 07:25:25.793: I/native-activity(3906):        Encrypted pin  = : e8c02cf4ec7a786d41e09caa7d47752fa8d9d48761a0cd0b1f025bc426232524 
-11-23 07:25:25.813: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.11 - changePinUsingAnswers
-11-23 07:25:25.813: D/MainActivity(3906): Test 2.12 - check pin (bad pin) ------ Starting test 
-11-23 07:25:25.813: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.813: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(tWo) ***
-11-23 07:25:25.813: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.813: I/native-activity(3906):        key = : 6a40a66c3309095460ee02c1dde45c51a1fc9d124cc84a47b0ca11151f489922 
-11-23 07:25:25.813: I/native-activity(3906):         iv = : 663d64467dd5a20dba15744ff76c78da 
-11-23 07:25:25.813: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.813: I/native-activity(3906):    INFO: masterKey Stored value =  = : 660a2e637d01188e79642a35727a98a08ae05d44c90333ccd75819d214f68a371e689be390152b78fc368dc6903ed4aa 
-11-23 07:25:25.813: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.813: I/native-activity(3906):        key = : 45c7a2ae3ce17a93030f2f5b99639a032866d5f67a395d57c32a48273c9b8cba 
-11-23 07:25:25.813: I/native-activity(3906):       iv = : 2e89e5e76d227129d31debbcc34263f8 
-11-23 07:25:25.813: I/native-activity(3906):    CheckPin: saved pin =  = : 9f868e32fbbe97033cac139f3e47419a 
-11-23 07:25:25.813: I/native-activity(3906):    CheckPin: presented pin =  = : 74576f 
-11-23 07:25:25.813: I/native-activity(3906): WARNING: PIN does not match
-11-23 07:25:25.813: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.12 - check pin (bad pin)
-11-23 07:25:25.813: D/MainActivity(3906): Test 2.13 - check pin (good pin) ------ Starting test 
-11-23 07:25:25.813: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.813: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(Password is  is four) ***
-11-23 07:25:25.813: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.813: I/native-activity(3906):        key = : c3d7897acdb1a4c6bdab44f1d32a312150a6f5dd024809bb95fc910f6c813a02 
-11-23 07:25:25.813: I/native-activity(3906):         iv = : 3f31f80c17a5ae6190cea9975f1db971 
-11-23 07:25:25.813: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.813: I/native-activity(3906):    INFO: masterKey Stored value =  = : 660a2e637d01188e79642a35727a98a08ae05d44c90333ccd75819d214f68a371e689be390152b78fc368dc6903ed4aa 
-11-23 07:25:25.813: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.813: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.813: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.823: I/native-activity(3906):    CheckPin: saved pin =  = : 50617373776f72642069732020697320666f757200 
-11-23 07:25:25.823: I/native-activity(3906):    CheckPin: presented pin =  = : 50617373776f72642069732020697320666f7572 
-11-23 07:25:25.823: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.13 - check pin (good pin)
-11-23 07:25:25.823: D/MainActivity(3906): Test 2.14 - changePinUsingAnswers ------ Starting test 
-11-23 07:25:25.823: I/native-activity(3906): Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers
-11-23 07:25:25.823: I/native-activity(3906): INFO: === checkAnswers ===
-11-23 07:25:25.823: I/native-activity(3906): INFO: *** Generating Secondary LockingKey  kdf(TwoThreeFour) ***
-11-23 07:25:25.823: I/native-activity(3906): INFO: ***  Generate Secondarylocking key ***
-11-23 07:25:25.823: I/native-activity(3906):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
-11-23 07:25:25.823: I/native-activity(3906):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
-11-23 07:25:25.823: I/native-activity(3906): INFO: ***  Recall BackupKey from NVM ***
-11-23 07:25:25.823: I/native-activity(3906):    INFO: masterKey Stored value =  = : 408bfccfc5c54f76de7ddfba1135a80c20dccd12ee015d641e40754b6dcd568d5f7b45d9e9e138a69a363e28a97287ea 
-11-23 07:25:25.823: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
-11-23 07:25:25.823: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.823: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.823: I/native-activity(3906): encryptedCheck length = 16
-11-23 07:25:25.823: I/native-activity(3906):        encryptedCheck =  = : 4d583051361d13dca2bff9e43e7bc491 
-11-23 07:25:25.823: I/native-activity(3906): q decryptedCheck length = 5
-11-23 07:25:25.823: I/native-activity(3906):        decryptedCheck =  = : 636865636b 
-11-23 07:25:25.823: I/native-activity(3906): INFO: === changePinUsingAnswers ===
-11-23 07:25:25.823: I/native-activity(3906): INFO: *** getRIKeyUsing answers and backup key TwoThreeFour ***
-11-23 07:25:25.823: I/native-activity(3906): INFO: ***  Generate Secondarylocking key ***
-11-23 07:25:25.823: I/native-activity(3906):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
-11-23 07:25:25.823: I/native-activity(3906):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
-11-23 07:25:25.823: I/native-activity(3906): INFO: ***  Recall BackupKey from NVM ***
-11-23 07:25:25.823: I/native-activity(3906):    INFO: masterKey Stored value =  = : 408bfccfc5c54f76de7ddfba1135a80c20dccd12ee015d641e40754b6dcd568d5f7b45d9e9e138a69a363e28a97287ea 
-11-23 07:25:25.823: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
-11-23 07:25:25.823: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.823: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.823: I/native-activity(3906): INFO: *** Generating New LockingKey  kdf() ***
-11-23 07:25:25.823: I/native-activity(3906):        key = : 5bf0c9c643bb72c859cc0b6390febfe08d62cbcc9018985415360e3e1a97e195 
-11-23 07:25:25.823: I/native-activity(3906):         iv = : 8bbab49289ffd765a3a215ad7f4d8d86 
-11-23 07:25:25.823: I/native-activity(3906): INFO: *** Generating and saving to NVM  new MasterKey ***
-11-23 07:25:25.823: I/native-activity(3906):    MasterKey = : dd2a6e6f33367970ea7e8490894b948c78eadd79e3cfbe4e0a0ea47f61dd789d4bcdb6248bc2988b0e6455b729b11b52 
-11-23 07:25:25.823: I/native-activity(3906): INFO:   *** Save MasterKey Key to User Preferences ***
-11-23 07:25:25.823: I/native-activity(3906): INFO:   length = 48
-11-23 07:25:25.843: I/native-activity(3906): outLength = 16
-11-23 07:25:25.843: I/native-activity(3906):        Encrypted pin  = : a720584d1b4fee0f0df2abc6a5b76099 
-11-23 07:25:25.863: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.14 - changePinUsingAnswers
-11-23 07:25:25.863: D/MainActivity(3906): Test 2.15 - check pin (bad pin) ------ Starting test 
-11-23 07:25:25.863: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.863: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(tWo) ***
-11-23 07:25:25.863: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.863: I/native-activity(3906):        key = : 6a40a66c3309095460ee02c1dde45c51a1fc9d124cc84a47b0ca11151f489922 
-11-23 07:25:25.863: I/native-activity(3906):         iv = : 663d64467dd5a20dba15744ff76c78da 
-11-23 07:25:25.863: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.863: I/native-activity(3906):    INFO: masterKey Stored value =  = : dd2a6e6f33367970ea7e8490894b948c78eadd79e3cfbe4e0a0ea47f61dd789d4bcdb6248bc2988b0e6455b729b11b52 
-11-23 07:25:25.863: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.863: I/native-activity(3906):        key = : ae5c542d56c5bf05be3c2410be9522045745a67ff66450e7e6f950857714329c 
-11-23 07:25:25.863: I/native-activity(3906):       iv = : ff0ed2ee8c875df134103560d8c92c80 
-11-23 07:25:25.863: I/native-activity(3906):    CheckPin: presented pin =  = : 74576f 
-11-23 07:25:25.863: I/native-activity(3906): WARNING: PIN does not match
-11-23 07:25:25.863: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.15 - check pin (bad pin)
-11-23 07:25:25.863: D/MainActivity(3906): Test 2.16 - check pin (good pin) ------ Starting test 
-11-23 07:25:25.863: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.863: I/native-activity(3906): INFO: *** Generating LockingKey  kdf() ***
-11-23 07:25:25.863: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.863: I/native-activity(3906):        key = : 5bf0c9c643bb72c859cc0b6390febfe08d62cbcc9018985415360e3e1a97e195 
-11-23 07:25:25.863: I/native-activity(3906):         iv = : 8bbab49289ffd765a3a215ad7f4d8d86 
-11-23 07:25:25.863: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.863: I/native-activity(3906):    INFO: masterKey Stored value =  = : dd2a6e6f33367970ea7e8490894b948c78eadd79e3cfbe4e0a0ea47f61dd789d4bcdb6248bc2988b0e6455b729b11b52 
-11-23 07:25:25.863: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.863: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.863: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.873: I/native-activity(3906):    CheckPin: saved pin =  = : 00 
-11-23 07:25:25.873: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.16 - check pin (good pin)
-11-23 07:25:25.873: D/MainActivity(3906): Test 2.17 - changePinUsingAnswers ------ Starting test 
-11-23 07:25:25.873: I/native-activity(3906): Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers
-11-23 07:25:25.873: I/native-activity(3906): INFO: === checkAnswers ===
-11-23 07:25:25.873: I/native-activity(3906): INFO: *** Generating Secondary LockingKey  kdf(TwoThreeFour) ***
-11-23 07:25:25.873: I/native-activity(3906): INFO: ***  Generate Secondarylocking key ***
-11-23 07:25:25.873: I/native-activity(3906):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
-11-23 07:25:25.873: I/native-activity(3906):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
-11-23 07:25:25.873: I/native-activity(3906): INFO: ***  Recall BackupKey from NVM ***
-11-23 07:25:25.873: I/native-activity(3906):    INFO: masterKey Stored value =  = : 408bfccfc5c54f76de7ddfba1135a80c20dccd12ee015d641e40754b6dcd568d5f7b45d9e9e138a69a363e28a97287ea 
-11-23 07:25:25.873: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
-11-23 07:25:25.873: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.873: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.873: I/native-activity(3906): encryptedCheck length = 16
-11-23 07:25:25.873: I/native-activity(3906):        encryptedCheck =  = : 4d583051361d13dca2bff9e43e7bc491 
-11-23 07:25:25.873: I/native-activity(3906): q decryptedCheck length = 5
-11-23 07:25:25.873: I/native-activity(3906):        decryptedCheck =  = : 636865636b 
-11-23 07:25:25.873: I/native-activity(3906): INFO: === changePinUsingAnswers ===
-11-23 07:25:25.873: I/native-activity(3906): INFO: *** getRIKeyUsing answers and backup key TwoThreeFour ***
-11-23 07:25:25.873: I/native-activity(3906): INFO: ***  Generate Secondarylocking key ***
-11-23 07:25:25.873: I/native-activity(3906):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
-11-23 07:25:25.873: I/native-activity(3906):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
-11-23 07:25:25.873: I/native-activity(3906): INFO: ***  Recall BackupKey from NVM ***
-11-23 07:25:25.873: I/native-activity(3906):    INFO: masterKey Stored value =  = : 408bfccfc5c54f76de7ddfba1135a80c20dccd12ee015d641e40754b6dcd568d5f7b45d9e9e138a69a363e28a97287ea 
-11-23 07:25:25.873: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
-11-23 07:25:25.873: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.873: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.873: I/native-activity(3906): INFO: *** Generating New LockingKey  kdf(9q34un 9vq34ute noaerpt9uertv[!%!#$^&^*^%&*))%2032498132064684;asdjjf;fsjfd;fkjkflja;fdjfeie11) ***
-11-23 07:25:25.873: I/native-activity(3906):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
-11-23 07:25:25.873: I/native-activity(3906):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
-11-23 07:25:25.873: I/native-activity(3906): INFO: *** Generating and saving to NVM  new MasterKey ***
-11-23 07:25:25.873: I/native-activity(3906):    MasterKey = : 9838d2b183e9d06c69a156ebf7ecedd618b9cfc5b072002bf4824ad8c007c8dfe917b63c6ff0479beeb3209fa3aed460 
-11-23 07:25:25.873: I/native-activity(3906): INFO:   *** Save MasterKey Key to User Preferences ***
-11-23 07:25:25.873: I/native-activity(3906): INFO:   length = 48
-11-23 07:25:25.903: I/native-activity(3906): outLength = 96
-11-23 07:25:25.903: I/native-activity(3906):        Encrypted pin  = : 7bc91d3897207a32d2743fcc2f09fa02f011e484a3aec039c316af3bba25b4e74449a55e8d1076d03ac20cb6598fc748940d3f57fa412e326704b3c96194685aaaf9098cd1c90845acdfc121ff2921773f640f701ac020e52341e8847234c992 
-11-23 07:25:25.924: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.17 - changePinUsingAnswers
-11-23 07:25:25.924: D/MainActivity(3906): Test 2.18 - check pin (bad pin) ------ Starting test 
-11-23 07:25:25.924: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.924: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(tWo) ***
-11-23 07:25:25.924: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.924: I/native-activity(3906):        key = : 6a40a66c3309095460ee02c1dde45c51a1fc9d124cc84a47b0ca11151f489922 
-11-23 07:25:25.924: I/native-activity(3906):         iv = : 663d64467dd5a20dba15744ff76c78da 
-11-23 07:25:25.924: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.924: I/native-activity(3906):    INFO: masterKey Stored value =  = : 9838d2b183e9d06c69a156ebf7ecedd618b9cfc5b072002bf4824ad8c007c8dfe917b63c6ff0479beeb3209fa3aed460 
-11-23 07:25:25.924: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.924: I/native-activity(3906):        key = : db571d27e672c468da4424607d7700e5c4cd8ba6e9fb74067ce486b0d2944ee0 
-11-23 07:25:25.924: I/native-activity(3906):       iv = : 993a82574ec0704bdf31fc8658ede060 
-11-23 07:25:25.924: I/native-activity(3906):    CheckPin: saved pin =  = : 00c32b257f78c164a67c7de9237d241725e6cafcb9b6b794a2f9ca440e1d7336824eb190392c370d69163e646d1297df09c4c6ace1edaac31d0bf97180e6c360a9d0151acc1370e3f1c001a5f73ca14b 
-11-23 07:25:25.924: I/native-activity(3906):    CheckPin: presented pin =  = : 74576f 
-11-23 07:25:25.924: I/native-activity(3906): WARNING: PIN does not match
-11-23 07:25:25.924: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.18 - check pin (bad pin)
-11-23 07:25:25.924: D/MainActivity(3906): Test 2.19 - check pin (good pin) ------ Starting test 
-11-23 07:25:25.934: I/native-activity(3906): INFO: === checkPin ===
-11-23 07:25:25.934: I/native-activity(3906): INFO: *** Generating LockingKey  kdf(9q34un 9vq34ute noaerpt9uertv[!%!#$^&^*^%&*))%2032498132064684;asdjjf;fsjfd;fkjkflja;fdjfeie11) ***
-11-23 07:25:25.934: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.934: I/native-activity(3906):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
-11-23 07:25:25.934: I/native-activity(3906):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
-11-23 07:25:25.934: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.934: I/native-activity(3906):    INFO: masterKey Stored value =  = : 9838d2b183e9d06c69a156ebf7ecedd618b9cfc5b072002bf4824ad8c007c8dfe917b63c6ff0479beeb3209fa3aed460 
-11-23 07:25:25.934: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.934: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.934: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.934: I/native-activity(3906):    CheckPin: saved pin =  = : 39713334756e203976713334757465206e6f61657270743975657274765b21252123245e265e2a5e25262a292925323033323439383133323036343638343b6173646a6a663b66736a66643b666b6a6b666c6a613b66646a66656965313100 
-11-23 07:25:25.934: I/native-activity(3906):    CheckPin: presented pin =  = : 39713334756e203976713334757465206e6f61657270743975657274765b21252123245e265e2a5e25262a292925323033323439383133323036343638343b6173646a6a663b66736a66643b666b6a6b666c6a613b66646a666569653131 
-11-23 07:25:25.934: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.19 - check pin (good pin)
-11-23 07:25:25.934: D/MainActivity(3906): Test 2.20 - check encrypt/decrypt ------ Starting test 
-11-23 07:25:25.934: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.934: I/native-activity(3906):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
-11-23 07:25:25.934: I/native-activity(3906):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
-11-23 07:25:25.934: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.934: I/native-activity(3906):    INFO: masterKey Stored value =  = : 9838d2b183e9d06c69a156ebf7ecedd618b9cfc5b072002bf4824ad8c007c8dfe917b63c6ff0479beeb3209fa3aed460 
-11-23 07:25:25.934: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.934: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.934: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.934: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.934: I/native-activity(3906):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
-11-23 07:25:25.934: I/native-activity(3906):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
-11-23 07:25:25.934: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.934: I/native-activity(3906):    INFO: masterKey Stored value =  = : 9838d2b183e9d06c69a156ebf7ecedd618b9cfc5b072002bf4824ad8c007c8dfe917b63c6ff0479beeb3209fa3aed460 
-11-23 07:25:25.934: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.934: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.934: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.934: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.20 - check encrypt/decrypt
-11-23 07:25:25.934: D/MainActivity(3906): Test 2.21 - check encrypt/decrypt - blank string ------ Starting test 
-11-23 07:25:25.944: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.944: I/native-activity(3906):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
-11-23 07:25:25.944: I/native-activity(3906):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
-11-23 07:25:25.944: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.944: I/native-activity(3906):    INFO: masterKey Stored value =  = : 9838d2b183e9d06c69a156ebf7ecedd618b9cfc5b072002bf4824ad8c007c8dfe917b63c6ff0479beeb3209fa3aed460 
-11-23 07:25:25.944: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.944: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.944: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.944: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.944: I/native-activity(3906):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
-11-23 07:25:25.944: I/native-activity(3906):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
-11-23 07:25:25.944: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.944: I/native-activity(3906):    INFO: masterKey Stored value =  = : 9838d2b183e9d06c69a156ebf7ecedd618b9cfc5b072002bf4824ad8c007c8dfe917b63c6ff0479beeb3209fa3aed460 
-11-23 07:25:25.944: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.944: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.944: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.944: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.21 - check encrypt/decrypt - blank string
-11-23 07:25:25.944: D/MainActivity(3906): Test 2.22 - check encrypt/decrypt - long string ------ Starting test 
-11-23 07:25:25.944: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.944: I/native-activity(3906):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
-11-23 07:25:25.944: I/native-activity(3906):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
-11-23 07:25:25.944: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.944: I/native-activity(3906):    INFO: masterKey Stored value =  = : 9838d2b183e9d06c69a156ebf7ecedd618b9cfc5b072002bf4824ad8c007c8dfe917b63c6ff0479beeb3209fa3aed460 
-11-23 07:25:25.944: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.944: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.944: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.944: I/native-activity(3906): INFO: ***  Generate Locking key ***
-11-23 07:25:25.944: I/native-activity(3906):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
-11-23 07:25:25.944: I/native-activity(3906):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
-11-23 07:25:25.944: I/native-activity(3906): INFO: ***  Recall MasterKey from NVM ***
-11-23 07:25:25.954: I/native-activity(3906):    INFO: masterKey Stored value =  = : 9838d2b183e9d06c69a156ebf7ecedd618b9cfc5b072002bf4824ad8c007c8dfe917b63c6ff0479beeb3209fa3aed460 
-11-23 07:25:25.954: I/native-activity(3906): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
-11-23 07:25:25.954: I/native-activity(3906):        key = : ccd40eff9f376265d2e3deea9f73f46737bb393a7b622a8c8425bc9823b97077 
-11-23 07:25:25.954: I/native-activity(3906):       iv = : f42e1cca30dee45f1afa07c4f5732a6a 
-11-23 07:25:25.954: D/MainActivity(3906):     PASSED - Iteration 1, Test 2.22 - check encrypt/decrypt - long string
-11-23 07:25:25.954: D/MainActivity(3906): -------------------------------------------------------------
-11-23 07:25:25.954: D/MainActivity(3906):   Iteration 1 - Unit Test Summary
-11-23 07:25:25.954: D/MainActivity(3906): -------------------------------------------------------------
-11-23 07:25:25.954: D/MainActivity(3906):    Iteration 1 -   Iterations Performed: 1
-11-23 07:25:25.954: D/MainActivity(3906):    Iteration 1 -   Tests passed: 24
-11-23 07:25:25.954: D/MainActivity(3906):    Iteration 1 -   Tests failed: 0
-11-23 07:25:25.954: D/MainActivity(3906):    ++ ALL TESTS PASSED ++ 
+04-23 08:27:54.789: D/MainActivity(23617): ---------------------- Testsing sqlCipher database functionality ---------------------
+04-23 08:27:54.789: D/MainActivity(23617): Test 3.1 - writing to and reading from sqlcipher database ------ Starting test 
+04-23 08:27:54.799: D/MainActivity(23617):     PASSED - Iteration 0, Test 3.1 - writing to and reading from sqlcipher database
+04-23 08:27:54.799: I/MainActivity(23617): resultA = fred
+04-23 08:27:54.849: D/MainActivity(23617): ---------------------- Testsing FIPS functionality ---------------------
+04-23 08:27:54.849: D/MainActivity(23617): Test 1.1 ------ Starting test 
+04-23 08:27:54.939: D/MainActivity(23617):     PASSED - Iteration 0, Test 1.1
+04-23 08:27:54.939: D/MainActivity(23617): T2 FIPS Version = 1.5.0
+04-23 08:27:54.949: D/MainActivity(23617): FIPS_mode returned 1
+04-23 08:27:54.979: D/MainActivity(23617): ---------------------- Testsing T2Crypto functionality - Iteration 1  ---------------------
+04-23 08:27:54.979: D/MainActivity(23617): Test 2.1 - doIsInitialized ------ Starting test 
+04-23 08:27:54.979: I/native-activity(23617): Java_com_t2_fcads_FipsWrapper_deInitializeLogin
+04-23 08:27:55.039: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.1 - doIsInitialized
+04-23 08:27:55.039: D/MainActivity(23617): Test 2.2 - doInitializeLogin ------ Starting test 
+04-23 08:27:55.039: I/native-activity(23617):  -- Using test vectors for key ---
+04-23 08:27:55.039: I/native-activity(23617):    xx     Password =   = : 571b2d382652dd42fe155fbf1f8d2c46c7c067db29eda301554e7f0c35570e87 
+04-23 08:27:55.039: I/native-activity(23617):    xx    salt =   = : 930e4b4f7262af75 
+04-23 08:27:55.059: I/native-activity(23617): INFO: *** Generating RIKey ***
+04-23 08:27:55.059: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.059: I/native-activity(23617):         iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.059: I/native-activity(23617): INFO: *** Generating LockingKey kdf(One) **n
+04-23 08:27:55.059: I/native-activity(23617):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
+04-23 08:27:55.059: I/native-activity(23617):         iv = : 3469df45b8a74913db89cb352a54367d 
+04-23 08:27:55.059: I/native-activity(23617): INFO: *** Generating SecondaryLockingKey ***
+04-23 08:27:55.059: I/native-activity(23617):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
+04-23 08:27:55.059: I/native-activity(23617):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
+04-23 08:27:55.059: I/native-activity(23617): INFO: *** Generating and saving to NVM MasterKey ***
+04-23 08:27:55.059: I/native-activity(23617):    MasterKey = : 5e85ce79dd24ee596203325bb46e77c29669572be01dc2b2d1d3a6407dba6ed89c6a60c3b93322b5cb100f8a27e2542a 
+04-23 08:27:55.059: I/native-activity(23617): INFO:   *** Save MasterKey Key to User Preferences ***
+04-23 08:27:55.059: I/native-activity(23617): INFO:   length = 48
+04-23 08:27:55.079: I/native-activity(23617): INFO: *** Generating and saving to nvm BackupKey ***
+04-23 08:27:55.079: I/native-activity(23617):    BackupKey = : db353fd3e13b703fede1ea0ed1fb1f12c92331b03338100736a9f81c675652e4ab40f79374c368daf2e237c72bb0e520 
+04-23 08:27:55.079: I/native-activity(23617): INFO:   *** Save BackupKey Key to User Preferences ***
+04-23 08:27:55.079: I/native-activity(23617): INFO:   length = 48
+04-23 08:27:55.099: I/native-activity(23617): outLength = 16
+04-23 08:27:55.099: I/native-activity(23617):        Encrypted pin  = : 30b91f52923bb7b7819ecfedb9d93314 
+04-23 08:27:55.139: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.2 - doInitializeLogin
+04-23 08:27:55.139: D/MainActivity(23617): Test 2.2a - check encryptRaw/decryptRaw ------ Starting test 
+04-23 08:27:55.139: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.139: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.139: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.139: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.139: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.2a - check encryptRaw/decryptRaw
+04-23 08:27:55.139: D/MainActivity(23617): Test 2.2b - check encrypt/decrypt - blank string ------ Starting test 
+04-23 08:27:55.139: I/native-activity(23617):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
+04-23 08:27:55.139: I/native-activity(23617):         iv = : 3469df45b8a74913db89cb352a54367d 
+04-23 08:27:55.139: I/native-activity(23617):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
+04-23 08:27:55.139: I/native-activity(23617):         iv = : 3469df45b8a74913db89cb352a54367d 
+04-23 08:27:55.149: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.2b - check encrypt/decrypt - blank string
+04-23 08:27:55.149: D/MainActivity(23617): Test 2.c - check encrypt/decrypt - long string ------ Starting test 
+04-23 08:27:55.149: I/native-activity(23617):        key = : 5bf0c9c643bb72c859cc0b6390febfe08d62cbcc9018985415360e3e1a97e195 
+04-23 08:27:55.149: I/native-activity(23617):         iv = : 8bbab49289ffd765a3a215ad7f4d8d86 
+04-23 08:27:55.149: I/native-activity(23617):        key = : 5bf0c9c643bb72c859cc0b6390febfe08d62cbcc9018985415360e3e1a97e195 
+04-23 08:27:55.149: I/native-activity(23617):         iv = : 8bbab49289ffd765a3a215ad7f4d8d86 
+04-23 08:27:55.149: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.c - check encrypt/decrypt - long string
+04-23 08:27:55.149: D/MainActivity(23617): Test 2.d - check encrypt/decrypt - bad pin ------ Starting test 
+04-23 08:27:55.149: I/native-activity(23617):        key = : 5bf0c9c643bb72c859cc0b6390febfe08d62cbcc9018985415360e3e1a97e195 
+04-23 08:27:55.149: I/native-activity(23617):         iv = : 8bbab49289ffd765a3a215ad7f4d8d86 
+04-23 08:27:55.149: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.149: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.159: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.d - check encrypt/decrypt - bad pin
+04-23 08:27:55.159: D/MainActivity(23617): Test 2.3 - doIsInitialized ------ Starting test 
+04-23 08:27:55.159: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.3 - doIsInitialized
+04-23 08:27:55.159: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.159: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(One) ***
+04-23 08:27:55.159: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.159: I/native-activity(23617):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
+04-23 08:27:55.159: I/native-activity(23617):         iv = : 3469df45b8a74913db89cb352a54367d 
+04-23 08:27:55.159: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.159: I/native-activity(23617):    INFO: masterKey Stored value =  = : 5e85ce79dd24ee596203325bb46e77c29669572be01dc2b2d1d3a6407dba6ed89c6a60c3b93322b5cb100f8a27e2542a 
+04-23 08:27:55.159: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.159: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.159: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.159: I/native-activity(23617):    CheckPin: saved pin =  = : 4f6e6500 
+04-23 08:27:55.159: I/native-activity(23617):    CheckPin: presented pin =  = : 4f6e65 
+04-23 08:27:55.159: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.159: I/native-activity(23617):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
+04-23 08:27:55.159: I/native-activity(23617):         iv = : 3469df45b8a74913db89cb352a54367d 
+04-23 08:27:55.159: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.159: I/native-activity(23617):    INFO: masterKey Stored value =  = : 5e85ce79dd24ee596203325bb46e77c29669572be01dc2b2d1d3a6407dba6ed89c6a60c3b93322b5cb100f8a27e2542a 
+04-23 08:27:55.159: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.159: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.169: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.169: D/MainActivity(23617): key = x'7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e41f0cd62c7fece6f249b9498942a817a7'
+04-23 08:27:55.169: D/MainActivity(23617): Test 2.4 - check answers (bad answers) ------ Starting test 
+04-23 08:27:55.169: I/native-activity(23617): INFO: === checkAnswers ===
+04-23 08:27:55.169: I/native-activity(23617): INFO: *** Generating Secondary LockingKey  kdf(TwoThreeFour1) ***
+04-23 08:27:55.169: I/native-activity(23617): INFO: ***  Generate Secondarylocking key ***
+04-23 08:27:55.169: I/native-activity(23617):        key = : 5b6ecdc8cfee8efa9a97fd8bc1390e447241f5cf79a112620e64eb1340ef5bb4 
+04-23 08:27:55.169: I/native-activity(23617):         iv = : 7566de079c6b0d76661fdc2ba91c26eb 
+04-23 08:27:55.169: I/native-activity(23617): INFO: ***  Recall BackupKey from NVM ***
+04-23 08:27:55.169: I/native-activity(23617):    INFO: masterKey Stored value =  = : db353fd3e13b703fede1ea0ed1fb1f12c92331b03338100736a9f81c675652e4ab40f79374c368daf2e237c72bb0e520 
+04-23 08:27:55.169: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
+04-23 08:27:55.169: I/native-activity(23617):        key = : 1183c0d7f472e51cb710eaf879f61cf1052cba5570f3d0c128b2c3e2e622756c 
+04-23 08:27:55.169: I/native-activity(23617):       iv = : 08aab26a9a6b334c7ec2a4d52db88c22 
+04-23 08:27:55.169: I/native-activity(23617): encryptedCheck length = 16
+04-23 08:27:55.169: I/native-activity(23617):        encryptedCheck =  = : 39cb4c2161cafac289dde13802c77ac9 
+04-23 08:27:55.169: I/native-activity(23617): q decryptedCheck length = 0
+04-23 08:27:55.169: I/native-activity(23617): WARNING: answers does not match
+04-23 08:27:55.169: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.4 - check answers (bad answers)
+04-23 08:27:55.169: D/MainActivity(23617): Test 2.5 - check answers (good answers) ------ Starting test 
+04-23 08:27:55.179: I/native-activity(23617): INFO: === checkAnswers ===
+04-23 08:27:55.179: I/native-activity(23617): INFO: *** Generating Secondary LockingKey  kdf(TwoThreeFour) ***
+04-23 08:27:55.179: I/native-activity(23617): INFO: ***  Generate Secondarylocking key ***
+04-23 08:27:55.179: I/native-activity(23617):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
+04-23 08:27:55.179: I/native-activity(23617):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
+04-23 08:27:55.179: I/native-activity(23617): INFO: ***  Recall BackupKey from NVM ***
+04-23 08:27:55.179: I/native-activity(23617):    INFO: masterKey Stored value =  = : db353fd3e13b703fede1ea0ed1fb1f12c92331b03338100736a9f81c675652e4ab40f79374c368daf2e237c72bb0e520 
+04-23 08:27:55.179: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
+04-23 08:27:55.179: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.179: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.179: I/native-activity(23617): encryptedCheck length = 16
+04-23 08:27:55.179: I/native-activity(23617):        encryptedCheck =  = : 39cb4c2161cafac289dde13802c77ac9 
+04-23 08:27:55.179: I/native-activity(23617): q decryptedCheck length = 5
+04-23 08:27:55.179: I/native-activity(23617):        decryptedCheck =  = : 636865636b 
+04-23 08:27:55.179: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.5 - check answers (good answers)
+04-23 08:27:55.179: D/MainActivity(23617): Test 2.6 - check pin (bad pin) ------ Starting test 
+04-23 08:27:55.179: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.179: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(TOne) ***
+04-23 08:27:55.179: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.179: I/native-activity(23617):        key = : 0d70f0b1f1d87aba0a044f5e09d99d7ace5bd5308c70e81541a97bea372e6678 
+04-23 08:27:55.179: I/native-activity(23617):         iv = : bb28d322a4c0bb0fdf5c2311abbda21b 
+04-23 08:27:55.179: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.179: I/native-activity(23617):    INFO: masterKey Stored value =  = : 5e85ce79dd24ee596203325bb46e77c29669572be01dc2b2d1d3a6407dba6ed89c6a60c3b93322b5cb100f8a27e2542a 
+04-23 08:27:55.189: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.189: I/native-activity(23617):        key = : 45c67720298486441a5ff4cab99c4709f4320a60945f77a22b2684df2e0f0151 
+04-23 08:27:55.189: I/native-activity(23617):       iv = : 2dd04aa70f04b7bbe5f5a1a794934ec2 
+04-23 08:27:55.189: I/native-activity(23617):    CheckPin: presented pin =  = : 544f6e65 
+04-23 08:27:55.189: I/native-activity(23617): WARNING: PIN does not match
+04-23 08:27:55.189: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.6 - check pin (bad pin)
+04-23 08:27:55.189: D/MainActivity(23617): Test 2.7 - check pin (good pin) ------ Starting test 
+04-23 08:27:55.189: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.189: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(One) ***
+04-23 08:27:55.189: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.189: I/native-activity(23617):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
+04-23 08:27:55.189: I/native-activity(23617):         iv = : 3469df45b8a74913db89cb352a54367d 
+04-23 08:27:55.189: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.189: I/native-activity(23617):    INFO: masterKey Stored value =  = : 5e85ce79dd24ee596203325bb46e77c29669572be01dc2b2d1d3a6407dba6ed89c6a60c3b93322b5cb100f8a27e2542a 
+04-23 08:27:55.189: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.189: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.189: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.189: I/native-activity(23617):    CheckPin: saved pin =  = : 4f6e6500 
+04-23 08:27:55.189: I/native-activity(23617):    CheckPin: presented pin =  = : 4f6e65 
+04-23 08:27:55.189: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.7 - check pin (good pin)
+04-23 08:27:55.189: D/MainActivity(23617): Test 2.8 - change pin using pin ------ Starting test 
+04-23 08:27:55.189: I/native-activity(23617): Java_com_t2_fcads_FipsWrapper_changePinUsingPin
+04-23 08:27:55.199: I/native-activity(23617): INFO: === changePinUsingPin ===
+04-23 08:27:55.199: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.199: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(One) ***
+04-23 08:27:55.199: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.199: I/native-activity(23617):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
+04-23 08:27:55.199: I/native-activity(23617):         iv = : 3469df45b8a74913db89cb352a54367d 
+04-23 08:27:55.199: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.199: I/native-activity(23617):    INFO: masterKey Stored value =  = : 5e85ce79dd24ee596203325bb46e77c29669572be01dc2b2d1d3a6407dba6ed89c6a60c3b93322b5cb100f8a27e2542a 
+04-23 08:27:55.199: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.199: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.199: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.199: I/native-activity(23617):    CheckPin: saved pin =  = : 4f6e6500 
+04-23 08:27:55.199: I/native-activity(23617):    CheckPin: presented pin =  = : 4f6e65 
+04-23 08:27:55.199: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.199: I/native-activity(23617):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
+04-23 08:27:55.199: I/native-activity(23617):         iv = : 3469df45b8a74913db89cb352a54367d 
+04-23 08:27:55.199: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.209: I/native-activity(23617):    INFO: masterKey Stored value =  = : 5e85ce79dd24ee596203325bb46e77c29669572be01dc2b2d1d3a6407dba6ed89c6a60c3b93322b5cb100f8a27e2542a 
+04-23 08:27:55.209: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.209: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.209: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.209: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(tWo) ***
+04-23 08:27:55.209: I/native-activity(23617):        key = : 6a40a66c3309095460ee02c1dde45c51a1fc9d124cc84a47b0ca11151f489922 
+04-23 08:27:55.209: I/native-activity(23617):         iv = : 663d64467dd5a20dba15744ff76c78da 
+04-23 08:27:55.209: I/native-activity(23617): INFO: *** Generating and saving to NVM MasterKey ***
+04-23 08:27:55.209: I/native-activity(23617):    MasterKey = : ba81cb492efbc79707edf45c9f581013b57278467319977c6a3de80f7852d5ed5f1aa54aa727558c49483bef84d676bc 
+04-23 08:27:55.209: I/native-activity(23617): INFO:   *** Save MasterKey Key to User Preferences ***
+04-23 08:27:55.209: I/native-activity(23617): INFO:   length = 48
+04-23 08:27:55.249: I/native-activity(23617): outLength = 16
+04-23 08:27:55.249: I/native-activity(23617):        Encrypted pin  = : 86146ea6e55669e99a73ce73e31c2b59 
+04-23 08:27:55.269: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.8 - change pin using pin
+04-23 08:27:55.269: D/MainActivity(23617): Test 2.9 - check pin (good pin) ------ Starting test 
+04-23 08:27:55.269: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.269: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(tWo) ***
+04-23 08:27:55.269: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.269: I/native-activity(23617):        key = : 6a40a66c3309095460ee02c1dde45c51a1fc9d124cc84a47b0ca11151f489922 
+04-23 08:27:55.269: I/native-activity(23617):         iv = : 663d64467dd5a20dba15744ff76c78da 
+04-23 08:27:55.269: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.269: I/native-activity(23617):    INFO: masterKey Stored value =  = : ba81cb492efbc79707edf45c9f581013b57278467319977c6a3de80f7852d5ed5f1aa54aa727558c49483bef84d676bc 
+04-23 08:27:55.269: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.269: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.269: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.269: I/native-activity(23617):    CheckPin: saved pin =  = : 74576f00 
+04-23 08:27:55.269: I/native-activity(23617):    CheckPin: presented pin =  = : 74576f 
+04-23 08:27:55.269: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.9 - check pin (good pin)
+04-23 08:27:55.269: D/MainActivity(23617): Test 2.10 - check pin (bad pin) ------ Starting test 
+04-23 08:27:55.279: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.279: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(One) ***
+04-23 08:27:55.279: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.279: I/native-activity(23617):        key = : 67f0357e3a8950c12c8ef93d05248ad8de5987c9e72ea31eac4a7a25e2782639 
+04-23 08:27:55.279: I/native-activity(23617):         iv = : 3469df45b8a74913db89cb352a54367d 
+04-23 08:27:55.279: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.279: I/native-activity(23617):    INFO: masterKey Stored value =  = : ba81cb492efbc79707edf45c9f581013b57278467319977c6a3de80f7852d5ed5f1aa54aa727558c49483bef84d676bc 
+04-23 08:27:55.279: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.279: I/native-activity(23617):        key = : 48ad7228e1daf8e69c3e9db0022fff9fedf3d00b07904bcb4544b19049cbe5e3 
+04-23 08:27:55.279: I/native-activity(23617):       iv = : 57284b41cab68b24c27b91d024dd89cb 
+04-23 08:27:55.279: I/native-activity(23617):    CheckPin: presented pin =  = : 4f6e65 
+04-23 08:27:55.279: I/native-activity(23617): WARNING: PIN does not match
+04-23 08:27:55.279: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.10 - check pin (bad pin)
+04-23 08:27:55.279: D/MainActivity(23617): Test 2.11 - changePinUsingAnswers ------ Starting test 
+04-23 08:27:55.279: I/native-activity(23617): Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers
+04-23 08:27:55.279: I/native-activity(23617): INFO: === checkAnswers ===
+04-23 08:27:55.279: I/native-activity(23617): INFO: *** Generating Secondary LockingKey  kdf(TwoThreeFour) ***
+04-23 08:27:55.279: I/native-activity(23617): INFO: ***  Generate Secondarylocking key ***
+04-23 08:27:55.279: I/native-activity(23617):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
+04-23 08:27:55.279: I/native-activity(23617):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
+04-23 08:27:55.279: I/native-activity(23617): INFO: ***  Recall BackupKey from NVM ***
+04-23 08:27:55.279: I/native-activity(23617):    INFO: masterKey Stored value =  = : db353fd3e13b703fede1ea0ed1fb1f12c92331b03338100736a9f81c675652e4ab40f79374c368daf2e237c72bb0e520 
+04-23 08:27:55.279: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
+04-23 08:27:55.279: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.279: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.279: I/native-activity(23617): encryptedCheck length = 16
+04-23 08:27:55.279: I/native-activity(23617):        encryptedCheck =  = : 39cb4c2161cafac289dde13802c77ac9 
+04-23 08:27:55.279: I/native-activity(23617): q decryptedCheck length = 5
+04-23 08:27:55.279: I/native-activity(23617):        decryptedCheck =  = : 636865636b 
+04-23 08:27:55.279: I/native-activity(23617): INFO: === changePinUsingAnswers ===
+04-23 08:27:55.279: I/native-activity(23617): INFO: *** getRIKeyUsing answers and backup key TwoThreeFour ***
+04-23 08:27:55.279: I/native-activity(23617): INFO: ***  Generate Secondarylocking key ***
+04-23 08:27:55.279: I/native-activity(23617):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
+04-23 08:27:55.279: I/native-activity(23617):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
+04-23 08:27:55.279: I/native-activity(23617): INFO: ***  Recall BackupKey from NVM ***
+04-23 08:27:55.289: I/native-activity(23617):    INFO: masterKey Stored value =  = : db353fd3e13b703fede1ea0ed1fb1f12c92331b03338100736a9f81c675652e4ab40f79374c368daf2e237c72bb0e520 
+04-23 08:27:55.289: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
+04-23 08:27:55.289: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.289: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.289: I/native-activity(23617): INFO: *** Generating New LockingKey  kdf(Password is  is four) ***
+04-23 08:27:55.289: I/native-activity(23617):        key = : c3d7897acdb1a4c6bdab44f1d32a312150a6f5dd024809bb95fc910f6c813a02 
+04-23 08:27:55.289: I/native-activity(23617):         iv = : 3f31f80c17a5ae6190cea9975f1db971 
+04-23 08:27:55.289: I/native-activity(23617): INFO: *** Generating and saving to NVM  new MasterKey ***
+04-23 08:27:55.289: I/native-activity(23617):    MasterKey = : 824a91c34bf45980171855f50ac5570da6711df818260fdd2ae0a0a33faa3870fa1985fee5c638c0cc525878be51faa1 
+04-23 08:27:55.289: I/native-activity(23617): INFO:   *** Save MasterKey Key to User Preferences ***
+04-23 08:27:55.289: I/native-activity(23617): INFO:   length = 48
+04-23 08:27:55.309: I/native-activity(23617): outLength = 32
+04-23 08:27:55.309: I/native-activity(23617):        Encrypted pin  = : d1f3777332f76254111043ba1dc07c9d3d1d424d02ce3c5539ca9579a7c99e2b 
+04-23 08:27:55.329: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.11 - changePinUsingAnswers
+04-23 08:27:55.329: D/MainActivity(23617): Test 2.12 - check pin (bad pin) ------ Starting test 
+04-23 08:27:55.329: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.329: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(tWo) ***
+04-23 08:27:55.329: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.329: I/native-activity(23617):        key = : 6a40a66c3309095460ee02c1dde45c51a1fc9d124cc84a47b0ca11151f489922 
+04-23 08:27:55.329: I/native-activity(23617):         iv = : 663d64467dd5a20dba15744ff76c78da 
+04-23 08:27:55.329: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.329: I/native-activity(23617):    INFO: masterKey Stored value =  = : 824a91c34bf45980171855f50ac5570da6711df818260fdd2ae0a0a33faa3870fa1985fee5c638c0cc525878be51faa1 
+04-23 08:27:55.329: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.329: I/native-activity(23617):        key = : 16d251983b66ff4bc52ad699438d1b5c7d3a0f2f4081b1f04e23132aea57d754 
+04-23 08:27:55.329: I/native-activity(23617):       iv = : ed95b2bb008d5f1326b716ea34606607 
+04-23 08:27:55.329: I/native-activity(23617):    CheckPin: saved pin =  = : 94194dafe7168f0105fcde15fdb27863 
+04-23 08:27:55.329: I/native-activity(23617):    CheckPin: presented pin =  = : 74576f 
+04-23 08:27:55.329: I/native-activity(23617): WARNING: PIN does not match
+04-23 08:27:55.329: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.12 - check pin (bad pin)
+04-23 08:27:55.329: D/MainActivity(23617): Test 2.13 - check pin (good pin) ------ Starting test 
+04-23 08:27:55.339: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.339: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(Password is  is four) ***
+04-23 08:27:55.339: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.339: I/native-activity(23617):        key = : c3d7897acdb1a4c6bdab44f1d32a312150a6f5dd024809bb95fc910f6c813a02 
+04-23 08:27:55.339: I/native-activity(23617):         iv = : 3f31f80c17a5ae6190cea9975f1db971 
+04-23 08:27:55.339: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.339: I/native-activity(23617):    INFO: masterKey Stored value =  = : 824a91c34bf45980171855f50ac5570da6711df818260fdd2ae0a0a33faa3870fa1985fee5c638c0cc525878be51faa1 
+04-23 08:27:55.339: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.339: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.339: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.339: I/native-activity(23617):    CheckPin: saved pin =  = : 50617373776f72642069732020697320666f757200 
+04-23 08:27:55.339: I/native-activity(23617):    CheckPin: presented pin =  = : 50617373776f72642069732020697320666f7572 
+04-23 08:27:55.339: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.13 - check pin (good pin)
+04-23 08:27:55.339: D/MainActivity(23617): Test 2.14 - changePinUsingAnswers ------ Starting test 
+04-23 08:27:55.339: I/native-activity(23617): Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers
+04-23 08:27:55.339: I/native-activity(23617): INFO: === checkAnswers ===
+04-23 08:27:55.339: I/native-activity(23617): INFO: *** Generating Secondary LockingKey  kdf(TwoThreeFour) ***
+04-23 08:27:55.339: I/native-activity(23617): INFO: ***  Generate Secondarylocking key ***
+04-23 08:27:55.339: I/native-activity(23617):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
+04-23 08:27:55.339: I/native-activity(23617):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
+04-23 08:27:55.339: I/native-activity(23617): INFO: ***  Recall BackupKey from NVM ***
+04-23 08:27:55.339: I/native-activity(23617):    INFO: masterKey Stored value =  = : db353fd3e13b703fede1ea0ed1fb1f12c92331b03338100736a9f81c675652e4ab40f79374c368daf2e237c72bb0e520 
+04-23 08:27:55.339: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
+04-23 08:27:55.339: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.339: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.339: I/native-activity(23617): encryptedCheck length = 16
+04-23 08:27:55.339: I/native-activity(23617):        encryptedCheck =  = : 39cb4c2161cafac289dde13802c77ac9 
+04-23 08:27:55.339: I/native-activity(23617): q decryptedCheck length = 5
+04-23 08:27:55.339: I/native-activity(23617):        decryptedCheck =  = : 636865636b 
+04-23 08:27:55.339: I/native-activity(23617): INFO: === changePinUsingAnswers ===
+04-23 08:27:55.339: I/native-activity(23617): INFO: *** getRIKeyUsing answers and backup key TwoThreeFour ***
+04-23 08:27:55.339: I/native-activity(23617): INFO: ***  Generate Secondarylocking key ***
+04-23 08:27:55.339: I/native-activity(23617):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
+04-23 08:27:55.339: I/native-activity(23617):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
+04-23 08:27:55.339: I/native-activity(23617): INFO: ***  Recall BackupKey from NVM ***
+04-23 08:27:55.339: I/native-activity(23617):    INFO: masterKey Stored value =  = : db353fd3e13b703fede1ea0ed1fb1f12c92331b03338100736a9f81c675652e4ab40f79374c368daf2e237c72bb0e520 
+04-23 08:27:55.339: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
+04-23 08:27:55.339: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.339: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.339: I/native-activity(23617): INFO: *** Generating New LockingKey  kdf() ***
+04-23 08:27:55.339: I/native-activity(23617):        key = : 5bf0c9c643bb72c859cc0b6390febfe08d62cbcc9018985415360e3e1a97e195 
+04-23 08:27:55.339: I/native-activity(23617):         iv = : 8bbab49289ffd765a3a215ad7f4d8d86 
+04-23 08:27:55.339: I/native-activity(23617): INFO: *** Generating and saving to NVM  new MasterKey ***
+04-23 08:27:55.339: I/native-activity(23617):    MasterKey = : f9acc30758479c58dd2bf01434685fa26ed3580523f1d107f603fee9d0136fa7ae6c629868fdf713d516185726c2fa4e 
+04-23 08:27:55.339: I/native-activity(23617): INFO:   *** Save MasterKey Key to User Preferences ***
+04-23 08:27:55.339: I/native-activity(23617): INFO:   length = 48
+04-23 08:27:55.369: I/native-activity(23617): outLength = 16
+04-23 08:27:55.369: I/native-activity(23617):        Encrypted pin  = : e9ef4cbbf8a5ede89551aa7bb9126305 
+04-23 08:27:55.389: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.14 - changePinUsingAnswers
+04-23 08:27:55.389: D/MainActivity(23617): Test 2.15 - check pin (bad pin) ------ Starting test 
+04-23 08:27:55.389: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.389: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(tWo) ***
+04-23 08:27:55.389: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.389: I/native-activity(23617):        key = : 6a40a66c3309095460ee02c1dde45c51a1fc9d124cc84a47b0ca11151f489922 
+04-23 08:27:55.389: I/native-activity(23617):         iv = : 663d64467dd5a20dba15744ff76c78da 
+04-23 08:27:55.389: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.389: I/native-activity(23617):    INFO: masterKey Stored value =  = : f9acc30758479c58dd2bf01434685fa26ed3580523f1d107f603fee9d0136fa7ae6c629868fdf713d516185726c2fa4e 
+04-23 08:27:55.389: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.389: I/native-activity(23617):        key = : 5329b4741fb7d17d692b7ba44504d87d0277e6791df9bfeb990c675c0b575c2d 
+04-23 08:27:55.389: I/native-activity(23617):       iv = : 8bdad161e0946e4d1829dfe6943afd9d 
+04-23 08:27:55.389: I/native-activity(23617):    CheckPin: presented pin =  = : 74576f 
+04-23 08:27:55.389: I/native-activity(23617): WARNING: PIN does not match
+04-23 08:27:55.389: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.15 - check pin (bad pin)
+04-23 08:27:55.389: D/MainActivity(23617): Test 2.16 - check pin (good pin) ------ Starting test 
+04-23 08:27:55.399: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.399: I/native-activity(23617): INFO: *** Generating LockingKey  kdf() ***
+04-23 08:27:55.399: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.399: I/native-activity(23617):        key = : 5bf0c9c643bb72c859cc0b6390febfe08d62cbcc9018985415360e3e1a97e195 
+04-23 08:27:55.399: I/native-activity(23617):         iv = : 8bbab49289ffd765a3a215ad7f4d8d86 
+04-23 08:27:55.399: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.399: I/native-activity(23617):    INFO: masterKey Stored value =  = : f9acc30758479c58dd2bf01434685fa26ed3580523f1d107f603fee9d0136fa7ae6c629868fdf713d516185726c2fa4e 
+04-23 08:27:55.399: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.399: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.399: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.399: I/native-activity(23617):    CheckPin: saved pin =  = : 00 
+04-23 08:27:55.399: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.16 - check pin (good pin)
+04-23 08:27:55.399: D/MainActivity(23617): Test 2.17 - changePinUsingAnswers ------ Starting test 
+04-23 08:27:55.399: I/native-activity(23617): Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers
+04-23 08:27:55.399: I/native-activity(23617): INFO: === checkAnswers ===
+04-23 08:27:55.399: I/native-activity(23617): INFO: *** Generating Secondary LockingKey  kdf(TwoThreeFour) ***
+04-23 08:27:55.399: I/native-activity(23617): INFO: ***  Generate Secondarylocking key ***
+04-23 08:27:55.399: I/native-activity(23617):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
+04-23 08:27:55.399: I/native-activity(23617):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
+04-23 08:27:55.399: I/native-activity(23617): INFO: ***  Recall BackupKey from NVM ***
+04-23 08:27:55.399: I/native-activity(23617):    INFO: masterKey Stored value =  = : db353fd3e13b703fede1ea0ed1fb1f12c92331b03338100736a9f81c675652e4ab40f79374c368daf2e237c72bb0e520 
+04-23 08:27:55.399: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
+04-23 08:27:55.399: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.399: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.399: I/native-activity(23617): encryptedCheck length = 16
+04-23 08:27:55.399: I/native-activity(23617):        encryptedCheck =  = : 39cb4c2161cafac289dde13802c77ac9 
+04-23 08:27:55.399: I/native-activity(23617): q decryptedCheck length = 5
+04-23 08:27:55.399: I/native-activity(23617):        decryptedCheck =  = : 636865636b 
+04-23 08:27:55.399: I/native-activity(23617): INFO: === changePinUsingAnswers ===
+04-23 08:27:55.399: I/native-activity(23617): INFO: *** getRIKeyUsing answers and backup key TwoThreeFour ***
+04-23 08:27:55.399: I/native-activity(23617): INFO: ***  Generate Secondarylocking key ***
+04-23 08:27:55.399: I/native-activity(23617):        key = : c808273ee7b2d2fc25aa2cab09ab0cd9a2e1e1c924f94c6b7a8b90d8a6d46697 
+04-23 08:27:55.399: I/native-activity(23617):         iv = : ce5eb0b93b7e28218ee0e1c2672370bd 
+04-23 08:27:55.399: I/native-activity(23617): INFO: ***  Recall BackupKey from NVM ***
+04-23 08:27:55.409: I/native-activity(23617):    INFO: masterKey Stored value =  = : db353fd3e13b703fede1ea0ed1fb1f12c92331b03338100736a9f81c675652e4ab40f79374c368daf2e237c72bb0e520 
+04-23 08:27:55.409: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(BackupKey, SecondaryLockingKey) ***
+04-23 08:27:55.409: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.409: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.409: I/native-activity(23617): INFO: *** Generating New LockingKey  kdf(9q34un 9vq34ute noaerpt9uertv[!%!#$^&^*^%&*))%2032498132064684;asdjjf;fsjfd;fkjkflja;fdjfeie11) ***
+04-23 08:27:55.409: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.409: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.409: I/native-activity(23617): INFO: *** Generating and saving to NVM  new MasterKey ***
+04-23 08:27:55.409: I/native-activity(23617):    MasterKey = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.409: I/native-activity(23617): INFO:   *** Save MasterKey Key to User Preferences ***
+04-23 08:27:55.409: I/native-activity(23617): INFO:   length = 48
+04-23 08:27:55.429: I/native-activity(23617): outLength = 96
+04-23 08:27:55.429: I/native-activity(23617):        Encrypted pin  = : ae71f8571dad7799d3803c8ea9136b84cc841525ee7258e7b6832023f106be8de0769431752b9682a7da7b5d0ce2e03b72cac6c152acd81013d2a7443fe540ce70e692301b92191cd40981752e1228075dbdc6b71de5f8887eeb6fe0af32fc43 
+04-23 08:27:55.449: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.17 - changePinUsingAnswers
+04-23 08:27:55.449: D/MainActivity(23617): Test 2.18 - check pin (bad pin) ------ Starting test 
+04-23 08:27:55.449: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.449: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(tWo) ***
+04-23 08:27:55.449: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.449: I/native-activity(23617):        key = : 6a40a66c3309095460ee02c1dde45c51a1fc9d124cc84a47b0ca11151f489922 
+04-23 08:27:55.449: I/native-activity(23617):         iv = : 663d64467dd5a20dba15744ff76c78da 
+04-23 08:27:55.449: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.449: I/native-activity(23617):    INFO: masterKey Stored value =  = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.449: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.449: I/native-activity(23617):        key = : 9f1cb779ff0bdcf94aeaf7659cf3429bed6d0d019eb9ea686c6d50ac2aa1a762 
+04-23 08:27:55.449: I/native-activity(23617):       iv = : 231144c3024ebc4e43ec55f4873217f5 
+04-23 08:27:55.449: I/native-activity(23617):    CheckPin: saved pin =  = : 09e5395c5973bbd9e8e9230743382e2341b624da090f19f791733d68f5697a74af32791884d13e3fa9fc91b285797df1008ac1c482dc58e970aeb7f0f541a431ba24f9e4e21e38da54e5d5cee34f8923 
+04-23 08:27:55.449: I/native-activity(23617):    CheckPin: presented pin =  = : 74576f 
+04-23 08:27:55.449: I/native-activity(23617): WARNING: PIN does not match
+04-23 08:27:55.449: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.18 - check pin (bad pin)
+04-23 08:27:55.449: D/MainActivity(23617): Test 2.19 - check pin (good pin) ------ Starting test 
+04-23 08:27:55.459: I/native-activity(23617): INFO: === checkPin ===
+04-23 08:27:55.459: I/native-activity(23617): INFO: *** Generating LockingKey  kdf(9q34un 9vq34ute noaerpt9uertv[!%!#$^&^*^%&*))%2032498132064684;asdjjf;fsjfd;fkjkflja;fdjfeie11) ***
+04-23 08:27:55.459: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.459: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.459: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.459: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.459: I/native-activity(23617):    INFO: masterKey Stored value =  = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.459: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.459: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.459: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.459: I/native-activity(23617):    CheckPin: saved pin =  = : 39713334756e203976713334757465206e6f61657270743975657274765b21252123245e265e2a5e25262a292925323033323439383133323036343638343b6173646a6a663b66736a66643b666b6a6b666c6a613b66646a66656965313100 
+04-23 08:27:55.459: I/native-activity(23617):    CheckPin: presented pin =  = : 39713334756e203976713334757465206e6f61657270743975657274765b21252123245e265e2a5e25262a292925323033323439383133323036343638343b6173646a6a663b66736a66643b666b6a6b666c6a613b66646a666569653131 
+04-23 08:27:55.459: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.19 - check pin (good pin)
+04-23 08:27:55.459: D/MainActivity(23617): Test 2.20 - check encrypt/decrypt ------ Starting test 
+04-23 08:27:55.459: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.459: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.459: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.459: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.459: I/native-activity(23617):    INFO: masterKey Stored value =  = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.459: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.459: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.459: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.459: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.459: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.459: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.459: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.459: I/native-activity(23617):    INFO: masterKey Stored value =  = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.459: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.459: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.459: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.469: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.20 - check encrypt/decrypt
+04-23 08:27:55.469: D/MainActivity(23617): Test 2.21 - check encrypt/decrypt - blank string ------ Starting test 
+04-23 08:27:55.469: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.469: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.469: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.469: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.469: I/native-activity(23617):    INFO: masterKey Stored value =  = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.469: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.469: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.469: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.469: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.469: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.469: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.469: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.469: I/native-activity(23617):    INFO: masterKey Stored value =  = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.469: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.469: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.469: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.479: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.21 - check encrypt/decrypt - blank string
+04-23 08:27:55.479: D/MainActivity(23617): Test 2.22 - check encrypt/decrypt - long string ------ Starting test 
+04-23 08:27:55.479: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.479: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.479: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.479: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.479: I/native-activity(23617):    INFO: masterKey Stored value =  = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.479: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.479: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.479: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.479: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.479: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.479: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.479: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.479: I/native-activity(23617):    INFO: masterKey Stored value =  = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.479: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.479: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.479: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.489: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.22 - check encrypt/decrypt - long string
+04-23 08:27:55.489: D/MainActivity(23617): Test 2.23 - check encrypt/decrypt - BAD PIIN long string ------ Starting test 
+04-23 08:27:55.489: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.489: I/native-activity(23617):        key = : fafe63e71fef0d3705970a6d46a2f01e336dc96eb0e5e9642dfc37b3ae7991ab 
+04-23 08:27:55.489: I/native-activity(23617):         iv = : 9ae69a092de3c93e6abe031d7eb0aba5 
+04-23 08:27:55.489: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.489: I/native-activity(23617):    INFO: masterKey Stored value =  = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.489: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.489: I/native-activity(23617):        key = : 7031fb059414c3524700aa3a7eab1e0d245e5fd468fb49573b14c29d98f893e4 
+04-23 08:27:55.489: I/native-activity(23617):       iv = : 1f0cd62c7fece6f249b9498942a817a7 
+04-23 08:27:55.489: I/native-activity(23617): INFO: ***  Generate Locking key ***
+04-23 08:27:55.489: I/native-activity(23617):        key = : c3d7897acdb1a4c6bdab44f1d32a312150a6f5dd024809bb95fc910f6c813a02 
+04-23 08:27:55.489: I/native-activity(23617):         iv = : 3f31f80c17a5ae6190cea9975f1db971 
+04-23 08:27:55.489: I/native-activity(23617): INFO: ***  Recall MasterKey from NVM ***
+04-23 08:27:55.489: I/native-activity(23617):    INFO: masterKey Stored value =  = : 6fcaff1971fe87373110d8570e05a1c863b1d07836ce672c98cd8a9090b14b1908cc6e74b357b935b9491effad2d82fd 
+04-23 08:27:55.489: I/native-activity(23617): INFO: *** Generate RIKey = decrypt(MasterKey, LockingKey) ***
+04-23 08:27:55.489: I/native-activity(23617):        key = : 56438340063c6c1cfaa09e7384937c838f550243fbc3c82a07d8e17139f0a12d 
+04-23 08:27:55.489: I/native-activity(23617):       iv = : 8cd97c0a46b591401fcc06f30764b99d 
+04-23 08:27:55.489: D/MainActivity(23617):     PASSED - Iteration 1, Test 2.23 - check encrypt/decrypt - BAD PIIN long string
+04-23 08:27:55.489: D/MainActivity(23617): -------------------------------------------------------------
+04-23 08:27:55.489: D/MainActivity(23617):   Iteration 1 - Unit Test Summary
+04-23 08:27:55.489: D/MainActivity(23617): -------------------------------------------------------------
+04-23 08:27:55.489: D/MainActivity(23617):    Iteration 1 -   Iterations Performed: 1
+04-23 08:27:55.489: D/MainActivity(23617):    Iteration 1 -   Tests passed: 29
+04-23 08:27:55.489: D/MainActivity(23617):    Iteration 1 -   Tests failed: 0
+04-23 08:27:55.489: D/MainActivity(23617):    ++ ALL TESTS PASSED ++ 

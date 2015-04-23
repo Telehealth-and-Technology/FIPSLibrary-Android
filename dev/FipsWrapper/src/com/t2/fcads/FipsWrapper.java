@@ -33,6 +33,8 @@ visit http://www.opensource.org/licenses/EPL-1.0
 package com.t2.fcads;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -118,10 +120,10 @@ public class FipsWrapper {
 	 public native int changePinUsingAnswers(String newPin, String answers);
 	 public native int setVerboseLogging(boolean verboseLogging);
 	 public native String encryptUsingT2Crypto(String pin, String plainText);
-	 public native String decryptUsingT2Crypto(String pin, String cipherText);
+	 public native byte[] decryptUsingT2Crypto(String pin, String cipherText);
 
 	 public native String encryptRaw(String pin, String plainText);
-	 public native String decryptRaw(String pin, String cipherText);
+	 public native byte[] decryptRaw(String pin, String cipherText);
 	 
 	/**
 	 * Constructor
@@ -150,8 +152,9 @@ public class FipsWrapper {
 	/**
 	 * @return Instance of FipsWrapper
 	 */
-	public static FipsWrapper getInstance() {
+	public static FipsWrapper getInstance(Context cxt) {
 		if (instance == null) {
+			context = cxt;
 			instance = new FipsWrapper();
 		}
 		return instance;
@@ -343,7 +346,12 @@ public class FipsWrapper {
 	 * @return return encrypted version of cipherText
 	 */
 	public String doDecryptUsingT2Crypto(String pin, String cipherText) {
-		return decryptUsingT2Crypto(pin, cipherText);
+		
+		byte[] retArray = decryptUsingT2Crypto(pin, cipherText);
+		int len = retArray.length;
+		byte[] truncated = Arrays.copyOf(retArray, len - 1);
+		String retString = new String(truncated);
+		return retString;
 	}
 	
 	/**
@@ -359,7 +367,13 @@ public class FipsWrapper {
 	 * @return return encrypted version of cipherText
 	 */	
 	public String doDecryptRaw(String pin, String cipherText) {
-		return decryptRaw(pin, cipherText);
+		// Need to dispose of the terminating zero
+		byte[] retArray = decryptRaw(pin, cipherText);
+		int len = retArray.length;
+		byte[] truncated = Arrays.copyOf(retArray, len - 1);
+		String retString = new String(truncated);
+		
+		return retString;
 	}	
 
 	// Routines for native code to call for preferences
@@ -405,10 +419,23 @@ public class FipsWrapper {
 	 * @param values Value to save to NVM
 	 */
 	static void putData(String key, byte[] values) {
-		String str = Base64.encodeToString(values, Base64.NO_WRAP);
-		SharedPreferences sp = context.getSharedPreferences("FIPS_VARS",
-				Context.MODE_PRIVATE);
-		sp.edit().putString(key, str).commit();
+		
+		
+		String str;
+		SharedPreferences sp;
+		try {
+			str = Base64.encodeToString(values, Base64.NO_WRAP);
+			sp = context.getSharedPreferences("FIPS_VARS",
+					Context.MODE_PRIVATE);
+			
+			sp.edit().putString(key, str).commit();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+
 	}
 
 	/**
@@ -445,7 +472,6 @@ public class FipsWrapper {
 		byte[] defaultSalt = new byte[] { (byte) 0x39, (byte) 0x30,
 				(byte) 0x00, (byte) 0x00, (byte) 0x31, (byte) 0xD4,
 				(byte) 0x00, (byte) 0x00 };
-
 		long hash = 0;
 		try {
 			// Calculate a 8 byte hash of the signature

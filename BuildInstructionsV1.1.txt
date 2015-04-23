@@ -93,6 +93,9 @@ Building
 	-----------------------------
 	execute . ./buildAll.sh
 
+	
+
+	<---------- Remaining instructions in step 2 are for legacy only!  ----------------->
 
 	Note: created deliverable files are in two locations:
 		/usr/local/ssl/...                       OpenSSL files files

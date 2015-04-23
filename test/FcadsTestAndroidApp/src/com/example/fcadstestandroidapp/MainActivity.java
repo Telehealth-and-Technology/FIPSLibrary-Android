@@ -89,7 +89,7 @@ public class MainActivity extends Activity
         updateView("Checking FIPS signature");     
         updateView("Calling FIPS_mode");      
         
-        FipsWrapper fipsWrapper = FipsWrapper.getInstance();
+        FipsWrapper fipsWrapper = FipsWrapper.getInstance(this);
         
         FipsWrapper.setContext(this);
         
@@ -125,7 +125,11 @@ public class MainActivity extends Activity
 		
 		// ---------------------------------------------------------------------------------------
 		final int NUM_ITERATIONS = 1;
-		fipsWrapper.doPrepare(useRandomVectorsFoRiKey);	
+		//fipsWrapper.doPrepare(useRandomVectorsFoRiKey);	
+		fipsWrapper.doPrepare(useTestVectorsFoRiKey);
+		
+		
+		
 		fipsWrapper.doSetVerboseLogging(true);
 		// ---------------------------------------------------------------------------------------
 		
@@ -146,17 +150,6 @@ public class MainActivity extends Activity
 		// Unit test template:		
 		//		testDescription = startTest("Test x");
 		//		assertT2Test(x = x, testDescription);
-		
-
-//		String stringtoEncrypt = "String to Encrypt";
-//		Log.d(TAG, "stringtoEncrypt = " + stringtoEncrypt);
-//		String encrypted = fipsWrapper.doEncryptRaw("TestPin", stringtoEncrypt);
-//		Log.d(TAG, "encrypted = " + encrypted);
-//		
-//		String decrypted = fipsWrapper.doDecryptRaw("TestPin", encrypted);
-//		Log.d(TAG, "decrypted = " + decrypted);
-//		
-				
 		
 		
 		while(iterations++ < NUM_ITERATIONS) {
@@ -191,24 +184,27 @@ public class MainActivity extends Activity
 				//Log.d(TAG,"java decryptedText = " + decryptedText);
 				assertT2Test(blankStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;					
 
+
 				testDescription = startTest("Test 2.c - check encrypt/decrypt - long string");
 				encryptedText = fipsWrapper.doEncryptRaw(blankPin, longStringToEncrypt);
 				decryptedText = fipsWrapper.doDecryptRaw(blankPin, encryptedText);
-				//Log.d(TAG,"java decryptedText       = " + decryptedText);
 				assertT2Test(longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;					
 
-//				testDescription = startTest("Test 2.d - check encrypt/decrypt - bad pin");
-//				String encryptedText = fipsWrapper.doEncryptRaw(blankPin, longStringToEncrypt);
-//				String decryptedText;
-//				try {
-//					decryptedText = fipsWrapper.doDecryptRaw(crazyPin, encryptedText);
-//				} catch (Exception e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			//	Log.d(TAG,"java decryptedText       = " + decryptedText);
-//				//assertT2Test(!longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;		
-//				
+				
+				
+				
+				// !!!!This will fail until Bug 3003 gets fixed
+				testDescription = startTest("Test 2.d - check encrypt/decrypt - bad pin");
+				encryptedText = fipsWrapper.doEncryptRaw(blankPin, longStringToEncrypt);
+				try {
+					decryptedText = fipsWrapper.doDecryptRaw(crazyPin, encryptedText);
+					//decryptedText = fipsWrapper.doDecryptRaw(blankPin, encryptedText);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				assertT2Test(!longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;		
+				
 				
 				testDescription = startTest("Test 2.3 - doIsInitialized");
 				ret = fipsWrapper.doIsInitialized();
@@ -283,7 +279,8 @@ public class MainActivity extends Activity
 				testDescription = startTest("Test 2.19 - check pin (good pin)");
 				ret = fipsWrapper.doCheckPin(crazyPin);
 				assertT2Test(ret == T2Success, testDescription) ;					
-								
+						
+				
 				testDescription = startTest("Test 2.20 - check encrypt/decrypt");
 				encryptedText = fipsWrapper.doEncryptUsingT2Crypto(crazyPin, stringToEncrypt);
 				decryptedText = fipsWrapper.doDecryptUsingT2Crypto(crazyPin, encryptedText);
@@ -299,10 +296,12 @@ public class MainActivity extends Activity
 				testDescription = startTest("Test 2.22 - check encrypt/decrypt - long string");
 				encryptedText = fipsWrapper.doEncryptUsingT2Crypto(crazyPin, longStringToEncrypt);
 				decryptedText = fipsWrapper.doDecryptUsingT2Crypto(crazyPin, encryptedText);
-				//Log.d(TAG,"java decryptedText       = " + decryptedText);
 				assertT2Test(longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;	
-								
 				
+				testDescription = startTest("Test 2.23 - check encrypt/decrypt - BAD PIIN long string");
+				encryptedText = fipsWrapper.doEncryptUsingT2Crypto(crazyPin, longStringToEncrypt);
+				decryptedText = fipsWrapper.doDecryptUsingT2Crypto(newPin3, encryptedText);
+				assertT2Test(!longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;	
 				
 				
 			} catch (Exception e) {

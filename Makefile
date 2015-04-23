@@ -53,7 +53,6 @@ cleanfipswrapper:
 	./clean.sh
 	cd ../..
 
-
 buildfipswrapper:
 	echo "Building fipswrapper files" && \
 	cd dev/fipswrapper && \
@@ -100,6 +99,7 @@ prepare:
 	cp SupplementalFiles/Makefile android-database-sqlcipher/ && \
 	cp SupplementalFiles/Application.mk android-database-sqlcipher/jni/ && \
 	cp SupplementalFiles/*.c android-database-sqlcipher/external && \
+	cp SupplementalFiles/*.cpp android-database-sqlcipher/external && \
 	cp SupplementalFiles/*.sh android-database-sqlcipher/external	
 
 fips:

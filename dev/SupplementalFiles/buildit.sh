@@ -357,7 +357,6 @@ $CC \
 
 
 
-
 $CC \
 -MMD -MP -MF \
 ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/String8.o.d \
@@ -381,12 +380,55 @@ $CC \
 -I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
  ./String8.cpp -o String8.o 
 
+// wrapper.c has been replace by newWrapper.cpp
+# set +x
+# echo ""
+# echo " -----------------  Starting build of wrapper.c  ----------"
+# echo ""
+# set -x
+
+
+
+# $CC \
+# -MMD -MP -MF \
+# ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/wrapper.o.d \
+# -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te \
+# -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g \
+# -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 \
+# -I./includes \
+# -I./sqlcipher \
+# -I./icu4c/i18n \
+# -I./icu4c/common \
+# -I./platform-system-core/include \
+# -I./platform-frameworks-base/include -Iopenssl/include \
+# -I$ANDROID_NDK_ROOT/sources/cxx-stl/stlport/stlport -I$ANDROID_NDK_ROOT/sources/cxx-stl//gabi++/include \
+# -I. \
+# -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 \
+# -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 \
+# -DSQLITE_ENABLE_FTS3_BACKWARDS \
+# -DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
+# -Wa,--noexecstack -Wformat -Werror=format-security  \
+# -frtti     \
+# -I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
+#  ./wrapper.c -o wrapper.o 
+
+
+
+
+
+set +x
+echo ""
+echo " -----------------  Starting build of wrapper.cpp  ----------"
+echo ""
+set -x
+
+
 
 $CC \
 -MMD -MP -MF \
-../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/wrapper.o.d \
+../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/newWrapper.o.d \
 -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te \
--mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g \
+-mtune=xscale -msoft-float -fno-rtti -mthumb -Os -g \
 -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 \
 -I./includes \
 -I./sqlcipher \
@@ -403,15 +445,30 @@ $CC \
 -Wa,--noexecstack -Wformat -Werror=format-security  \
 -frtti     \
 -I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
- ./wrapper.c -o wrapper.o 
+ ./newWrapper.cpp -o newWrapper.o 
 
+
+set +x
+echo ""
+echo " -----------------  Ending build of wrapper.cpp  ----------"
+echo ""
+set -x
+
+set +x
+echo ""
+echo " -----------------  Starting link  ----------"
+echo ""
+set -x
+
+
+# Updated linker to use newWrapper.o instead of wrapper.o
 
 
 #$CC \
 $CC \
 -Wl,-soname,libsqlcipher_android.so -shared --sysroot=$ANDROID_NDK_ROOT/platforms/android-3/arch-arm\
  sqlite3_android.o PhonebookIndex.o PhoneNumberUtils.o OldPhoneNumberUtils.o PhoneticStringUtils.o \
- String16.o String8.o wrapper.o \
+ String16.o String8.o newWrapper.o \
  ../obj/local/armeabi/libsqlcipher.a \
  ../obj/local/armeabi/libicui18n.a \
  ./android-libs/armeabi/libcrypto.a \
@@ -422,6 +479,15 @@ $CC \
  -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now  \
  -L$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/lib -llog -lutils -lcutils -lc -lm \
  -o libsqlcipher_android.so
+
+
+
+set +x
+echo ""
+echo " -----------------  Copying lib files to lib directories  ----------"
+echo ""
+set -x
+
 
 cp libsqlcipher_android.so ../libs/armeabi
 cp libsqlcipher_android.so ../libs/armeabi-v7a
