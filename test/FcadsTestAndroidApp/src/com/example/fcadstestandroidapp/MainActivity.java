@@ -124,7 +124,7 @@ public class MainActivity extends Activity
 		final boolean useRandomVectorsFoRiKey = false;
 		
 		// ---------------------------------------------------------------------------------------
-		final int NUM_ITERATIONS = 1;
+		final int NUM_ITERATIONS = 100;
 		//fipsWrapper.doPrepare(useRandomVectorsFoRiKey);	
 		fipsWrapper.doPrepare(useTestVectorsFoRiKey);
 		

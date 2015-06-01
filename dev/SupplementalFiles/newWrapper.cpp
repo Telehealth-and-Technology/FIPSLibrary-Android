@@ -1351,7 +1351,7 @@ jint Java_com_t2_fcads_FipsWrapper_FIPSmode( JNIEnv* env, jobject thiz ) {
  * @return Version string
  */
 jstring Java_com_t2_fcads_FipsWrapper_T2FIPSVersion( JNIEnv* env, jobject thiz ) {
-    return env->NewStringUTF("1.5.0");
+    return env->NewStringUTF("1.5.1");
 }
 
 
