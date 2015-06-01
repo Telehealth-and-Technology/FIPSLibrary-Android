@@ -304,6 +304,26 @@ public class MainActivity extends Activity
 				assertT2Test(!longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;	
 				
 				
+				// No test here, just do it and make sure that the app doesn't crash
+				testDescription = startTest("Test 2.24 - check encrypt/decrypt - Good pin, decrypted non-encrypted string");
+				//encryptedText = fipsWrapper.doEncryptUsingT2Crypto(newPin3, longStringToEncrypt);
+				try {
+					decryptedText = fipsWrapper.doDecryptUsingT2Crypto(newPin3, "1");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					decryptedText = fipsWrapper.doDecryptUsingT2Crypto(newPin3, "4");
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				//assertT2Test(!longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;	
+				
+
+				
+				
 			} catch (Exception e) {
 				Log.e(TAG, "Exception " + e.toString());
 				e.printStackTrace();

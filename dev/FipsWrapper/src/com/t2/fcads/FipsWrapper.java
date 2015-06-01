@@ -367,11 +367,25 @@ public class FipsWrapper {
 	 * @return return encrypted version of cipherText
 	 */	
 	public String doDecryptRaw(String pin, String cipherText) {
+		if (cipherText == null) {
+			return new String("");
+		}
+		
+		
 		// Need to dispose of the terminating zero
 		byte[] retArray = decryptRaw(pin, cipherText);
 		int len = retArray.length;
-		byte[] truncated = Arrays.copyOf(retArray, len - 1);
-		String retString = new String(truncated);
+		
+		String retString;
+		if (len > 0) {
+			byte[] truncated = Arrays.copyOf(retArray, len - 1);
+			retString = new String(truncated);		
+		}
+		else {
+			retString = new String("");
+		}
+		
+
 		
 		return retString;
 	}	
