@@ -1022,9 +1022,14 @@ jstring Java_com_t2_fcads_FipsWrapper_encryptRaw(JNIEnv* env, jobject thiz, jstr
     int key_data_len = strlen(pin);
     
 
+    unsigned char rawSalt[SALT_LENGTH];
+    unsigned char tmp[] = CANNNED_SALT;
+    memcpy(rawSalt,tmp,SALT_LENGTH);
+    logAsHexString(rawSalt, SALT_LENGTH, (char *) "xx    salt =  ");
+
 
     /* gen key and iv. init the cipher ctx object */
-    if (key_init(key_data, key_data_len, (unsigned char *)_salt, &RawKey)) {
+    if (key_init(key_data, key_data_len, (unsigned char *)rawSalt, &RawKey)) {
         T2Assert(FALSE, "ERROR: initializing key");
         // Clean up jni variables
         env->ReleaseStringUTFChars(jPin, pin);
@@ -1080,12 +1085,18 @@ jbyteArray Java_com_t2_fcads_FipsWrapper_decryptRaw(JNIEnv* env, jobject thiz, j
 
     unsigned char *key_data = (unsigned char *)pin;
     int key_data_len = strlen(pin);
+
+
+    unsigned char rawSalt[SALT_LENGTH];
+    unsigned char tmp[] = CANNNED_SALT;
+    memcpy(rawSalt,tmp,SALT_LENGTH);
+    logAsHexString(rawSalt, SALT_LENGTH, (char *) "xx    salt =  ");
     
     // Generate RawKey = kdf(PIN)
     // ------------------------------
 
     /* gen key and iv. init the cipher ctx object */
-    if (key_init(key_data, key_data_len, (unsigned char *)_salt, &RawKey)) {
+    if (key_init(key_data, key_data_len, (unsigned char *)rawSalt, &RawKey)) {
         T2Assert(FALSE, "ERROR: initializing key");
         // Clean up jni variables
         env->ReleaseStringUTFChars(jPin, pin);

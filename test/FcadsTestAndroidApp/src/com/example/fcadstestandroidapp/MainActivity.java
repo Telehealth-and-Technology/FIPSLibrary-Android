@@ -166,6 +166,9 @@ public class MainActivity extends Activity
 				ret = fipsWrapper.doIsInitialized();
 				assertT2Test(ret == T2False, testDescription);
 			
+				String encryptedText1 = fipsWrapper.doEncryptRaw(crazyPin, stringToEncrypt);
+				String decryptedText1 = fipsWrapper.doDecryptRaw(crazyPin, encryptedText1);
+				
 				testDescription = startTest("Test 2.2 - doInitializeLogin");
 				ret = fipsWrapper.doInitializeLogin(pin, answers);
 				assertT2Test(ret == T2Success, testDescription );

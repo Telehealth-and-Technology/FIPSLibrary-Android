@@ -349,9 +349,16 @@ public class FipsWrapper {
 		
 		byte[] retArray = decryptUsingT2Crypto(pin, cipherText);
 		int len = retArray.length;
-		byte[] truncated = Arrays.copyOf(retArray, len - 1);
-		String retString = new String(truncated);
-		return retString;
+		String retString;
+		if (len > 0) {
+			byte[] truncated = Arrays.copyOf(retArray, len - 1);
+			retString = new String(truncated);		
+		}
+		else {
+			retString = new String("");
+		}
+		return retString;		
+
 	}
 	
 	/**
