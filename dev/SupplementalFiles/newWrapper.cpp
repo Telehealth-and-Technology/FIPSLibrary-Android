@@ -182,6 +182,7 @@ jint Java_com_t2_fcads_FipsWrapper_isInitialized( JNIEnv* env,jobject thiz );
 void Java_com_t2_fcads_FipsWrapper_deInitializeLogin( JNIEnv* env,jobject thiz );
 void Java_com_t2_fcads_FipsWrapper_cleanup(JNIEnv* env,jobject thiz);
 jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,jstring jOldPin,jstring jNewPin);
+jint Java_com_t2_fcads_FipsWrapper_changeAnswersUsingPin( JNIEnv* env,jobject thiz,jstring jOldPin,jstring jNewPin);
 jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject thiz, jstring jNewPin,jstring jAnswers);
 
 
@@ -608,6 +609,90 @@ void Java_com_t2_fcads_FipsWrapper_deInitializeLogin( JNIEnv* env,jobject thiz )
 }
 
 
+/*!
+ * @brief Changes to a new PIN using the previous PIN to authenticate
+ * @discussion Generates and saves new masterKey
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jPin Pin
+ * @param jAnswers New Answers
+ * @return T2Success or T2Error
+ */
+jint Java_com_t2_fcads_FipsWrapper_changeAnswersUsingPin( JNIEnv* env,jobject thiz, 
+          jstring jPin,
+          jstring jAnswers
+           ) {
+    
+    T2Key SecondaryLockingKey;
+    T2Key acredential;
+    T2Key *rIKey_1 = &acredential;
+    
+
+    LOGI("Java_com_t2_fcads_FipsWrapper_changeAnswersUsingPin");
+    if (!Java_com_t2_fcads_FipsWrapper_isInitialized(env, thiz)) {
+      return T2Error;
+    }
+    
+      // Retrieve jni variables
+    const char *pin= env->GetStringUTFChars(jPin, 0);
+    const char *answers = env->GetStringUTFChars(jAnswers, 0);
+
+    LOGI("INFO: === changeAnswerUsingPin ===");
+    
+    int result = checkPin_I(env, (unsigned char*) pin);
+    if (result != T2Success) {
+
+        // Clean up jni variables
+        env->ReleaseStringUTFChars(jPin, pin);
+        env->ReleaseStringUTFChars(jAnswers, answers);
+        return T2Error;
+    }
+
+    // Pin is ok, go ahead and change the backup key
+    
+    // Generate the RIKey based on Pin and Master Key
+    result = getRIKeyUsing(env, rIKey_1, (char*) pin, (char *) KEY_MASTER_KEY);
+    if (result != T2Success) {
+        // Clean up jni variables
+        env->ReleaseStringUTFChars(jPin, pin);
+        env->ReleaseStringUTFChars(jAnswers, answers);
+        return result;
+    }
+    
+    // Generate SecondaryLockingKey = kdf(answers)
+    // ------------------------------
+    LOGI("INFO: *** Generating Secondary LockingKey  kdf(%s) ***", answers);
+    
+    {
+        unsigned char *key_data = (unsigned char *)answers;
+        int key_data_len = strlen(answers);
+        
+        /* gen key and iv. init the cipher ctx object */
+        if (key_init(key_data, key_data_len, (unsigned char *)_salt, &SecondaryLockingKey)) {
+            env->ReleaseStringUTFChars(jPin, pin);
+            env->ReleaseStringUTFChars(jAnswers, answers);
+            T2Assert(FALSE, "ERROR: initalizing key");
+            return T2Error;
+        }
+    }
+    
+    // Generate BackupKey = encrypt(RI Key, SecondaryLockingKey)
+    // ------------------------------
+    LOGI("INFO: *** Generating and saving to nvm BackupKey ***");
+    generateMasterOrRemoteKeyAndSave(env, rIKey_1, &SecondaryLockingKey, KEY_BACKUP_KEY);
+
+    EVP_CIPHER_CTX_cleanup(&rIKey_1->encryptContext);
+    EVP_CIPHER_CTX_cleanup(&rIKey_1->decryptContext);
+    EVP_CIPHER_CTX_cleanup(&SecondaryLockingKey.encryptContext);
+    EVP_CIPHER_CTX_cleanup(&SecondaryLockingKey.decryptContext);
+    
+    // Clean up jni variables
+    env->ReleaseStringUTFChars(jPin, pin);
+    env->ReleaseStringUTFChars(jAnswers, answers);
+
+    return T2Success;
+}
+
 
 /*!
  * @brief Changes to a new PIN using the previous PIN to authenticate
@@ -642,13 +727,17 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,
     
     int result = checkPin_I(env, (unsigned char*) oldPin);
     if (result != T2Success) {
+        env->ReleaseStringUTFChars(jOldPin, oldPin);
+        env->ReleaseStringUTFChars(jNewPin, newPin);
         return T2Error;
     }
     
     // Generate the RIKey based on oldPin and Master Key
     result = getRIKeyUsing(env, rIKey_1, (char*) oldPin, (char *) KEY_MASTER_KEY);
     if (result != T2Success) {
-      return result;
+        env->ReleaseStringUTFChars(jOldPin, oldPin);
+        env->ReleaseStringUTFChars(jNewPin, newPin);
+        return result;
     }
     
     // Generate LockingKey = kdf(newPin)
@@ -662,6 +751,8 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,
         /* gen key and iv. init the cipher ctx object */
         if (key_init(key_data, key_data_len, (unsigned char *)_salt, &LockingKey)) {
             T2Assert(FALSE, "ERROR: initalizing key");
+            env->ReleaseStringUTFChars(jOldPin, oldPin);
+            env->ReleaseStringUTFChars(jNewPin, newPin);            
             return T2Error;
         }
     }
@@ -675,10 +766,15 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,
 
     int outLength;
     unsigned char *encryptedPin = encryptStringUsingKey_malloc(rIKey_1, (unsigned char *) newPin, &outLength);
-    T2Assert((encryptedPin != NULL), "Memory allocation error");
+    if (encryptedPin == NULL) {
+      env->ReleaseStringUTFChars(jOldPin, oldPin);
+      env->ReleaseStringUTFChars(jNewPin, newPin);    
+      T2Assert((encryptedPin != NULL), "Memory allocation error");
+      return T2Error;
+    }
 
     LOGI("outLength = %d", outLength);
-     logAsHexString(encryptedPin, outLength, (char*) "    Encrypted pin ");
+    logAsHexString(encryptedPin, outLength, (char*) "    Encrypted pin ");
 
     putData(env, (char const *)KEY_DATABASE_PIN, (char const *) encryptedPin, outLength );
     free(encryptedPin);
@@ -725,6 +821,8 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject th
 
     int result = checkAnswers_I(env, (unsigned char*)answers);
     if (result != T2Success) {
+        env->ReleaseStringUTFChars(jAnswers, answers);
+        env->ReleaseStringUTFChars(jNewPin, newPin);
         return T2Error;
     }
 
@@ -734,7 +832,9 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject th
     LOGI("INFO: *** getRIKeyUsing answers and backup key %s ***", answers);
     result = getRIKeyUsing(env, rIKey_1, (char*) answers, (char *) KEY_BACKUP_KEY);
     if (result != T2Success) {
-      return result;
+        env->ReleaseStringUTFChars(jAnswers, answers);
+        env->ReleaseStringUTFChars(jNewPin, newPin);
+        return result;
     }
     
     // Generate LockingKey = kdf(newPin)
@@ -747,6 +847,8 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject th
         
         /* gen key and iv. init the cipher ctx object */
         if (key_init(key_data, key_data_len, (unsigned char *)_salt, &LockingKey)) {
+            env->ReleaseStringUTFChars(jAnswers, answers);
+            env->ReleaseStringUTFChars(jNewPin, newPin);
             T2Assert(FALSE, "ERROR: initalizing key");
             return T2Error;
         }
@@ -761,10 +863,17 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject th
     
     int outLength;
     unsigned char *encryptedPin = encryptStringUsingKey_malloc(rIKey_1, (unsigned char *) newPin, &outLength);
+    if (encryptedPin == NULL) {
+      env->ReleaseStringUTFChars(jAnswers, answers);
+      env->ReleaseStringUTFChars(jNewPin, newPin);    
+      T2Assert((encryptedPin != NULL), "Memory allocation error");
+      return T2Error;
+    }
+
     T2Assert((encryptedPin != NULL), "Memory allocation error");
 
     LOGI("outLength = %d", outLength);
-     logAsHexString(encryptedPin, outLength, (char *) "    Encrypted pin ");
+    logAsHexString(encryptedPin, outLength, (char *) "    Encrypted pin ");
 
     putData(env, KEY_DATABASE_PIN, (const char *)encryptedPin, outLength );
     free(encryptedPin);
@@ -1351,7 +1460,7 @@ jint Java_com_t2_fcads_FipsWrapper_FIPSmode( JNIEnv* env, jobject thiz ) {
  * @return Version string
  */
 jstring Java_com_t2_fcads_FipsWrapper_T2FIPSVersion( JNIEnv* env, jobject thiz ) {
-    return env->NewStringUTF("1.5.1");
+    return env->NewStringUTF("1.5.2");
 }
 
 

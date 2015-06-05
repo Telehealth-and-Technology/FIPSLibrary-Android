@@ -117,6 +117,7 @@ public class FipsWrapper {
 	 public native int isInitialized();
 	 public native void deInitializeLogin();
 	 public native int changePinUsingPin(String oldPin, String newPin);
+	 public native int changeAnswersUsingPin(String pin, String answers);
 	 public native int changePinUsingAnswers(String newPin, String answers);
 	 public native int setVerboseLogging(boolean verboseLogging);
 	 public native String encryptUsingT2Crypto(String pin, String plainText);
@@ -269,13 +270,28 @@ public class FipsWrapper {
 
 	/**
 	 * 
+	 * Changes to a new set of answers using the previous PIN to authenticate. Generates and
+	 * saves new backupKey
+	 * 
+	 * @param newPin
+	 *            New pin
+	 * @param answers
+	 *            new answers
+	 * @return T2Success or T2Error
+	 */
+	public int doChangeAnswersUsingPin(String pin, String answers) {
+		return changeAnswersUsingPin(pin, answers);
+	}
+	
+	/**
+	 * 
 	 * Changes to a new PIN using ANSWERS to authenticate Generates and saves
 	 * new backup key
 	 * 
 	 * @param newPin
 	 *            New pin
 	 * @param answers
-	 *            Answers used to initialize t2Ctrypto
+	 *            Answers used to initialize t2Crypto
 	 * @return T2Success or T2Error
 	 */
 	public int doChangePinUsingAnswers(String newPin, String answers) {

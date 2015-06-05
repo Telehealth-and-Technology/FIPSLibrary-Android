@@ -1,0 +1,281 @@
+Tools Necessary for Build
+=========================
+	OAC OS-X
+	Android ndk
+		Make sure that $ANDROID_NDK_ROOT  is defined
+		ex: echo $ANDROID_NDK_ROOT 
+			/Users/scoleman/android-ndk-r9d
+Steps:
+======
+	1. Download files
+	2. Build files
+	3. Test result
+
+******************
+1. Download Files
+******************
+
+Retrieve source files
+================================
+
+	mkdir fcads
+	cd fcads
+
+
+	1a. Clone the T2 fcads project from git:
+	----------------------------------------
+		git clone git.t2.local:/git/mobile/crossplatform/fcads.git
+		cd fcads
+
+		Results: 
+		========
+			fcads/dev/supplemental
+				.. files
+			fcads/doc
+				.. files
+
+	1b. Obtain fips/opsnssl files copy them to fcads/dev
+	-----------------------------------------------------
+
+		Option 1 (the official way):
+		----------------------------
+			OBtain the official disk and copy $sslFiles, and fipsFiles to the dev directory
+
+		Option 2:
+		--------
+  			Copy the files from the local distribution (use command: make copyLocalFipsFiles)
+  			(Alternately, the main build file will offer to copy these files for you if they are missing)
+
+
+		Results: 
+		========
+			fcads/dev
+				openssl-fips-ecp-2.0.2.tar.gz	
+				openssl-1.0.1f.tar.gz
+
+
+	1c. Obtain sqlcipher source files
+	---------------------------------
+
+		Option 1 (the official way):
+		----------------------------
+			Clone sqlcipher source files from Github - into fcads/dev/
+				git clone git://github.com/sqlcipher/android-database-sqlcipher.git
+				make init (Downloads all dependencies - LOTS OF FILES ~ 3 gB)
+
+		Option 2:
+		---------
+		Copy canned files from enclave at /Volumes/shares/Groups/Tech Team/Current Projects/FIPS/resources/android-database-sqlcipher
+		to fcads/dev/
+
+		Option 3:
+		---------
+		Copy the files from the local distribution (use command cp -r localFipsSslFiles/android-database-sqlcipher ./)
+		(Alternately, the main build file will offer to copy these files for you if they are missing)
+
+
+
+	Results: 
+	========
+		fcads/dev/android-database-sqlcipher
+			.. Lots of files and directories (~2.9 Gb)
+
+
+******************
+2. BuildFiles
+******************
+
+
+Building
+==========
+
+	Automated method (all in one)   <---------- Use this one!
+	-----------------------------
+	execute . ./buildAll.sh
+
+	
+
+	<---------- Remaining instructions in step 2 are for legacy only!  ----------------->
+
+	Note: created deliverable files are in two locations:
+		/usr/local/ssl/...                       OpenSSL files files
+		/dev/android-database-sqlcipher/libs     Compiled libraries
+
+
+
+	Manual method (makefile)
+	-----------------------------
+		Makefile commands:
+			prepare
+			fips 			(Be prepared to enter password!)
+			ssl
+			sqlcipher
+			t2
+
+			buildAall 			(all of the above)
+
+			check 			(Checks for existance of all artifacts produced by build proces)
+			cleanAll
+
+	Manual method (command line)
+	-----------------------------
+	Follow steps listed below
+
+
+		2a. Prepare files
+		(Alternately - make prepare)
+		=============
+			Unpack OpenSSL files
+			-----------------------------------------------------------------
+				gunzip -c openssl-fips-ecp-2.0.2.tar.gz | tar xf -
+				gunzip -c openssl-1.0.1f.tar.gz | tar xf -
+
+				Results: 
+				========
+					fcads/dev/openssl-1.0.1f
+						.. files
+					fcads/dev/openssl-fips-ecp-2.0.2
+						.. files
+
+			Copy makefiles from supplemental directory to where they belong (See appendix A for changes to these files)
+			---------------------------------------------
+			cp SupplementalFiles/Makefile android-database-sqlcipher/
+			cp SupplementalFiles/Application.mk android-database-sqlcipher/jni/
+
+
+		2b. Build the FIPS Object Module
+		(Alternately - make fips) - Be prepared to enter password!
+		============================
+
+			Run the setup script from the FIPS object module directory
+				cd openssl-fips-ecp-2.0.2
+				. ../Setenv-android.sh
+
+			./config
+			make                                             # Creates ./fips/fipscanister.o
+			sudo make install # copy files to /usr/local/ssl/
+
+			Results: 
+			========
+				/usr/local/ssl/fips-2.0/bin/fips_standalone_sha1					
+				/usr/local/ssl/fips-2.0/bin/fipsld
+				/usr/local/ssl/fips-2.0/include/openssl/*.h					
+				/usr/local/ssl/fips-2.0/lib/fips_premain.c
+				/usr/local/ssl/fips-2.0/lib/fips_premain.c.sha1
+				/usr/local/ssl/fips-2.0/lib/fipscanister.o
+				/usr/local/ssl/fips-2.0/lib/fipscanister.o.sha1
+
+		2c. Build the FIPS capable library (openssl)
+		(Alternately - make ssl)
+		======================================== 	
+			Run the setup script from the FIPS object module directory
+				cd openssl-fips-ecp-2.0.2
+				. ../Setenv-android.sh
+
+			cd ../openssl-1.0.1f
+			./config fips no-ec2m --with-fipslibdir=/usr/local/ssl/fips-2.0/lib/ 
+			make depend
+			make
+
+			Results: 
+			========
+				openssl-1.0.1f/libcrypto.a
+
+		2d. Build SQLCipher
+		(Alternately - make sqlcipher
+		================
+
+			cd fcads/dev
+
+			Copy OpenSSL file(s) to SqlCipher uses previously built libcrypto.a
+				This ensures that the SQLCipher build uses the FIPS object module and OpenSSL just built
+			----------------------------------------------------------------------------------------
+			cp openssl-1.0.1f/libcrypto.a android-database-sqlcipher/external/android-libs/armeabi
+			cp openssl-1.0.1f/libcrypto.a android-database-sqlcipher/external/android-libs/armeabi-v7a
+
+
+			Build SQLCipher files
+			------------------------------------
+				cd android-database-sqlcipher
+
+				make 
+				(If it fails, run make clean first)
+
+				Note that you may get a no such file or directory at eh very end of the process if you removed any targets from application.mk as above
+				Results:
+				========
+				fcads/dev/android-database-sqlcipher/libs/
+					armeabi/	
+						libdatabase_sqlcipher.so
+						libsqlcipher_android.so
+						libstlport_shared.so
+					commons-codec.jar
+					guava-r09.jar
+					sqlcipher.jar
+
+		2e. Run T2 build to compile with wrapper and create new libdatabase_sqlciipher.so
+		(Alternately - make t2)
+		==============================================================================
+			cd external
+
+			. ./buildit.sh 
+
+			Results:
+			========
+			fcads/dev/android-database-sqlcipher/libs/armeabi/libsqlcipher_android.so(updated)
+			Other targets will be updated as well it they were not removed form Application.mk
+
+
+******************
+3. Test on Android
+******************
+
+
+	cd fcads/dev
+
+	Copy .so files from lib dir to project
+		cp -R android-database-sqlcipher/libs ../test/FcadsTestAndroid
+
+	Open FcadsTestAndroid in Eclipse
+
+	Refresh project and make sure that libs were are copied over
+	to android project at /Users/scoleman/dev/eclipse/HelloSQLCipherActivity
+	
+	Then build and run the Test app		
+
+		This tests three things:
+			1 - That that an encrypted database can be created, written to and read for successfully
+			2 - That FIPS can be enabled properly
+			3 - Extensive unit tests are run which test the T2Crypto functionality (lost password implementation)
+			
+
+********************************
+Appendix A - Update source files:
+********************************
+		Make changes:
+			To fix adroid sdk version issue:
+				Update fcads/dev/android-database-sqlcipher/Makefile 
+					change:
+						android update project -p . to
+						android update project -p . --target 1
+
+				update fcads/dev/android-database-sqlcipher/Makefile to add
+					t2fix:
+						android update project -p . --target 1
+
+			To make it so it only builds arm (Optional)
+				Change fcads/dev/android-database-sqlcipher/jni/Application.mk
+					from: APP_ABI := armeabi armeabi-v7a x86
+					to: APP_ABI := armeabi	  # leave only the targets you want
+
+			CopyT2 supplemental build files to external directory
+				cp SupplementalFiles/*.* android-database-sqlcipher/external
+
+			Results:
+			========
+					fcads/dev/android-database-sqlcipher/external/buildit.sh
+					fcads/dev//android-database-sqlcipher/external/buildA5.sh
+					fcads/dev/android-database-sqlcipher/external/wrapper.c
+
+
+

@@ -1,0 +1,14 @@
+1.    The openssl-fips-ecp-2.0.2.tar.gz file distribution file which was used as the basis for the production of the FIPS 
+        object module was obtained from  the  FIPS compatible OpenSSL library from physical media (CD) 
+        obtained directly from the OpenSSL foundation.
+2.    The host platform on which the fipscanister.o, fipscanister.o.sha1,fips_premain.c, 
+        and fips_premain.c.sha1 files were generated is OX-X. The compiler used was gcc version 4.6.
+3.    The fipscanister.o module was generated with exactly the three commands:
+            ./config
+            make                      
+            make install
+        No other build-time options were specified.
+4.    The HMAC SHA-1 digest of the produced fipscanister.o is: 
+        HMAC-SHA1(fipscanister.o)= f129aeb6f91736bde36e8b0d4c11a15bd454d2d1
+5.    The contents of the distribution file used to create 
+        fipscanister.o was not manually modified in any way at any time during the build process.
