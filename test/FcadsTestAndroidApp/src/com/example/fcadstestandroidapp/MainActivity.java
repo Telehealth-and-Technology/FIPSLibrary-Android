@@ -124,7 +124,7 @@ public class MainActivity extends Activity
 		final boolean useRandomVectorsFoRiKey = false;
 		
 		// ---------------------------------------------------------------------------------------
-		final int NUM_ITERATIONS = 100;
+		final int NUM_ITERATIONS = 1;
 		//fipsWrapper.doPrepare(useRandomVectorsFoRiKey);	
 		fipsWrapper.doPrepare(useTestVectorsFoRiKey);
 		
@@ -139,6 +139,7 @@ public class MainActivity extends Activity
 		String newPin2 = "thrEe";
 		String newPin3 = "Password is  is four";
 		String answers = "TwoThreeFour";
+		String newAnswers = "TenNineEight";
 		String badAnswers = "TwoThreeFour1";
 		String badPin = "TOne";
 		String blankPin = "";
@@ -305,6 +306,31 @@ public class MainActivity extends Activity
 				encryptedText = fipsWrapper.doEncryptUsingT2Crypto(crazyPin, longStringToEncrypt);
 				decryptedText = fipsWrapper.doDecryptUsingT2Crypto(newPin3, encryptedText);
 				assertT2Test(!longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;	
+				
+				testDescription = startTest("Test 2.24 - check changeAnswersUsingPin");
+				ret  = fipsWrapper.changeAnswersUsingPin(crazyPin, newAnswers);
+				assertT2Test(ret == T2Success, testDescription );			
+				
+				testDescription = startTest("Test 2.25 - changePinUsingAnswers");
+				ret  = fipsWrapper.changePinUsingAnswers(newPin3, answers); // Should fail - used old answers
+				assertT2Test(ret == T2Error, testDescription );					
+				
+				testDescription = startTest("Test 2.26 - changePinUsingAnswers");
+				ret  = fipsWrapper.changePinUsingAnswers(newPin3, newAnswers);
+				assertT2Test(ret == T2Success, testDescription );	
+				
+				testDescription = startTest("Test 2.27 - check pin (bad pin)");
+				ret = fipsWrapper.doCheckPin(newPin1);
+				assertT2Test(ret == T2Error, testDescription );	
+				
+				testDescription = startTest("Test 2.28 - check pin (good pin)");
+				ret = fipsWrapper.doCheckPin(newPin3);
+				assertT2Test(ret == T2Success, testDescription) ;				
+				
+				
+				
+				
+				
 				
 				
 				// No test here, just do it and make sure that the app doesn't crash
