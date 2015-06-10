@@ -1,9 +1,0 @@
-Current version number is V1.5.1
-
-
-*****
-	If this changes make sure to update the file
-	/Users/scoleman/dev/fips/fcads/dev/SupplementalFiles/newWrapper.cpp
-
-	with this version number so the API shows this version !
-*****
