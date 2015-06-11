@@ -231,15 +231,9 @@ Building
 ******************
 
 
-	cd fcads/dev
-
-	Copy .so files from lib dir to project
-		cp -R android-database-sqlcipher/libs ../test/FcadsTestAndroid
 
 	Open FcadsTestAndroid in Eclipse
 
-	Refresh project and make sure that libs were are copied over
-	to android project at /Users/scoleman/dev/eclipse/HelloSQLCipherActivity
 	
 	Then build and run the Test app		
 
