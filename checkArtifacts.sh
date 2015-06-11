@@ -50,6 +50,7 @@ MY_FILES="
     dev/openssl-1.0.1f/libcrypto.a
 
     dev/FipsWrapper/bin/fipswrapper.jar
+    dev/android-database-sqlcipher/libs/fipswrapper.jar
 
     "
 

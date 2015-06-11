@@ -50,7 +50,7 @@ cp -r *.log* $docDst/doc
 #copy source files
 cp -r dev/SupplementalFiles* $docDst/source
 
-#copy tewst files
+#copy test files
 cp -r test $docDst/test
 
 #Remove lib build instructions so they dont confuse end app developers
