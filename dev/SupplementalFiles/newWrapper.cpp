@@ -1,10 +1,53 @@
+/*
+ *
+ * Copyright � 2009-2015 United States Government as represented by
+ * the Chief Information Officer of the National Center for Telehealth
+ * and Technology. All Rights Reserved.
+ *
+ * Copyright � 2009-2015 Contributors. All Rights Reserved.
+ *
+ * THIS OPEN SOURCE AGREEMENT ("AGREEMENT") DEFINES THE RIGHTS OF USE,
+ * REPRODUCTION, DISTRIBUTION, MODIFICATION AND REDISTRIBUTION OF CERTAIN
+ * COMPUTER SOFTWARE ORIGINALLY RELEASED BY THE UNITED STATES GOVERNMENT
+ * AS REPRESENTED BY THE GOVERNMENT AGENCY LISTED BELOW ("GOVERNMENT AGENCY").
+ * THE UNITED STATES GOVERNMENT, AS REPRESENTED BY GOVERNMENT AGENCY, IS AN
+ * INTENDED THIRD-PARTY BENEFICIARY OF ALL SUBSEQUENT DISTRIBUTIONS OR
+ * REDISTRIBUTIONS OF THE SUBJECT SOFTWARE. ANYONE WHO USES, REPRODUCES,
+ * DISTRIBUTES, MODIFIES OR REDISTRIBUTES THE SUBJECT SOFTWARE, AS DEFINED
+ * HEREIN, OR ANY PART THEREOF, IS, BY THAT ACTION, ACCEPTING IN FULL THE
+ * RESPONSIBILITIES AND OBLIGATIONS CONTAINED IN THIS AGREEMENT.
+ *
+ * Government Agency: The National Center for Telehealth and Technology
+ * Government Agency Original Software Designation: T2Crypto
+ * Government Agency Original Software Title: T2Crypto
+ * User Registration Requested. Please send email
+ * with your contact information to: robert.a.kayl.civ@mail.mil
+ * Government Agency Point of Contact for Original Software: robert.a.kayl.civ@mail.mil
+ *
+ */
+ 
 #include <string.h>
 #include <jni.h>
+#include <assert.h>
 #include <openssl/des.h>
 #include <openssl/aes.h>
 #include <openssl/evp.h>
 #include <android/log.h>
 #include <openssl/crypto/rand/rand.h>
+
+
+
+// for native audio
+// #include <SLES/OpenSLES.h>
+// #include <SLES/OpenSLES_Android.h>
+
+// for native asset manager
+#include <sys/types.h>
+#include <android/asset_manager.h>
+#include <android/asset_manager_jni.h>
+
+
+#include <android/native_activity.h>
 
 
 // t2Crypto functionality (Lost password functionality)
@@ -185,6 +228,9 @@ jint Java_com_t2_fcads_FipsWrapper_changePinUsingPin( JNIEnv* env,jobject thiz,j
 jint Java_com_t2_fcads_FipsWrapper_changeAnswersUsingPin( JNIEnv* env,jobject thiz,jstring jOldPin,jstring jNewPin);
 jint Java_com_t2_fcads_FipsWrapper_changePinUsingAnswers( JNIEnv* env,jobject thiz, jstring jNewPin,jstring jAnswers);
 
+jbyteArray Java_com_t2_fcads_FipsWrapper_encryptBytesRaw(JNIEnv* env, jobject thiz, jstring jPin, jbyteArray jInputData);
+jbyteArray Java_com_t2_fcads_FipsWrapper_decryptBytesRaw(JNIEnv* env, jobject thiz, jstring jPin, jbyteArray jInputData);
+jint Java_com_t2_fcads_FipsWrapper_processBinaryFile(JNIEnv* env, jobject thiz, jstring jInputFile, jstring jOutputFile, jint operation, jstring password);
 
 //   ======= Internal methods =================
 int checkPin_I(JNIEnv* env, unsigned char *pin);
@@ -193,6 +239,7 @@ void generateMasterOrRemoteKeyAndSave(JNIEnv* env, T2Key * RIKey, T2Key * Lockin
 char * generateMasterOrRemoteKey_malloc(JNIEnv* env, T2Key * RIKey, T2Key * LockingKey, const char * keyType);
 unsigned char * encryptStringUsingKey_malloc(T2Key * credentials, unsigned char * pUencryptedText, int *outLength);
 unsigned char * encryptBinaryUsingKey_malloc1(T2Key * credentials, unsigned char * pUencryptedText, int inLength, int * outLength);
+unsigned char * decryptBinaryUsingKey_malloc1(T2Key * credentials, unsigned char * pEncryptedText, int inLength, int * outLength);
 unsigned char * decryptUsingKey_malloc1(T2Key * credentials, unsigned char * encryptedText, int * inLength);
 int key_init(unsigned char * key_data, int key_data_len, unsigned char * salt, T2Key * aCredentials);
 int getRIKeyUsing(JNIEnv* env, T2Key * RiKey, char * answersOrPin, char * keyType);
@@ -345,7 +392,7 @@ void putData(JNIEnv* env, const char *pKey, const char *pValue, int data_size ) 
 
   #ifdef ENCRYPT_PREFERENCES
 
-    // Need to encrypt the key string before saving
+    // Need to encrypt the key string before sav2ing
     int encryptedKeyLength;
     unsigned char *encryptedKey = encryptBinaryUsingKey_malloc1(&preferencesKey, (unsigned char *) pKey, strlen(pKey), &encryptedKeyLength);
     T2Assert((encryptedKey != NULL), "Memory allocation error");
@@ -1172,6 +1219,327 @@ jstring Java_com_t2_fcads_FipsWrapper_encryptRaw(JNIEnv* env, jobject thiz, jstr
 }
 
 
+jboolean Java_com_example_nativeaudio_NativeAudio_createAssetAudioPlayer(JNIEnv* env, jclass clazz,
+        jobject assetManager, jstring filename)
+{
+    //SLresult result;
+
+    // convert Java string to UTF-8
+    const char *utf8 = env->GetStringUTFChars(filename, NULL);
+    assert(NULL != utf8);
+
+    // use asset manager to open asset by filename
+    AAssetManager* mgr = AAssetManager_fromJava(env, assetManager);
+   // assert(NULL != mgr);
+    AAsset* asset = AAssetManager_open(mgr, utf8, AASSET_MODE_UNKNOWN);
+
+    // release the Java string and UTF-8
+    env->ReleaseStringUTFChars(filename, utf8);
+
+    // the asset might not be found
+    // if (NULL == asset) {
+    //     return JNI_FALSE;
+    // }
+}
+
+enum T2Operation {
+    T2Encrypt = 1,
+    T2Decrypt = -1,
+    T2NOOP = 0
+    
+};
+
+/*!
+ * @brief Encrypts or Decrypts file
+ * @discussion Note that this method does NOT depend on T2Crypto being previously initialized
+ *   meaning is doesn't use masterKey
+ * @param env Jni environment
+ * @param thiz Passed jni object
+ * @param jInputFile Name of file to get data from to encrypt/decrypt
+ * @param jOutputFile Name of file to put encrypted/decrypted data to
+ * @param jOperation T2Encrypt, T2Decrypt, T2NOOP
+ * @param jPassword PAssword to use
+ * @return  T2Success is success
+ */
+jint Java_com_t2_fcads_FipsWrapper_processBinaryFile(JNIEnv* env, jobject thiz, jstring jInputFile, jstring jOutputFile, jint jOperation, jstring jPassword) {
+
+   // convert Java string to UTF-8
+    const char *inputFileName = env->GetStringUTFChars(jInputFile, NULL);
+    T2Assert(NULL != inputFileName, "Memory Error");
+
+    const char *outputFileName = env->GetStringUTFChars(jOutputFile, NULL);
+    T2Assert(NULL != outputFileName, "Memory Error");
+
+    const char *password = env->GetStringUTFChars(jPassword, NULL);
+    T2Assert(NULL != password, "Memory Error");
+
+    int  blocklength;
+    if (jOperation == T2Encrypt) {
+        blocklength = 1024; // Arbitarry chunk of bytes to process
+    }
+    else {
+        // since we know the plaitext block is 1024, doe to the encryption we're using the encrypted block is 1040
+        blocklength = 1040;// since we know the plaitext block is 1024, doe to the encryption we're using the encrypted block is 1040
+    }
+
+    char * buffer = (char *) malloc (sizeof (char) * blocklength); // allocate memory 
+    FILE * pInputFile = fopen (inputFileName, "rb");
+    T2Assert(NULL != pInputFile, "Memory Error");  
+
+    FILE * pOutputfile = fopen (outputFileName, "wb");
+    T2Assert(NULL != pOutputfile, "Memory Error");
+    // Check errors
+
+    
+    int limit = 4096;  // just a safeguard
+    while(limit-- > 0) {
+
+        int bytesRead = fread (buffer, sizeof (char), blocklength, pInputFile); 
+        if (bytesRead == 0) break;
+      
+        //LOGE("bytesRead = %d", bytesRead);
+
+
+        if (jOperation == T2Encrypt) {
+            jbyteArray bytestoEncrypt = env->NewByteArray(bytesRead);
+
+            T2Assert((bytestoEncrypt != NULL), "Memory allocation error");
+            void *temp = env->GetPrimitiveArrayCritical((jarray)bytestoEncrypt, 0);
+            memcpy(temp, buffer, bytesRead);
+            env->ReleasePrimitiveArrayCritical(bytestoEncrypt, temp, 0);
+
+            jbyteArray jEncryptedBytes  = Java_com_t2_fcads_FipsWrapper_encryptBytesRaw(env, thiz, jPassword, bytestoEncrypt);
+            jbyte* encryptedBytes = env->GetByteArrayElements(jEncryptedBytes, 0);
+            int length = env->GetArrayLength(jEncryptedBytes);
+            //LOGE("length = %d", length);
+
+            //fwrite cannot reach intothe jbyte* pointer so we have to copy it to local memory
+            char * buffer1 = (char *) malloc (length);
+            T2Assert((buffer1 != NULL), "Memory allocation error");
+            memcpy(buffer1, encryptedBytes, length);
+
+            int bytesWritten = fwrite(buffer1 , 1 , length , pOutputfile );
+            //LOGE("bytesWritten = %d", bytesWritten);
+            if (buffer1 != NULL) free(buffer1);
+            env->ReleaseByteArrayElements(jEncryptedBytes, encryptedBytes, 0);
+            T2Assert(bytesWritten == length, "Error writing file");
+
+        }
+        
+        if (jOperation == T2Decrypt) {
+            jbyteArray bytestoDecrypt = env->NewByteArray(bytesRead);
+
+            T2Assert((bytestoDecrypt != NULL), "Memory allocation error");
+            void *temp = env->GetPrimitiveArrayCritical((jarray)bytestoDecrypt, 0);
+            memcpy(temp, buffer, bytesRead);
+            env->ReleasePrimitiveArrayCritical(bytestoDecrypt, temp, 0);
+
+            jbyteArray jDecryptedBytes  = Java_com_t2_fcads_FipsWrapper_decryptBytesRaw(env, thiz, jPassword, bytestoDecrypt);
+            jbyte* decryptedBytes = env->GetByteArrayElements(jDecryptedBytes, 0);
+            int length = env->GetArrayLength(jDecryptedBytes);
+            //LOGE("length = %d", length);
+
+            //fwrite cannot reach intothe jbyte* pointer so we have to copy it to local memory
+            char * buffer1 = (char *) malloc (length);
+            T2Assert((buffer1 != NULL), "Memory allocation error");
+            memcpy(buffer1, decryptedBytes, length);
+
+            int bytesWritten = fwrite(buffer1 , 1 , length , pOutputfile );
+            //LOGE("bytesWritten = %d", bytesWritten);
+            if (buffer1 != NULL) free(buffer1);
+            env->ReleaseByteArrayElements(jDecryptedBytes, decryptedBytes, 0);
+            T2Assert(bytesWritten == length, "Error writing file");        
+
+        }
+        
+        // Just pass the data straight through (copyFile)
+        if (jOperation == T2NOOP) {
+            int bytesWritten = fwrite(buffer , 1 , bytesRead , pOutputfile );
+            T2Assert(bytesWritten == bytesRead, "Error writing file");
+            LOGE("bytesWritten = %d", bytesWritten);
+        }
+    }
+   
+
+
+  
+    if (buffer != NULL) free (buffer); // manually release the allocated memory 
+
+    if (pInputFile != NULL) {
+      fclose (pInputFile) ;// close the stream 
+    }
+
+    if (pOutputfile != NULL) {
+      fclose (pOutputfile) ;// close the stream 
+    }
+
+    // Clean up jni variables
+    if (inputFileName != NULL) {
+        env->ReleaseStringUTFChars(jInputFile, inputFileName);
+        inputFileName = NULL;
+    }   
+
+    if (outputFileName != NULL) {
+        env->ReleaseStringUTFChars(jOutputFile, outputFileName);
+        outputFileName = NULL;
+    }   
+
+    if (password != NULL) {
+        env->ReleaseStringUTFChars(jPassword, password);
+        password = NULL;
+    }   
+    return T2Success;
+}
+
+
+/*!
+ * @brief Encrypts a byte array using given pin
+ * @discussion Note that this method does NOT depend on T2Crypto being previously initialized
+ *   meaning  masterKey MUST have been [previously initialized!] 
+ * @param thiz Passed jni object
+ * @param jPin Password use
+ * @param jInputData bytes to encrypt
+ * @return  Encrypted bytes (NULL if error)
+ */
+jbyteArray Java_com_t2_fcads_FipsWrapper_encryptBytesRaw(JNIEnv* env, jobject thiz, jstring jPin, jbyteArray jInputData) {
+    T2Key RawKey;   
+    genericBuffer[0] = 0;   // Clear out generic buffer in case we fail
+    int result;
+
+
+    // Retrieve jni variables
+    // Note: re are receiving a hex string equivilant of the encrypted binary
+    const char *pin= env->GetStringUTFChars(jPin, 0);
+
+    jbyte* inputDataPtr = env->GetByteArrayElements(jInputData, NULL);
+    jsize inputDataLen = env->GetArrayLength(jInputData);
+
+    //logAsHexString((unsigned char*) inputDataPtr, inputDataLen, (char *) "input bytes =   ");
+
+
+    unsigned char *key_data = (unsigned char *)pin;
+    int key_data_len = strlen(pin);
+
+
+    unsigned char rawSalt[SALT_LENGTH];
+    unsigned char tmp[] = CANNNED_SALT;
+    memcpy(rawSalt,tmp,SALT_LENGTH);
+    logAsHexString(rawSalt, SALT_LENGTH, (char *) "xx    salt =  ");
+    
+    // Generate RawKey = kdf(PIN)
+    // ------------------------------
+
+    /* gen key and iv. init the cipher ctx object */
+    if (key_init(key_data, key_data_len, (unsigned char *)rawSalt, &RawKey)) {
+        T2Assert(FALSE, "ERROR: initializing key");
+        // Clean up jni variables
+        env->ReleaseStringUTFChars(jPin, pin);
+        env->ReleaseByteArrayElements(jInputData, inputDataPtr, JNI_ABORT);
+       
+        return NULL;
+    } else {
+
+      int outLength;
+      signed char const *encryptedbytes = (signed char const *)encryptBinaryUsingKey_malloc1(&RawKey, (unsigned char *) inputDataPtr, inputDataLen, &outLength);
+      T2Assert((encryptedbytes != NULL), "Memory allocation error");
+
+      //logAsHexString((unsigned char*)encryptedbytes, outLength, (char *) "encrypted bytes: ");
+
+     jbyteArray retArray = env->NewByteArray( outLength);
+     env->SetByteArrayRegion(retArray, 0, outLength, encryptedbytes);
+     //  // Clean up jni variables
+     env->ReleaseStringUTFChars(jPin, pin);
+     env->ReleaseByteArrayElements(jInputData, inputDataPtr, JNI_ABORT);
+
+     free((void*)encryptedbytes);
+
+     return retArray;
+
+    }
+
+ 
+
+    // Clean up jni variables
+    env->ReleaseStringUTFChars(jPin, pin);
+    env->ReleaseByteArrayElements(jInputData, inputDataPtr, JNI_ABORT);
+    return NULL;
+}
+
+/*!
+ * @brief decrypts a byte array using given pin
+ * @discussion Note that this method does NOT depend on T2Crypto being previously initialized
+ *   meaning  masterKey MUST have been [previously initialized!] 
+ * @param thiz Passed jni object
+ * @param jPin Password use
+ * @param jInputData bytes to decrypt
+ * @return  Decrypted bytes (NULL if errort)
+ */
+jbyteArray Java_com_t2_fcads_FipsWrapper_decryptBytesRaw(JNIEnv* env, jobject thiz, jstring jPin, jbyteArray jInputData) {
+    T2Key RawKey;   
+    genericBuffer[0] = 0;   // Clear out generic buffer in case we fail
+    int result;
+
+
+    // Retrieve jni variables
+    // Note: re are receiving a hex string equivilant of the encrypted binary
+    const char *pin= env->GetStringUTFChars(jPin, 0);
+
+    jbyte* inputDataPtr = env->GetByteArrayElements(jInputData, NULL);
+    jsize inputDataLen = env->GetArrayLength(jInputData);
+
+    //logAsHexString((unsigned char*) inputDataPtr, inputDataLen, (char *) "input bytes =   ");
+
+
+    unsigned char *key_data = (unsigned char *)pin;
+    int key_data_len = strlen(pin);
+
+
+    unsigned char rawSalt[SALT_LENGTH];
+    unsigned char tmp[] = CANNNED_SALT;
+    memcpy(rawSalt,tmp,SALT_LENGTH);
+    logAsHexString(rawSalt, SALT_LENGTH, (char *) "xx    salt =  ");
+    
+    // Generate RawKey = kdf(PIN)
+    // ------------------------------
+
+    /* gen key and iv. init the cipher ctx object */
+    if (key_init(key_data, key_data_len, (unsigned char *)rawSalt, &RawKey)) {
+        T2Assert(FALSE, "ERROR: initializing key");
+        // Clean up jni variables
+        env->ReleaseStringUTFChars(jPin, pin);
+        env->ReleaseByteArrayElements(jInputData, inputDataPtr, JNI_ABORT);
+       
+        return NULL;
+    } else {
+
+      int outLength;
+      signed char const *decryptededBytes = (signed char const *)decryptBinaryUsingKey_malloc1(&RawKey, (unsigned char *) inputDataPtr, inputDataLen, &outLength);
+      T2Assert((decryptededBytes != NULL), "Memory allocation error");
+
+      ///logAsHexString((unsigned char*)decryptededBytes, outLength, (char *) "decrypteded bytes: ");
+
+     jbyteArray retArray = env->NewByteArray( outLength);
+     env->SetByteArrayRegion(retArray, 0, outLength, decryptededBytes);
+     //  // Clean up jni variables
+     env->ReleaseStringUTFChars(jPin, pin);
+     env->ReleaseByteArrayElements(jInputData, inputDataPtr, JNI_ABORT);
+
+     free((void*)decryptededBytes);
+
+     return retArray;
+
+    }
+
+ 
+
+    // Clean up jni variables
+    env->ReleaseStringUTFChars(jPin, pin);
+    env->ReleaseByteArrayElements(jInputData, inputDataPtr, JNI_ABORT);
+    return NULL;
+}
+
+
+
 /*!
  * @brief Decrypts a string using given pin
  * @discussion Note that this method does NOT depend on T2Crypto being previously initialized
@@ -1460,7 +1828,7 @@ jint Java_com_t2_fcads_FipsWrapper_FIPSmode( JNIEnv* env, jobject thiz ) {
  * @return Version string
  */
 jstring Java_com_t2_fcads_FipsWrapper_T2FIPSVersion( JNIEnv* env, jobject thiz ) {
-    return env->NewStringUTF("1.5.2");
+    return env->NewStringUTF("1.5.3");
 }
 
 
@@ -1575,20 +1943,35 @@ unsigned char * aes_decrypt_malloc(EVP_CIPHER_CTX * decryptContext, unsigned cha
     return plaintext;
 }
 
+/*!
+ * @brief Decrypts binary array using a T2Key
+ * @discussion 
+ * @param credentials T2Key credentials to use in encrypt/decrypt functions
+ * @param  pEncryptedBytes bytes to decrypt
+ * @param inLength Length of input byte array
+ * @param outlength Gets set to length of output
+ * @return  Decrypted bytes
+ */
+unsigned char * decryptBinaryUsingKey_malloc1(T2Key * credentials, unsigned char * pEncryptedBytes, int inLength, int * outLength) {
+    unsigned char* szDecryptedBytes =  aes_decrypt_malloc(&credentials->decryptContext, pEncryptedBytes, &inLength);
+    *outLength = inLength;
+    return szDecryptedBytes;
+}
+
 
 /*!
  * @brief Encrypts binary array using a T2Key
  * @discussion 
  * @param credentials T2Key credentials to use in encrypt/decrypt functions
- * @param  pUencryptedText bytes to encrypt
+ * @param  pInputBytes bytes to encrypt
  * @param inLength Length of input byte array
  * @param outlength Gets set to length of output
  * @return  Encrypted bytes
  */
-unsigned char * encryptBinaryUsingKey_malloc1(T2Key * credentials, unsigned char * pUencryptedText, int inLength, int * outLength) {
-    unsigned char* szEncryptedText =  aes_encrypt_malloc(&credentials->encryptContext, pUencryptedText, &inLength);
+unsigned char * encryptBinaryUsingKey_malloc1(T2Key * credentials, unsigned char * pInputBytes, int inLength, int * outLength) {
+    unsigned char* szEncryptedBytes =  aes_encrypt_malloc(&credentials->encryptContext, pInputBytes, &inLength);
     *outLength = inLength;
-    return szEncryptedText;
+    return szEncryptedBytes;
 }
 
 /*!

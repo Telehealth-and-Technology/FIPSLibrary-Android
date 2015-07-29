@@ -123,8 +123,19 @@ public class FipsWrapper {
 	 public native String encryptUsingT2Crypto(String pin, String plainText);
 	 public native byte[] decryptUsingT2Crypto(String pin, String cipherText);
 
+	 public native int processBinaryFile(String inputFile, String outputFile, int operation, String password);
+	 public native byte[] encryptBytesRaw(String pin, byte[] inputData);
+	 public native byte[] decryptBytesRaw(String pin, byte[] inputData);
+
+
 	 public native String encryptRaw(String pin, String plainText);
 	 public native byte[] decryptRaw(String pin, String cipherText);
+	 
+	 // Constants for ProcessBinaryFile (encrypt/decrpt file)
+	 public static final int T2Encrypt = 1;
+	 public static final int T2Decrypt = -1;
+	 public static final int T2NOOP = 0;
+	 
 	 
 	/**
 	 * Constructor
@@ -348,7 +359,60 @@ public class FipsWrapper {
 	public String doEncryptRaw(String pin, String plainText) {
 		return encryptRaw(pin, plainText);
 	}
+	
+	/**
+	 * Encrypts/Decrypts a file and writes resultant data to another file
+	 *  Is NOT dependent on T2Crypto being initialized!
+	 * 
+	 * @param inputFile
+	 *        	Name of the file whos data is to be encrypted/decrypted   
+	 * @param outputFile
+	 *            
+	 * @param operation
+	 *            T2Encrypt/T2Decrypt
+	 * @param password
+	 *            Password (or PIN to use for encrypt/decrypt)
+     *
+	 * 
+	 * @return T2Success or T2Error
+	 */	
+	public int doProcessBinaryFile(String inputFile, String outputFile, int operation, String password) {
+		return processBinaryFile(inputFile, outputFile, operation, password);
+	}
+	
+	
+	/**
+	 * Encrypts a byte array using a pin/password
+	 *  Is NOT dependent on T2Crypto being initialized!
+	 * 
+	 * @param pin
+	 *            Pin to use
+	 * @param inputData
+	 *            Bytes to encrypt
+	 * 
+	 * @return return encrypted version of inputData
+	 */	
+	public byte[] doEncryptBytesRaw(String pin, byte[] inputData) {
+		return encryptBytesRaw(pin, inputData);
+	}
 
+	/**
+	 * Decrypts a byte array using a pin/password
+	 *  Is NOT dependent on T2Crypto being initialized!
+	 * 
+	 * @param pin
+	 *            Pin to use
+	 * @param inputData
+	 *            Bytes to decrypt
+	 * 
+	 * @return return decrypted version of inputData
+	 */		
+	public byte[] doDecryptBytesRaw(String pin, byte[] inputData) {
+		return decryptBytesRaw(pin, inputData);
+	}
+
+	
+	
 	/**
 	 * decrypts a string using a pin/password
 	 *  Is dependent on T2Crypto being initialized!
@@ -467,7 +531,6 @@ public class FipsWrapper {
 			
 			sp.edit().putString(key, str).commit();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -484,10 +547,9 @@ public class FipsWrapper {
 	 * @return Retrieved value
 	 */
 	static byte[] getData(String key) {
-		SharedPreferences sp = context.getSharedPreferences("FIPS_VARS",
-				Context.MODE_PRIVATE);
+		SharedPreferences sp = context.getSharedPreferences("FIPS_VARS", Context.MODE_PRIVATE);
 		String str = sp.getString(key, "");
-		byte[] tmp = Base64.decode(str, Base64.NO_WRAP);
+		//byte[] tmp = Base64.decode(str, Base64.NO_WRAP);
 		return Base64.decode(str, Base64.NO_WRAP);
 	}
 

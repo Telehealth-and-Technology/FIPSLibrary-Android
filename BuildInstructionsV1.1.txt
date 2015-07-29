@@ -1,3 +1,23 @@
+*********************************************************************************
+* Do you really need to build this???
+*
+* Note, that if you only need to USE the library you don’t need to build it.
+* there are current releases maintained on the enclave shared drive at:
+*
+*   /Volumes/shares/Groups/Tech Team/Current Projects/FIPS/release/FCIDS (IOS) 
+*   and
+*   /Volumes/shares/Groups/Tech Team/Current Projects/FIPS/release/FCADS  (Android)
+*
+*   follow the procedure in HowToInstallRelease.txt
+*
+*
+*  You will need to build this only if you need to change the internal workings
+*  of the API’s it provides
+*
+*********************************************************************************
+
+
+
 Tools Necessary for Build
 =========================
 	OAC OS-X
@@ -92,6 +112,20 @@ Building
 	Automated method (all in one)   <---------- Use this one!
 	-----------------------------
 	execute . ./buildAll.sh
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	
 

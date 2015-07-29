@@ -1,15 +1,43 @@
+MC68985-scoleman:fcads scoleman$ git status
+On branch master
+Your branch is up-to-date with 'origin/master'.
+
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+    deleted:    test/FcadsTestAndroidApp/libs/fipswrapper.jar
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+    modified:   BuildInstructionsV1.1.txt
+    modified:   SuccessfulUnitTest1PassVerbose.log
+    modified:   SuccessfulUnitTestManyPass.log
+    modified:   dev/FipsWrapper/src/com/t2/fcads/FipsWrapper.java
+    modified:   dev/SupplementalFiles/buildit.sh
+    modified:   dev/SupplementalFiles/newWrapper.cpp
+    deleted:    test/FcadsTestAndroidApp/libs/armeabi-v7a/libdatabase_sqlcipher.so
+    deleted:    test/FcadsTestAndroidApp/libs/armeabi-v7a/libstlport_shared.so
+    deleted:    test/FcadsTestAndroidApp/libs/armeabi/libdatabase_sqlcipher.so
+    deleted:    test/FcadsTestAndroidApp/libs/armeabi/libstlport_shared.so
+    deleted:    test/FcadsTestAndroidApp/libs/commons-codec.jar
+    deleted:    test/FcadsTestAndroidApp/libs/guava-r09.jar
+    deleted:    test/FcadsTestAndroidApp/libs/sqlcipher.jar
+    deleted:    test/FcadsTestAndroidApp/libs/x86/libdatabase_sqlcipher.so
+    deleted:    test/FcadsTestAndroidApp/libs/x86/libstlport_shared.so
+    modified:   test/FcadsTestAndroidApp/project.properties
+    modified:   test/FcadsTestAndroidApp/src/com/example/fcadstestandroidapp/MainActivity.java
+    modified:   versionNumber.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+    test/FcadsTestAndroidApp/bin/
+    test/FcadsTestAndroidApp/libs/libs/
+
 MC68985-scoleman:fcads scoleman$ 
-MC68985-scoleman:fcads scoleman$ ls
-BuildAndReleaseChecklist.txt        checkArtifacts.sh
-BuildInstructionsV1.1.txt       dev
-HowToUseLibrary.txt         doRelease.sh
-Makefile                doc
-SuccessfulBuildAllLog.txt       localFipsSslFiles
-SuccessfulUnitTest1PassVerbose.log  setEnvOpenSslFiles.sh
-SuccessfulUnitTestManyPass.log      test
-buildAll.sh             versionNumber.txt
-buildT2Only.sh
-MC68985-scoleman:fcads scoleman$ ./buildAll.sh
+MC68985-scoleman:fcads scoleman$ . ./buildAll.sh
 
 using openssl-1.0.1f.tar.gz
 using openssl-fips-ecp-2.0.2.tar.gz
@@ -23,17 +51,6 @@ fipsFiles = dev/openssl-fips-ecp-2.0.2.tar.gz
 
 You have two options:
 Option y - Copy local (unofficial) openssl downlad files form this distribution
-Option n - Stop build so you can download the official files
-
-press y or n : y
-Copying local files
-
-!!!! One or more of the sqlCipher download files are missing !!!!!
-
-sqlcipherFiles = dev/android-database-sqlcipher
-
-You have two options:
-Option y - Copy local (unofficial) sqlCipher downlad files form this distribution
 Option n - Stop build so you can download the official files
 
 press y or n : y
@@ -72,7 +89,6 @@ Buildfile: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/build.xml
 [gettarget] API level:        19
      [echo] ----------
      [echo] Creating output directories if needed...
-    [mkdir] Created dir: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/libs
     [mkdir] Created dir: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/bin
     [mkdir] Created dir: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/bin/res
     [mkdir] Created dir: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/bin/rsObj
@@ -162,6 +178,8 @@ Preparing files
 Updated project.properties
 Updated local.properties
 Updated file ./proguard-project.txt
+It seems that there are sub-projects. If you want to update them
+please use the --subprojects parameter.
 cd /Users/scoleman/dev/fips/fcads/dev && \
     gunzip -c openssl-fips-ecp-2.0.2.tar.gz | tar xf - && \
     gunzip -c openssl-1.0.1f.tar.gz | tar xf - && \
@@ -2165,6 +2183,7 @@ Buildfile: /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/build.x
 -pre-clean:
 
 clean:
+   [delete] Deleting directory /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/bin
    [delete] Deleting directory /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/gen
 [getlibpath] Library dependencies:
 [getlibpath] No Libraries
@@ -2283,32 +2302,18 @@ rm libs/armeabi/libsqlcipher_android.so
 rm: libs/armeabi/libsqlcipher_android.so: No such file or directory
 make[1]: [clean] Error 1 (ignored)
 rm libs/armeabi/libdatabase_sqlcipher.so
-rm: libs/armeabi/libdatabase_sqlcipher.so: No such file or directory
-make[1]: [clean] Error 1 (ignored)
 rm libs/armeabi/libstlport_shared.so
-rm: libs/armeabi/libstlport_shared.so: No such file or directory
-make[1]: [clean] Error 1 (ignored)
 rm libs/sqlcipher.jar
-rm: libs/sqlcipher.jar: No such file or directory
-make[1]: [clean] Error 1 (ignored)
 rm libs/x86/libsqlcipher_android.so
 rm: libs/x86/libsqlcipher_android.so: No such file or directory
 make[1]: [clean] Error 1 (ignored)
 rm libs/x86/libdatabase_sqlcipher.so
-rm: libs/x86/libdatabase_sqlcipher.so: No such file or directory
-make[1]: [clean] Error 1 (ignored)
 rm libs/x86/libstlport_shared.so
-rm: libs/x86/libstlport_shared.so: No such file or directory
-make[1]: [clean] Error 1 (ignored)
 rm libs/armeabi-v7a/libsqlcipher_android.so
 rm: libs/armeabi-v7a/libsqlcipher_android.so: No such file or directory
 make[1]: [clean] Error 1 (ignored)
 rm libs/armeabi-v7a/libdatabase_sqlcipher.so
-rm: libs/armeabi-v7a/libdatabase_sqlcipher.so: No such file or directory
-make[1]: [clean] Error 1 (ignored)
 rm libs/armeabi-v7a/libstlport_shared.so
-rm: libs/armeabi-v7a/libstlport_shared.so: No such file or directory
-make[1]: [clean] Error 1 (ignored)
 --------------------------------------------
 ------------ Performing make ---------------
 cd /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external && \
@@ -2512,7 +2517,7 @@ Android NDK: WARNING:/Users/scoleman/dev/fips/fcads/dev/android-database-sqlciph
 [armeabi] Compile++ thumb: sqlcipher_android <= String8.cpp
 [armeabi] Prebuilt       : libstlport_shared.so <= <NDK>/sources/cxx-stl/stlport/libs/armeabi/
 [armeabi] Compile thumb  : sqlcipher <= sqlite3.c
-^[[D^[[D^[[D^[[D^[[D [armeabi] StaticLibrary  : libsqlcipher.a
+[armeabi] StaticLibrary  : libsqlcipher.a
 [armeabi] Compile thumb  : icui18n <= bocsu.c
 [armeabi] Compile thumb  : icui18n <= ucln_in.c
 [armeabi] Compile thumb  : icui18n <= decContext.c
@@ -3664,7 +3669,7 @@ Buildfile: /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/build.x
       [dex] Pre-Dexing /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/libs/commons-codec.jar -> commons-codec-6c1ba81b0af2306b569c80d0ac781ad2.jar
       [dex] Converting compiled files and external libraries into /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/bin/classes.dex...
        [dx] Merged dex A (63 defs/113.0KiB) with dex B (2 defs/1.1KiB). Result is 65 defs/138.1KiB. Took 0.2s
-       [dx] Merged dex A (65 defs/138.1KiB) with dex B (883 defs/1023.2KiB). Result is 948 defs/1481.6KiB. Took 0.6s
+       [dx] Merged dex A (65 defs/138.1KiB) with dex B (883 defs/1023.2KiB). Result is 948 defs/1481.6KiB. Took 0.3s
        [dx] Merged dex A (948 defs/1481.6KiB) with dex B (25 defs/42.4KiB). Result is 973 defs/2087.0KiB. Took 0.1s
 
 -crunch:
@@ -3705,7 +3710,7 @@ Buildfile: /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/build.x
 release:
 
 BUILD SUCCESSFUL
-Total time: 14 seconds
+Total time: 13 seconds
 added manifest
 adding: example/(in = 0) (out= 0)(stored 0%)
 adding: example/EventDataSQLHelper.class(in = 1873) (out= 947)(deflated 49%)
@@ -3815,20 +3820,20 @@ ANDROID_DEV: /Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr
 CC = /usr/local/ssl/android-14/bin/fipsld
 FIPSLD_CC = /Users/scoleman/android-ndk-r9d/toolchains/arm-linux-androideabi-4.6/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-gcc
 
-++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/sqlite3_android.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm/usr/include -c ./android-sqlite/android/sqlite3_android.cpp -o sqlite3_android.o
-++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/PhonebookIndex.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm/usr/include -c ./android-sqlite/android/PhonebookIndex.cpp -o PhonebookIndex.o
-++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/PhoneNumberUtils.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm/usr/include -c ./android-sqlite/android/PhoneNumberUtils.cpp -o PhoneNumberUtils.o
-++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/OldPhoneNumberUtils.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm/usr/include -c ./android-sqlite/android/OldPhoneNumberUtils.cpp -o OldPhoneNumberUtils.o
-++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/PhoneticStringUtils.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm/usr/include -c ./android-sqlite/android/PhoneticStringUtils.cpp -o PhoneticStringUtils.o
-++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/String16.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm/usr/include -c ./String16.cpp -o String16.o
-++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/String8.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm/usr/include -c ./String8.cpp -o String8.o
+++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/sqlite3_android.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm/usr/include -c ./android-sqlite/android/sqlite3_android.cpp -o sqlite3_android.o
+++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/PhonebookIndex.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm/usr/include -c ./android-sqlite/android/PhonebookIndex.cpp -o PhonebookIndex.o
+++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/PhoneNumberUtils.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm/usr/include -c ./android-sqlite/android/PhoneNumberUtils.cpp -o PhoneNumberUtils.o
+++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/OldPhoneNumberUtils.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm/usr/include -c ./android-sqlite/android/OldPhoneNumberUtils.cpp -o OldPhoneNumberUtils.o
+++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/PhoneticStringUtils.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm/usr/include -c ./android-sqlite/android/PhoneticStringUtils.cpp -o PhoneticStringUtils.o
+++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/String16.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm/usr/include -c ./String16.cpp -o String16.o
+++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/String8.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-exceptions -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm/usr/include -c ./String8.cpp -o String8.o
 ++ // wrapper.c has been replace by newWrapper.cpp
 ./buildit.sh: line 383: //: is a directory
 ++ set +x
 
  -----------------  Starting build of wrapper.cpp  ----------
 
-++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/newWrapper.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm/usr/include -c ./newWrapper.cpp -o newWrapper.o
+++ /usr/local/ssl/android-14/bin/fipsld -MMD -MP -MF ../obj/local/armeabi/objs/sqlcipher_android/android-sqlite/android/newWrapper.o.d -fpic -ffunction-sections -funwind-tables -fstack-protector -no-canonical-prefixes -march=armv5te -mtune=xscale -msoft-float -fno-rtti -mthumb -Os -g -DNDEBUG -fomit-frame-pointer -fno-strict-aliasing -finline-limit=64 -I./includes -I./sqlcipher -I./icu4c/i18n -I./icu4c/common -I./platform-system-core/include -I./platform-frameworks-base/include -Iopenssl/include -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl/stlport/stlport -I/Users/scoleman/android-ndk-r9d/sources/cxx-stl//gabi++/include -I. -DANDROID -DHAVE_USLEEP=1 -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 -DSQLITE_ENABLE_FTS3_BACKWARDS -DSQLITE_ENABLE_LOAD_EXTENSION '-DOS_PATH_SEPARATOR='\''/'\''' -DHAVE_SYS_UIO_H -Wa,--noexecstack -Wformat -Werror=format-security -frtti -I/Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm/usr/include -c ./newWrapper.cpp -o newWrapper.o
 ++ set +x
 
  -----------------  Ending build of wrapper.cpp  ----------
@@ -3837,8 +3842,8 @@ FIPSLD_CC = /Users/scoleman/android-ndk-r9d/toolchains/arm-linux-androideabi-4.6
 
  -----------------  Starting link  ----------
 
-++ /usr/local/ssl/android-14/bin/fipsld -Wl,-soname,libsqlcipher_android.so -shared --sysroot=/Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm sqlite3_android.o PhonebookIndex.o PhoneNumberUtils.o OldPhoneNumberUtils.o PhoneticStringUtils.o String16.o String8.o newWrapper.o ../obj/local/armeabi/libsqlcipher.a ../obj/local/armeabi/libicui18n.a ./android-libs/armeabi/libcrypto.a ../obj/local/armeabi/libicuuc.a -lgcc ../obj/local/armeabi/libstlport_shared.so -no-canonical-prefixes -L./android-libs/armeabi/ -L./libs/armeabi/ -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -L/Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm/usr/lib -llog -lutils -lcutils -lc -lm -o libsqlcipher_android.so
-/Users/scoleman/android-ndk-r9d/toolchains/arm-linux-androideabi-4.6/prebuilt/darwin-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.6/../../../../arm-linux-androideabi/bin/ld: warning: hidden symbol '__dso_handle' in /Users/scoleman/android-ndk-r9d/platforms/android-3/arch-arm/usr/lib/crtbegin_so.o is referenced by DSO ./android-libs/armeabi//libutils.so
+++ /usr/local/ssl/android-14/bin/fipsld -Wl,-soname,libsqlcipher_android.so -shared --sysroot=/Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm sqlite3_android.o PhonebookIndex.o PhoneNumberUtils.o OldPhoneNumberUtils.o PhoneticStringUtils.o String16.o String8.o newWrapper.o ../obj/local/armeabi/libsqlcipher.a ../obj/local/armeabi/libicui18n.a ./android-libs/armeabi/libcrypto.a ../obj/local/armeabi/libicuuc.a -lgcc ../obj/local/armeabi/libstlport_shared.so -no-canonical-prefixes -L./android-libs/armeabi/ -L./libs/armeabi/ -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now -L/Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm/usr/lib -lOpenSLES -landroid -llog -lutils -lcutils -lc -lm -o libsqlcipher_android.so
+/Users/scoleman/android-ndk-r9d/toolchains/arm-linux-androideabi-4.6/prebuilt/darwin-x86_64/bin/../lib/gcc/arm-linux-androideabi/4.6/../../../../arm-linux-androideabi/bin/ld: warning: hidden symbol '__dso_handle' in /Users/scoleman/android-ndk-r9d/platforms/android-9/arch-arm/usr/lib/crtbegin_so.o is referenced by DSO ./android-libs/armeabi//libutils.so
 ++ set +x
 
  -----------------  Copying lib files to lib directories  ----------
@@ -3855,7 +3860,7 @@ Checking for artifacts produced
 Checking for existence of delivery release files
 
 *****************************************************************
-All 32 artifact files are present and accounted for!
+All 33 artifact files are present and accounted for!
 *****************************************************************
 
-MC68985-scoleman:fcads scoleman$  
+MC68985-scoleman:fcads scoleman$ 

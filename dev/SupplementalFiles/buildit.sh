@@ -11,7 +11,7 @@ _ANDROID_EABI="arm-linux-androideabi-4.6"
 
 # Set _ANDROID_API to the API you want to use. You should set it
 # to one of: android-14, android-9, android-8, android-14, android-5
-# android-4, or android-3. You can't set it to the latest (for
+# android-4, or android-9. You can't set it to the latest (for
 # example, API-17) because the NDK does not supply the platform. At
 # Android 5.0, there will likely be another plaform added (android-18?).
 # This value is always used.
@@ -227,7 +227,7 @@ $CC \
 -DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
 -Wa,--noexecstack -Wformat -Werror=format-security  \
 -frtti     \
--I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
+-I$ANDROID_NDK_ROOT/platforms/android-9/arch-arm/usr/include -c \
  ./android-sqlite/android/sqlite3_android.cpp -o sqlite3_android.o 
 
 
@@ -252,7 +252,7 @@ $CC \
 -DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
 -Wa,--noexecstack -Wformat -Werror=format-security  \
 -frtti     \
--I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c  ./android-sqlite/android/PhonebookIndex.cpp -o PhonebookIndex.o 
+-I$ANDROID_NDK_ROOT/platforms/android-9/arch-arm/usr/include -c  ./android-sqlite/android/PhonebookIndex.cpp -o PhonebookIndex.o 
 
 
 
@@ -277,7 +277,7 @@ $CC \
 -DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
 -Wa,--noexecstack -Wformat -Werror=format-security  \
 -frtti     \
--I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
+-I$ANDROID_NDK_ROOT/platforms/android-9/arch-arm/usr/include -c \
  ./android-sqlite/android/PhoneNumberUtils.cpp -o PhoneNumberUtils.o 
 
 
@@ -303,7 +303,7 @@ $CC \
 -DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
 -Wa,--noexecstack -Wformat -Werror=format-security  \
 -frtti     \
--I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
+-I$ANDROID_NDK_ROOT/platforms/android-9/arch-arm/usr/include -c \
  ./android-sqlite/android/OldPhoneNumberUtils.cpp -o OldPhoneNumberUtils.o 
 
 
@@ -327,7 +327,7 @@ $CC \
 -DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
 -Wa,--noexecstack -Wformat -Werror=format-security  \
 -frtti     \
--I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
+-I$ANDROID_NDK_ROOT/platforms/android-9/arch-arm/usr/include -c \
  ./android-sqlite/android/PhoneticStringUtils.cpp -o PhoneticStringUtils.o 
 
 
@@ -352,7 +352,7 @@ $CC \
 -DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
 -Wa,--noexecstack -Wformat -Werror=format-security  \
 -frtti     \
--I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
+-I$ANDROID_NDK_ROOT/platforms/android-9/arch-arm/usr/include -c \
  ./String16.cpp -o String16.o 
 
 
@@ -377,7 +377,7 @@ $CC \
 -DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
 -Wa,--noexecstack -Wformat -Werror=format-security  \
 -frtti     \
--I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
+-I$ANDROID_NDK_ROOT/platforms/android-9/arch-arm/usr/include -c \
  ./String8.cpp -o String8.o 
 
 // wrapper.c has been replace by newWrapper.cpp
@@ -409,7 +409,7 @@ $CC \
 # -DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
 # -Wa,--noexecstack -Wformat -Werror=format-security  \
 # -frtti     \
-# -I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
+# -I$ANDROID_NDK_ROOT/platforms/android-9/arch-arm/usr/include -c \
 #  ./wrapper.c -o wrapper.o 
 
 
@@ -444,7 +444,7 @@ $CC \
 -DSQLITE_ENABLE_LOAD_EXTENSION -DOS_PATH_SEPARATOR="'/'" -DHAVE_SYS_UIO_H \
 -Wa,--noexecstack -Wformat -Werror=format-security  \
 -frtti     \
--I$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/include -c \
+-I$ANDROID_NDK_ROOT/platforms/android-9/arch-arm/usr/include -c \
  ./newWrapper.cpp -o newWrapper.o 
 
 
@@ -466,7 +466,7 @@ set -x
 
 #$CC \
 $CC \
--Wl,-soname,libsqlcipher_android.so -shared --sysroot=$ANDROID_NDK_ROOT/platforms/android-3/arch-arm\
+-Wl,-soname,libsqlcipher_android.so -shared --sysroot=$ANDROID_NDK_ROOT/platforms/android-9/arch-arm\
  sqlite3_android.o PhonebookIndex.o PhoneNumberUtils.o OldPhoneNumberUtils.o PhoneticStringUtils.o \
  String16.o String8.o newWrapper.o \
  ../obj/local/armeabi/libsqlcipher.a \
@@ -477,7 +477,7 @@ $CC \
  -L./android-libs/armeabi/ \
  -L./libs/armeabi/ \
  -Wl,--no-undefined -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now  \
- -L$ANDROID_NDK_ROOT/platforms/android-3/arch-arm/usr/lib -llog -lutils -lcutils -lc -lm \
+ -L$ANDROID_NDK_ROOT/platforms/android-9/arch-arm/usr/lib -lOpenSLES -landroid  -llog -lutils -lcutils -lc -lm \
  -o libsqlcipher_android.so
 
 

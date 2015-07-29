@@ -33,24 +33,26 @@ visit http://www.opensource.org/licenses/EPL-1.0
 
 package com.example.fcadstestandroidapp;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.t2.fcads.FipsWrapper;
-
 import net.sqlcipher.database.SQLiteDatabase;
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
+import android.content.res.AssetManager;
 import android.database.Cursor;
-import net.sqlcipher.database.SQLiteException;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
+
 
 public class MainActivity extends Activity
 {
@@ -72,6 +74,11 @@ public class MainActivity extends Activity
 	private int iterations = 0;
 	private String testDescription;
 	private boolean databaseTestsPassed = false;
+	
+
+	
+	
+	static AssetManager assetManager;
     
     /** Called when the activity is first created. */
     @Override
@@ -79,6 +86,8 @@ public class MainActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        assetManager = getAssets();
         
         textViewMain = (TextView) findViewById(R.id.textViewMain);   
         textLines = new ArrayList<String>();
@@ -94,7 +103,7 @@ public class MainActivity extends Activity
         FipsWrapper.setContext(this);
         
 		Log.d(TAG, "---------------------- Testsing FIPS functionality ---------------------");       
-		testDescription = startTest("Test 1.1");
+		testDescription = startTest("Test 0.1");
         int result = fipsWrapper.doFIPSmode();	
         String t2FipsVersion = fipsWrapper.doT2FIPSVersion();
 		assertT2Test(result == 1, testDescription);
@@ -121,7 +130,7 @@ public class MainActivity extends Activity
 
 		
 		final boolean useTestVectorsFoRiKey = true;
-		final boolean useRandomVectorsFoRiKey = false;
+		//final boolean useRandomVectorsFoRiKey = false;
 		
 		// ---------------------------------------------------------------------------------------
 		final int NUM_ITERATIONS = 1;
@@ -136,7 +145,6 @@ public class MainActivity extends Activity
 		// Test t2Crypto
 		String pin = "One";
 		String newPin1 = "tWo";
-		String newPin2 = "thrEe";
 		String newPin3 = "Password is  is four";
 		String answers = "TwoThreeFour";
 		String newAnswers = "TenNineEight";
@@ -152,6 +160,18 @@ public class MainActivity extends Activity
 		//		testDescription = startTest("Test x");
 		//		assertT2Test(x = x, testDescription);
 		
+		File internalFileStorage = this.getFilesDir();		
+		internalFileStorage.getAbsolutePath();
+		String internalFileStoragePath = internalFileStorage.getAbsolutePath();
+		String inputFileName = internalFileStoragePath + "/input.bin";	
+		String encryptedFileName = internalFileStoragePath + "/encrypted.bin";	
+		String decryptedFileName = internalFileStoragePath + "/decrypted.bin";	
+
+
+		
+		
+
+		
 		
 		while(iterations++ < NUM_ITERATIONS) {
 		
@@ -161,14 +181,59 @@ public class MainActivity extends Activity
 
 			
 			try {
+				boolean filesEqual  = false;
+				
+				testDescription = startTest("Test 1.0 - file encryption - short file");
+				createBinaryFile(inputFileName, 20); // Create an initial file to test with
+				try {
+					fipsWrapper.doProcessBinaryFile(inputFileName, encryptedFileName,FipsWrapper.T2Encrypt, "password"); // Encrypt to the file into encryptedFileName
+					fipsWrapper.doProcessBinaryFile(encryptedFileName, decryptedFileName,FipsWrapper.T2Decrypt , "password"); // Decrypt the file into encryptedFileName
+				} catch (Exception e2) {
+					e2.printStackTrace();
+				}
+
+				try {
+					filesEqual = isFileBinaryEqual( new File(inputFileName), new File(decryptedFileName) );
+					if (filesEqual) {
+						Log.d(TAG, "Success - Original file is equal to encrypted then decrypted file");
+					} else {
+						Log.e(TAG, "Failed - Files NOT equal");
+					}
+				} catch (IOException e2) {
+					e2.printStackTrace();
+				}				
+				assertT2Test(filesEqual == true, testDescription);				
+				
+				
+				testDescription = startTest("Test 1.1 - file encryption - long file file");
+				createBinaryFile(inputFileName, 2000); // Create an initial file to test with
+				try {
+					fipsWrapper.doProcessBinaryFile(inputFileName, encryptedFileName,FipsWrapper.T2Encrypt , "password"); // Encrypt to the file into encryptedFileName
+					fipsWrapper.doProcessBinaryFile(encryptedFileName, decryptedFileName,FipsWrapper.T2Decrypt , "password"); // Decrypt the file into encryptedFileName
+				} catch (Exception e2) {
+					e2.printStackTrace();
+				}
+
+				try {
+					filesEqual = isFileBinaryEqual( new File(inputFileName), new File(decryptedFileName) );
+					if (filesEqual) {
+						Log.d(TAG, "Success - Original file is equal to encrypted then decrypted file");
+					} else {
+						Log.e(TAG, "Failed - Files NOT equal");
+					}
+				} catch (IOException e2) {
+					e2.printStackTrace();
+				}				
+				assertT2Test(filesEqual == true, testDescription);			
+				
 				
 				testDescription = startTest("Test 2.1 - doIsInitialized");
 				fipsWrapper.doDeInitializeLogin();
 				ret = fipsWrapper.doIsInitialized();
 				assertT2Test(ret == T2False, testDescription);
 			
-				String encryptedText1 = fipsWrapper.doEncryptRaw(crazyPin, stringToEncrypt);
-				String decryptedText1 = fipsWrapper.doDecryptRaw(crazyPin, encryptedText1);
+				//String encryptedText1 = fipsWrapper.doEncryptRaw(crazyPin, stringToEncrypt);
+				//String decryptedText1 = fipsWrapper.doDecryptRaw(crazyPin, encryptedText1);
 				
 				testDescription = startTest("Test 2.2 - doInitializeLogin");
 				ret = fipsWrapper.doInitializeLogin(pin, answers);
@@ -176,29 +241,26 @@ public class MainActivity extends Activity
 				
 				// 
 				// Purposefully insert the encrypt/decrypt raw tests here to make sure they work before t2Crypto is initialized!
-				testDescription = startTest("Test 2.2a - check encryptRaw/decryptRaw");
+				testDescription = startTest("Test 2.2a - check encryptRaw/decryptRaw string");
 				String encryptedText = fipsWrapper.doEncryptRaw(crazyPin, stringToEncrypt);
 				String decryptedText = fipsWrapper.doDecryptRaw(crazyPin, encryptedText);
 				//Log.d(TAG,"java decryptedText = " + decryptedText);
 				assertT2Test(stringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;					
 				
-				testDescription = startTest("Test 2.2b - check encrypt/decrypt - blank string");
+				testDescription = startTest("Test 2.2b - check encryptRaw/decryptRaw string - blank string");
 				encryptedText = fipsWrapper.doEncryptRaw(pin, blankStringToEncrypt);
 				decryptedText = fipsWrapper.doDecryptRaw(pin, encryptedText);
 				//Log.d(TAG,"java decryptedText = " + decryptedText);
 				assertT2Test(blankStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;					
 
 
-				testDescription = startTest("Test 2.c - check encrypt/decrypt - long string");
+				testDescription = startTest("Test 2.2c - check encryptRaw/decryptRaw string - long string");
 				encryptedText = fipsWrapper.doEncryptRaw(blankPin, longStringToEncrypt);
 				decryptedText = fipsWrapper.doDecryptRaw(blankPin, encryptedText);
 				assertT2Test(longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;					
 
-				
-				
-				
 				// !!!!This will fail until Bug 3003 gets fixed
-				testDescription = startTest("Test 2.d - check encrypt/decrypt - bad pin");
+				testDescription = startTest("Test 2.2d - encryptRaw/decryptRaw string - bad pin");
 				encryptedText = fipsWrapper.doEncryptRaw(blankPin, longStringToEncrypt);
 				try {
 					decryptedText = fipsWrapper.doDecryptRaw(crazyPin, encryptedText);
@@ -210,11 +272,41 @@ public class MainActivity extends Activity
 				assertT2Test(!longStringToEncrypt.equalsIgnoreCase(decryptedText), testDescription) ;		
 				
 				
+				byte[] bytesToEncrypt = "012345678901234567890123456789".getBytes("UTF-8");
+				
+				// Now test encryptRaw/decryptRaw bytes
+				testDescription = startTest("Test 2.2a.1 - check encryptRaw/decryptRaw bytes");
+				byte[]  encryptedBytes = fipsWrapper.doEncryptBytesRaw(crazyPin, bytesToEncrypt);
+				byte[]  decryptedBytes = fipsWrapper.doDecryptBytesRaw(crazyPin, encryptedBytes);
+				Arrays.equals(bytesToEncrypt, decryptedBytes);
+				assertT2Test(Arrays.equals(bytesToEncrypt, decryptedBytes), testDescription); 				
+				
+				bytesToEncrypt = "".getBytes("UTF-8");
+				testDescription = startTest("Test 2.2b.1 - check encryptRaw/decryptRaw bytes - empty array");
+				encryptedBytes = fipsWrapper.doEncryptBytesRaw(crazyPin, bytesToEncrypt);
+				decryptedBytes = fipsWrapper.doDecryptBytesRaw(crazyPin, encryptedBytes);
+				Arrays.equals(bytesToEncrypt, decryptedBytes);
+				assertT2Test(Arrays.equals(bytesToEncrypt, decryptedBytes), testDescription); 				
+				
+				bytesToEncrypt = longStringToEncrypt.getBytes("UTF-8");
+				testDescription = startTest("Test 2.2c.1 - check encryptRaw/decryptRaw bytes - long array");
+				encryptedBytes = fipsWrapper.doEncryptBytesRaw(crazyPin, bytesToEncrypt);
+				decryptedBytes = fipsWrapper.doDecryptBytesRaw(crazyPin, encryptedBytes);
+				Arrays.equals(bytesToEncrypt, decryptedBytes);
+				assertT2Test(Arrays.equals(bytesToEncrypt, decryptedBytes), testDescription); 				
+
+				bytesToEncrypt = longStringToEncrypt.getBytes("UTF-8");
+				testDescription = startTest("Test 2.2d.1 - check encryptRaw/decryptRaw bytes - bad pin");
+				encryptedBytes = fipsWrapper.doEncryptBytesRaw(blankPin, bytesToEncrypt);
+				decryptedBytes = fipsWrapper.doDecryptBytesRaw(crazyPin, encryptedBytes);
+				Arrays.equals(bytesToEncrypt, decryptedBytes);
+				assertT2Test(!Arrays.equals(bytesToEncrypt, decryptedBytes), testDescription); 				
+
+
 				testDescription = startTest("Test 2.3 - doIsInitialized");
 				ret = fipsWrapper.doIsInitialized();
 				assertT2Test(ret == T2True, testDescription );
-	
-				
+					
 				String key = fipsWrapper.doGetDatabaseKeyUsingPin(pin);
 				Log.d(TAG,"key = " + key);
 	
@@ -334,7 +426,7 @@ public class MainActivity extends Activity
 				
 				
 				// No test here, just do it and make sure that the app doesn't crash
-				testDescription = startTest("Test 2.24 - check encrypt/decrypt - Good pin, decrypted non-encrypted string");
+				testDescription = startTest("Test 2.24 - check encrypt/decrypt text - Good pin, decrypted non-encrypted string");
 				//encryptedText = fipsWrapper.doEncryptUsingT2Crypto(newPin3, longStringToEncrypt);
 				try {
 					decryptedText = fipsWrapper.doDecryptUsingT2Crypto(newPin3, "1");
@@ -424,7 +516,8 @@ public class MainActivity extends Activity
 			// Now create the database file and the database	
 			String dbDirPath = getDatabasePath(DATABASE_NAME).getParent();
 			File dbDirFile = this.getApplicationContext().getDatabasePath(dbDirPath);
-			boolean result = dbDirFile.mkdirs();	// Note: we MUST create the directoryt path for this version of SQLCiphert
+			//boolean result = dbDirFile.mkdirs();	// Note: we MUST create the directory path for this version of SQLCipher
+			dbDirFile.mkdirs();	// Note: we MUST create the directory path for this version of SQLCipher
 			File databaseFile = this.getApplicationContext().getDatabasePath(DATABASE_NAME);
 			database = SQLiteDatabase.openOrCreateDatabase(databaseFile, PASSWORD, null);			
 			
@@ -477,54 +570,187 @@ public class MainActivity extends Activity
 		}
     }
 
-    // This can be used to test for database path issues - currently not used
-    private void reopenDatabase() {
-        SQLiteDatabase.loadLibs(this);
+//    // This can be used to test for database path issues - currently not used
+//    private void reopenDatabase() {
+//        SQLiteDatabase.loadLibs(this);
+//
+//        String dbDirPath = getDatabasePath(DATABASE_NAME).getParent();
+//        File dbDirFile = this.getApplicationContext().getDatabasePath(dbDirPath);
+//        dbDirFile.mkdirs();
+//        
+//        SQLiteDatabase database;
+//		try {
+//			
+//			// Now create the database file and the database
+//			File databaseFile = this.getApplicationContext().getDatabasePath(DATABASE_NAME);
+//			database = SQLiteDatabase.openOrCreateDatabase(databaseFile, "Wrong password", null);
+//			
+//			
+//	        // Create a database table
+//	        database.execSQL("create table if not exists t1(a, b)");
+//	        
+//	        // Do a quick check to make sure we can write to and read from database
+//	        ContentValues values = new ContentValues();
+//	        values.put("a", "fred");
+//	        values.put("b", "arnie");
+//	        database.insert("t1", null, values);
+//	        
+//	        String resultA= "";
+//	        String query = "select a from t1";
+//	        Cursor cursor = database.rawQuery(query,  null);
+//	        if (cursor.moveToFirst()) {
+//	        	resultA = cursor.getString(0);
+//
+//	        	Log.i("mytag", "resultA = " + resultA );
+//	        	if (resultA.equalsIgnoreCase("fred")) {
+//	        		Log.i("mytag", "PASSED - successfully writing to and reading from sqlcipher database" );
+//	        	}
+//	        	cursor.close();
+//	        }	
+//			
+//			
+//	        database.close();
+//			
+//		} catch (SQLiteException e) {
+//			Log.e(TAG, "SQLite Exception: " + e.toString());
+//			e.printStackTrace();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//    }
+    
+    
+    public boolean isFileBinaryEqual( File first, File second ) throws IOException   {
+    	
+    	 	  final int BUFFER_SIZE = 65536;
+    	      // TODO: Test: Missing test
+    	      boolean retval = false;
+    	      
+    	      if ((first.exists()) && (second.exists()) 
+    	         && (first.isFile()) && (second.isFile()))
+    	      {
+    	         if (first.getCanonicalPath().equals(second.getCanonicalPath()))
+    	         {
+    	            retval = true;
+    	         }
+    	         else
+    	         {
+    	            FileInputStream firstInput = null;
+    	            FileInputStream secondInput = null;
+    	            BufferedInputStream bufFirstInput = null;
+    	            BufferedInputStream bufSecondInput = null;
 
-        String dbDirPath = getDatabasePath(DATABASE_NAME).getParent();
-        File dbDirFile = this.getApplicationContext().getDatabasePath(dbDirPath);
-        dbDirFile.mkdirs();
-        
-        SQLiteDatabase database;
+    	            try
+    	            {            
+    	               firstInput = new FileInputStream(first); 
+    	               secondInput = new FileInputStream(second);
+    	               bufFirstInput = new BufferedInputStream(firstInput, BUFFER_SIZE); 
+    	               bufSecondInput = new BufferedInputStream(secondInput, BUFFER_SIZE);
+    	   
+    	               int firstByte;
+    	               int secondByte;
+    	               
+    	               while (true)
+    	               {
+    	                  firstByte = bufFirstInput.read();
+    	                  secondByte = bufSecondInput.read();
+    	                  if (firstByte != secondByte)
+    	                  {
+    	                     break;
+    	                  }
+    	                  if ((firstByte < 0) && (secondByte < 0))
+    	                  {
+    	                     retval = true;
+    	                     break;
+    	                  }
+    	               }
+    	            }
+    	            finally
+    	            {
+    	               try
+    	               {
+    	                  if (bufFirstInput != null)
+    	                  {
+    	                     bufFirstInput.close();
+    	                  }
+    	               }
+    	               finally
+    	               {
+    	                  if (bufSecondInput != null)
+    	                  {
+    	                     bufSecondInput.close();
+    	                  }
+    	               }
+    	            }
+    	         }
+    	      }
+    	      
+    	      return retval;
+    	   }
+    
+	// Test utility    
+	void readBinaryFile(String testFileName) {
+		
 		try {
+			FileInputStream in = new FileInputStream(new File(testFileName));
+			//long length = in.getChannel().size();
+		    byte[] buffer = new byte[1024]; // Or whatever constant you feel like using
+		    int read = 0;
+		    while (true) {
+		        read = in.read(buffer);
+		        if (read == -1) break;
+	
+		    }		
+		    in.close();		
 			
-			// Now create the database file and the database
-			File databaseFile = this.getApplicationContext().getDatabasePath(DATABASE_NAME);
-			database = SQLiteDatabase.openOrCreateDatabase(databaseFile, "Wrong password", null);
-			
-			
-	        // Create a database table
-	        database.execSQL("create table if not exists t1(a, b)");
-	        
-	        // Do a quick check to make sure we can write to and read from database
-	        ContentValues values = new ContentValues();
-	        values.put("a", "fred");
-	        values.put("b", "arnie");
-	        database.insert("t1", null, values);
-	        
-	        String resultA= "";
-	        String query = "select a from t1";
-	        Cursor cursor = database.rawQuery(query,  null);
-	        if (cursor.moveToFirst()) {
-	        	resultA = cursor.getString(0);
-
-	        	Log.i("mytag", "resultA = " + resultA );
-	        	if (resultA.equalsIgnoreCase("fred")) {
-	        		Log.i("mytag", "PASSED - successfully writing to and reading from sqlcipher database" );
-	        	}
-	        	cursor.close();
-	        }	
-			
-			
-	        database.close();
-			
-		} catch (SQLiteException e) {
-			Log.e(TAG, "SQLite Exception: " + e.toString());
-			e.printStackTrace();
-		} catch (Exception e) {
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    }
-    
+		
+	
+	}
+	    
+
+	/**
+	 * Writes a formatted hex string (created from supplied byte array to the log
+	 * @param TAG				Logging tag to use
+	 * @param prependString		String to prepend to the hex display of bytes 
+	 * @param bytes				Byte array to print
+	 */
+	static public void logHexByteString(String TAG, String prependString, byte[] bytes) {
+		StringBuffer hexString = new StringBuffer();
+		for (int i=0;i<bytes.length;i++) {
+			String s = Integer.toHexString(0xFF & bytes[i]);
+			if (s.length() < 2)
+			{
+				s = "0" + s;
+			}
+			
+		    hexString.append(s);
+		    }		
+		Log.i(TAG, prependString + new String(hexString));
+	}	
+
+
+	void createBinaryFile(String testFileName, int length) {
+		byte[] testData = new byte[length];
+		for (int i = 0; i < length; i++) {
+			testData[i] = (byte) (i & 255);
+			
+		}
+		
+		FileOutputStream f;
+		try {
+			f = new FileOutputStream(new File(testFileName));
+			f.write(testData);
+			f.flush();
+			f.close();	
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
 }
-;
