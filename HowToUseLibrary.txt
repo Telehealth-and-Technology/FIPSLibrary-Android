@@ -1,7 +1,7 @@
 Using the FCADS Android FIPS compliant library in an android project:
 =====================================================================
 
-1. Retrieve librarys and assets from release folder:
+1. Retrieve libraries and assets from release folder:
 	In the release directory structure the library files are at:
 		./object/android/libs
 		./object/android/assets
@@ -52,6 +52,20 @@ Using the FCADS Android FIPS compliant library in an android project:
 7. When application is complete, create the following FIPS documentation files from templates:
 	doc/FIPS140-2ApplicationComplianceStatementTemplate.txt
 	doc/FIPS140-2ApplicationComplianceRecordTemplate.txt
+
+
+
+=====================================================================
+Unit Teests
+=====================================================================
+The application FcadsTestAndroidApp contains a suite of unit tests that 
+test all of the T2Crypto functions .
+
+After running the App the phone display will indicate pass/fail status
+and the log will contain detailed information about the tests as well
+as pass/fail status.
+
+
 
 A note about encryption keys:
 ------------------------------

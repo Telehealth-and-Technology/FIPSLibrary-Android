@@ -127,9 +127,11 @@ Building
 
 
 
-	
 
-	<---------- Remaining instructions in step 2 are for legacy only!  ----------------->
+
+
+	
+<---------- Remaining instructions in step 2 are for legacy only!  ----------------->
 
 	Note: created deliverable files are in two locations:
 		/usr/local/ssl/...                       OpenSSL files files
@@ -276,6 +278,35 @@ Building
 			2 - That FIPS can be enabled properly
 			3 - Extensive unit tests are run which test the T2Crypto functionality (lost password implementation)
 			
+
+***************************************************
+4. Shortcut for developing T2Crypto functions
+***************************************************
+	But bulk of the T2Crypto functionality comes from the project FipsWrapper
+	(which contains native portion in newWrapper.cpp)	
+
+	Sometimes you may want to just compile this part to reduce the development/debug cycle.
+	Here’s how:
+
+	1. Make updates to native functions in newWrapper.cpp.
+		If the interface in the cpp file has changed you need to change FipsWrapper.java accordingly
+	2. Build the native code (  ./buildT2Only.sh  )
+	3. Build/clean the FipsWrapper project
+
+	4. This produces fipswrapper.jar, you may need to copy this file to  FcadsTestAndroidApp/libs
+		(You won’t need to do this if you have included the FipsWrapper project as a sub-project.
+                 otherwise you will) - Out of the box the FipsWrapper is NOT a sub-project of FcadsTestAndroidApp.
+	5. Run FcadsTestAndroidApp and observer your changes
+
+	6. Next time you do a full build (./buildAll.sh) your changes will be picked up.
+
+
+	Here’s where these files are located:
+		./dev/FipsWrapper
+		./test/FcadsTestAndroidApp
+		.dev/SupplementalFiles/newWrapper.cpp
+		.dev/fips/fcads/buildT2Only.sh
+
 
 ********************************
 Appendix A - Update source files:
