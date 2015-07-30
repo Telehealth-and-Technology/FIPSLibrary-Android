@@ -56,10 +56,11 @@ cleanfipswrapper:
 buildfipswrapper:
 	echo "Building fipswrapper files" && \
 	cd dev/fipswrapper && \
-	ant debug	
-	cp dev/fipswrapper/bin/fipswrapper.jar test/FcadsTestAndroidApp/libs
-
-
+	ant debug && \
+	[ -d ../../test/FcadsTestAndroidApp/libs ] && echo "libs folder exists" || mkdir ../../test/FcadsTestAndroidApp/libs && \
+	echo "copying fipswrapper.jar to test applicaion" && \
+	cp bin/fipswrapper.jar ../../test/FcadsTestAndroidApp/libs
+	
 clean:
 	make cleanfipswrapper
 	echo "Cleaning files" && \
