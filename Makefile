@@ -133,7 +133,7 @@ t2:
 	cd ${EXTERNAL_DIR}  && \
 	. ./buildit.sh && \
 	cd ${DEV_DIR}  &&\
-	cp -R android-database-sqlcipher/libs ${TEST_DIR}/FcadsTestAndroidApp
+	rsync -a android-database-sqlcipher/libs ${TEST_DIR}/FcadsTestAndroidApp
 
 	
 

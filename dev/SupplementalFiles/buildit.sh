@@ -488,6 +488,9 @@ echo " -----------------  Copying lib files to lib directories  ----------"
 echo ""
 set -x
 
+test -d "../libs/armeabi" || mkdir -p "../libs/armeabi" && cp libsqlcipher_android.so "../libs/armeabi"
+test -d "../libs/armeabi-v7a" || mkdir -p "../libs/armeabi-v7a" && cp libsqlcipher_android.so "../libs/armeabi-v7a"
+test -d "../libs/x86" || mkdir -p "../libs/x86" && cp libsqlcipher_android.so "../libs/x86"
 
 cp libsqlcipher_android.so ../libs/armeabi
 cp libsqlcipher_android.so ../libs/armeabi-v7a
