@@ -1,42 +1,15 @@
-MC68985-scoleman:fcads scoleman$ git status
-On branch master
-Your branch is up-to-date with 'origin/master'.
-
-Changes to be committed:
-  (use "git reset HEAD <file>..." to unstage)
-
-    deleted:    test/FcadsTestAndroidApp/libs/fipswrapper.jar
-
-Changes not staged for commit:
-  (use "git add/rm <file>..." to update what will be committed)
-  (use "git checkout -- <file>..." to discard changes in working directory)
-
-    modified:   BuildInstructionsV1.1.txt
-    modified:   SuccessfulUnitTest1PassVerbose.log
-    modified:   SuccessfulUnitTestManyPass.log
-    modified:   dev/FipsWrapper/src/com/t2/fcads/FipsWrapper.java
-    modified:   dev/SupplementalFiles/buildit.sh
-    modified:   dev/SupplementalFiles/newWrapper.cpp
-    deleted:    test/FcadsTestAndroidApp/libs/armeabi-v7a/libdatabase_sqlcipher.so
-    deleted:    test/FcadsTestAndroidApp/libs/armeabi-v7a/libstlport_shared.so
-    deleted:    test/FcadsTestAndroidApp/libs/armeabi/libdatabase_sqlcipher.so
-    deleted:    test/FcadsTestAndroidApp/libs/armeabi/libstlport_shared.so
-    deleted:    test/FcadsTestAndroidApp/libs/commons-codec.jar
-    deleted:    test/FcadsTestAndroidApp/libs/guava-r09.jar
-    deleted:    test/FcadsTestAndroidApp/libs/sqlcipher.jar
-    deleted:    test/FcadsTestAndroidApp/libs/x86/libdatabase_sqlcipher.so
-    deleted:    test/FcadsTestAndroidApp/libs/x86/libstlport_shared.so
-    modified:   test/FcadsTestAndroidApp/project.properties
-    modified:   test/FcadsTestAndroidApp/src/com/example/fcadstestandroidapp/MainActivity.java
-    modified:   versionNumber.txt
-
-Untracked files:
-  (use "git add <file>..." to include in what will be committed)
-
-    test/FcadsTestAndroidApp/bin/
-    test/FcadsTestAndroidApp/libs/libs/
-
-MC68985-scoleman:fcads scoleman$ 
+Last login: Thu Jul 30 12:00:03 on ttys003
+MC68985-scoleman:fips scoleman$ git clone git.t2.local:/git/mobile/crossplatform/fcads.git
+Cloning into 'fcads'...
+scoleman@git.t2.local's password: 
+remote: Counting objects: 34279, done.
+remote: Compressing objects: 100% (22562/22562), done.
+remote: Total 34279 (delta 10382), reused 33556 (delta 10050)
+Receiving objects: 100% (34279/34279), 649.48 MiB | 5.76 MiB/s, done.
+Resolving deltas: 100% (10382/10382), done.
+Checking connectivity... done.
+Checking out files: 100% (31452/31452), done.
+MC68985-scoleman:fips scoleman$ cd fcads
 MC68985-scoleman:fcads scoleman$ . ./buildAll.sh
 
 using openssl-1.0.1f.tar.gz
@@ -55,12 +28,26 @@ Option n - Stop build so you can download the official files
 
 press y or n : y
 Copying local files
+
+!!!! One or more of the sqlCipher download files are missing !!!!!
+
+sqlcipherFiles = dev/android-database-sqlcipher
+
+You have two options:
+Option y - Copy local (unofficial) sqlCipher downlad files form this distribution
+Option n - Stop build so you can download the official files
+
+press y or n : y
+Copying local files
 ----------------------------------------------------------------------------------------------------------
 Compiling fipswrapper project
 ----------------------------------------------------------------------------------------------------------
 echo "Building fipswrapper files" && \
-    cd dev/fipswrapper && \
-    ant debug   
+	cd dev/fipswrapper && \
+	ant debug && \
+	[ -d ../../test/FcadsTestAndroidApp/libs ] && echo "libs folder exists" || mkdir ../../test/FcadsTestAndroidApp/libs && \
+	echo "copying fipswrapper.jar to test applicaion" && \
+	cp bin/fipswrapper.jar ../../test/FcadsTestAndroidApp/libs
 Building fipswrapper files
 Buildfile: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/build.xml
 
@@ -89,6 +76,7 @@ Buildfile: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/build.xml
 [gettarget] API level:        19
      [echo] ----------
      [echo] Creating output directories if needed...
+    [mkdir] Created dir: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/libs
     [mkdir] Created dir: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/bin
     [mkdir] Created dir: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/bin/res
     [mkdir] Created dir: /Users/scoleman/dev/fips/fcads/dev/FipsWrapper/bin/rsObj
@@ -166,7 +154,7 @@ debug:
 
 BUILD SUCCESSFUL
 Total time: 1 second
-cp dev/fipswrapper/bin/fipswrapper.jar test/FcadsTestAndroidApp/libs
+copying fipswrapper.jar to test applicaion
 
 --- All files present and accounted for, proceeding with build ---
 
@@ -178,24 +166,22 @@ Preparing files
 Updated project.properties
 Updated local.properties
 Updated file ./proguard-project.txt
-It seems that there are sub-projects. If you want to update them
-please use the --subprojects parameter.
 cd /Users/scoleman/dev/fips/fcads/dev && \
-    gunzip -c openssl-fips-ecp-2.0.2.tar.gz | tar xf - && \
-    gunzip -c openssl-1.0.1f.tar.gz | tar xf - && \
-    cp SupplementalFiles/Makefile android-database-sqlcipher/ && \
-    cp SupplementalFiles/Application.mk android-database-sqlcipher/jni/ && \
-    cp SupplementalFiles/*.c android-database-sqlcipher/external && \
-    cp SupplementalFiles/*.cpp android-database-sqlcipher/external && \
-    cp SupplementalFiles/*.sh android-database-sqlcipher/external   
+	gunzip -c openssl-fips-ecp-2.0.2.tar.gz | tar xf - && \
+	gunzip -c openssl-1.0.1f.tar.gz | tar xf - && \
+	cp SupplementalFiles/Makefile android-database-sqlcipher/ && \
+	cp SupplementalFiles/Application.mk android-database-sqlcipher/jni/ && \
+	cp SupplementalFiles/*.c android-database-sqlcipher/external && \
+	cp SupplementalFiles/*.cpp android-database-sqlcipher/external && \
+	cp SupplementalFiles/*.sh android-database-sqlcipher/external	
 ----------------------------------------------------------------------------------------------------------
 Compiling FIPS Module
 ----------------------------------------------------------------------------------------------------------
 cd /Users/scoleman/dev/fips/fcads/dev/openssl-fips-ecp-2.0.2 && \
-    . ../Setenv-android.sh && \
-    ./config && \
-    make && \
-    sudo make install
+	. ../Setenv-android.sh && \
+	./config && \
+	make && \
+	sudo make install
 Operating system: armv7l-whatever-android
 Auto Configuring fipsonly
 Auto Configuring fipsonly
@@ -396,17 +382,17 @@ http://openssl.org/docs/fips/ or http://csrc.nist.gov/cryptval/).
 This is the OpenSSL FIPS 2.0 module.
 
 if [ -n "libcrypto" ]; then \
-        EXCL_OBJ='aes_cbc.o aes-armv4.o bn_asm.o armv4-mont.o  des_enc.o fcrypt_b.o armcap.o armv4cpuid.o sha1-armv4-large.o sha256-armv4.o sha512-armv4.o ghash-armv4.o ../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o' ; export EXCL_OBJ ; \
-        ARX='/usr/bin/perl ${TOP}/util/arx.pl arm-linux-androideabi-ar  r' ; \
-    else \
-        ARX='arm-linux-androideabi-ar  r' ; \
-    fi ; export ARX ; \
-    if [ y = "y" ]; then \
-        AS='/usr/bin/perl ${TOP}/util/fipsas.pl ${TOP} ${<} arm-linux-androideabi-gcc' ; \
-    else \
-        AS='arm-linux-androideabi-gcc -c' ; \
-    fi ; export AS ; \
-        dir=crypto; target=fips; if expr " crypto fips test  " : ".* $dir " >/dev/null 2>&1; then if [ -d "$dir" ]; then (  cd $dir && echo "making $target in $dir..." && TOP= && unset TOP ${LIB+LIB} ${LIBS+LIBS} ${INCLUDE+INCLUDE} ${INCLUDES+INCLUDES} ${DIR+DIR} ${DIRS+DIRS} ${SRC+SRC} ${LIBSRC+LIBSRC} ${LIBOBJ+LIBOBJ} ${ALL+ALL} ${EXHEADER+EXHEADER} ${HEADER+HEADER} ${GENERAL+GENERAL} ${CFLAGS+CFLAGS} ${ASFLAGS+ASFLAGS} ${AFLAGS+AFLAGS} ${LDCMD+LDCMD} ${LDFLAGS+LDFLAGS} ${SHAREDCMD+SHAREDCMD} ${SHAREDFLAGS+SHAREDFLAGS} ${SHARED_LIB+SHARED_LIB} ${LIBEXTRAS+LIBEXTRAS} && /Applications/Xcode.app/Contents/Developer/usr/bin/make -e PLATFORM='android-armv7' PROCESSOR='' CC='arm-linux-androideabi-gcc' CFLAG='-DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM' ASFLAG='-DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM -c' AR='arm-linux-androideabi-ar  r' NM='arm-linux-androideabi-nm' RANLIB='arm-linux-androideabi-ranlib' CROSS_COMPILE='arm-linux-androideabi-' PERL='/usr/bin/perl' ENGDIRS='ccgost' SDIRS='sha hmac des aes modes bn ec rsa dsa ecdsa dh buffer evp ecdh cmac' LIBRPATH='/usr/local/ssl/fips-2.0/lib' INSTALL_PREFIX='' INSTALLTOP='/usr/local/ssl/fips-2.0' OPENSSLDIR='/usr/local/ssl/fips-2.0' LIBDIR='lib' MAKEDEPEND='$${TOP}/util/domd $${TOP} -MD arm-linux-androideabi-gcc' DEPFLAG='-DOPENSSL_NO_DEPRECATED -DOPENSSL_NO_BF -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_CAST -DOPENSSL_NO_EC2M -DOPENSSL_NO_EC_NISTP_64_GCC_128 -DOPENSSL_NO_GMP -DOPENSSL_NO_IDEA -DOPENSSL_NO_JPAKE -DOPENSSL_NO_MD2 -DOPENSSL_NO_MD5 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC2 -DOPENSSL_NO_RC4 -DOPENSSL_NO_RC5 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_RIPEMD -DOPENSSL_NO_SEED -DOPENSSL_NO_SRP -DOPENSSL_NO_SSL2 -DOPENSSL_NO_SSL3 -DOPENSSL_NO_STORE -DOPENSSL_NO_TLS1 -DOPENSSL_NO_TLSEXT' MAKEDEPPROG='arm-linux-androideabi-gcc' SHARED_LDFLAGS='' KRB5_INCLUDES='' LIBKRB5='' ZLIB_INCLUDE='' LIBZLIB='' EXE_EXT='' SHARED_LIBS='libcrypto.so.1.1.0 libssl.so.1.1.0' SHLIB_EXT='.so.1.1.0' SHLIB_TARGET='linux-shared' PEX_LIBS='' EX_LIBS='-ldl' CPUID_OBJ='armcap.o armv4cpuid.o' BN_ASM='bn_asm.o armv4-mont.o ' DES_ENC='des_enc.o fcrypt_b.o' AES_ENC='aes_cbc.o aes-armv4.o' CMLL_ENC='camellia.o cmll_misc.o cmll_cbc.o' BF_ENC='bf_enc.o' CAST_ENC='c_enc.o' RC4_ENC='rc4_enc.o rc4_skey.o' RC5_ENC='rc5_enc.o' SHA1_ASM_OBJ='sha1-armv4-large.o sha256-armv4.o sha512-armv4.o' MD5_ASM_OBJ='' RMD160_ASM_OBJ='' WP_ASM_OBJ='wp_block.o' MODES_ASM_OBJ='ghash-armv4.o' PERLASM_SCHEME='void' FIPSLIBDIR='' FIPSCANLIB="${FIPSCANLIB:-libcrypto}" FIPSCANISTERINTERNAL='y' FIPSCANISTERONLY='y' FIPS_EX_OBJ='../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o' THIS=${THIS:-build_crypto} MAKEFILE=Makefile MAKEOVERRIDES= TOP=.. DIR=$dir $target ) || exit 1; fi; fi
+		EXCL_OBJ='aes_cbc.o aes-armv4.o bn_asm.o armv4-mont.o  des_enc.o fcrypt_b.o armcap.o armv4cpuid.o sha1-armv4-large.o sha256-armv4.o sha512-armv4.o ghash-armv4.o ../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o' ; export EXCL_OBJ ; \
+		ARX='/usr/bin/perl ${TOP}/util/arx.pl arm-linux-androideabi-ar  r' ; \
+	else \
+		ARX='arm-linux-androideabi-ar  r' ; \
+	fi ; export ARX ; \
+	if [ y = "y" ]; then \
+		AS='/usr/bin/perl ${TOP}/util/fipsas.pl ${TOP} ${<} arm-linux-androideabi-gcc' ; \
+	else \
+		AS='arm-linux-androideabi-gcc -c' ; \
+	fi ; export AS ; \
+		dir=crypto; target=fips; if expr " crypto fips test  " : ".* $dir " >/dev/null 2>&1; then if [ -d "$dir" ]; then (	cd $dir && echo "making $target in $dir..." && TOP= && unset TOP ${LIB+LIB} ${LIBS+LIBS} ${INCLUDE+INCLUDE} ${INCLUDES+INCLUDES} ${DIR+DIR} ${DIRS+DIRS} ${SRC+SRC} ${LIBSRC+LIBSRC} ${LIBOBJ+LIBOBJ} ${ALL+ALL} ${EXHEADER+EXHEADER} ${HEADER+HEADER} ${GENERAL+GENERAL} ${CFLAGS+CFLAGS} ${ASFLAGS+ASFLAGS} ${AFLAGS+AFLAGS} ${LDCMD+LDCMD} ${LDFLAGS+LDFLAGS} ${SHAREDCMD+SHAREDCMD} ${SHAREDFLAGS+SHAREDFLAGS} ${SHARED_LIB+SHARED_LIB} ${LIBEXTRAS+LIBEXTRAS} && /Applications/Xcode.app/Contents/Developer/usr/bin/make -e PLATFORM='android-armv7' PROCESSOR='' CC='arm-linux-androideabi-gcc' CFLAG='-DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM' ASFLAG='-DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM -c' AR='arm-linux-androideabi-ar  r' NM='arm-linux-androideabi-nm' RANLIB='arm-linux-androideabi-ranlib' CROSS_COMPILE='arm-linux-androideabi-' PERL='/usr/bin/perl' ENGDIRS='ccgost' SDIRS='sha hmac des aes modes bn ec rsa dsa ecdsa dh buffer evp ecdh cmac' LIBRPATH='/usr/local/ssl/fips-2.0/lib' INSTALL_PREFIX='' INSTALLTOP='/usr/local/ssl/fips-2.0' OPENSSLDIR='/usr/local/ssl/fips-2.0' LIBDIR='lib' MAKEDEPEND='$${TOP}/util/domd $${TOP} -MD arm-linux-androideabi-gcc' DEPFLAG='-DOPENSSL_NO_DEPRECATED -DOPENSSL_NO_BF -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_CAST -DOPENSSL_NO_EC2M -DOPENSSL_NO_EC_NISTP_64_GCC_128 -DOPENSSL_NO_GMP -DOPENSSL_NO_IDEA -DOPENSSL_NO_JPAKE -DOPENSSL_NO_MD2 -DOPENSSL_NO_MD5 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC2 -DOPENSSL_NO_RC4 -DOPENSSL_NO_RC5 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_RIPEMD -DOPENSSL_NO_SEED -DOPENSSL_NO_SRP -DOPENSSL_NO_SSL2 -DOPENSSL_NO_SSL3 -DOPENSSL_NO_STORE -DOPENSSL_NO_TLS1 -DOPENSSL_NO_TLSEXT' MAKEDEPPROG='arm-linux-androideabi-gcc' SHARED_LDFLAGS='' KRB5_INCLUDES='' LIBKRB5='' ZLIB_INCLUDE='' LIBZLIB='' EXE_EXT='' SHARED_LIBS='libcrypto.so.1.1.0 libssl.so.1.1.0' SHLIB_EXT='.so.1.1.0' SHLIB_TARGET='linux-shared' PEX_LIBS='' EX_LIBS='-ldl' CPUID_OBJ='armcap.o armv4cpuid.o' BN_ASM='bn_asm.o armv4-mont.o ' DES_ENC='des_enc.o fcrypt_b.o' AES_ENC='aes_cbc.o aes-armv4.o' CMLL_ENC='camellia.o cmll_misc.o cmll_cbc.o' BF_ENC='bf_enc.o' CAST_ENC='c_enc.o' RC4_ENC='rc4_enc.o rc4_skey.o' RC5_ENC='rc5_enc.o' SHA1_ASM_OBJ='sha1-armv4-large.o sha256-armv4.o sha512-armv4.o' MD5_ASM_OBJ='' RMD160_ASM_OBJ='' WP_ASM_OBJ='wp_block.o' MODES_ASM_OBJ='ghash-armv4.o' PERLASM_SCHEME='void' FIPSLIBDIR='' FIPSCANLIB="${FIPSCANLIB:-libcrypto}" FIPSCANISTERINTERNAL='y' FIPSCANISTERONLY='y' FIPS_EX_OBJ='../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o' THIS=${THIS:-build_crypto} MAKEFILE=Makefile MAKEOVERRIDES= TOP=.. DIR=$dir $target ) || exit 1; fi; fi
 making fips in crypto...
 arm-linux-androideabi-gcc -I. -I.. -I../include  -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o cryptlib.o cryptlib.c
 arm-linux-androideabi-gcc -I. -I.. -I../include  -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o thr_id.o thr_id.c
@@ -417,10 +403,10 @@ arm-linux-androideabi-gcc -I. -I.. -I../include  -DOPENSSL_FIPSCANISTER -fPIC -D
 arm-linux-androideabi-gcc -I. -I.. -I../include  -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o armcap.o armcap.c
 arm-linux-androideabi-gcc -I. -I.. -I../include  -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM -c   -c -o armv4cpuid.o armv4cpuid.S
 [ -n "sha hmac des aes modes bn ec rsa dsa ecdsa dh buffer evp ecdh cmac" ] && for i in sha hmac des aes modes bn ec rsa dsa ecdsa dh buffer evp ecdh cmac ; do \
-            ( obj=`/usr/bin/perl ../util/fipsobj.pl $i` && \
-            cd $i && echo "making fips in crypto/$i..." && \
-            /Applications/Xcode.app/Contents/Developer/usr/bin/make -e TOP=../.. DIR=$i INCLUDES='-I.. -I../.. -I../modes -I../asn1 -I../evp -I../../include ' $obj ) || exit 1; \
-        done;
+		    ( obj=`/usr/bin/perl ../util/fipsobj.pl $i` && \
+			cd $i && echo "making fips in crypto/$i..." && \
+		    /Applications/Xcode.app/Contents/Developer/usr/bin/make -e TOP=../.. DIR=$i INCLUDES='-I.. -I../.. -I../modes -I../asn1 -I../evp -I../../include ' $obj ) || exit 1; \
+		done;
 making fips in crypto/sha...
 arm-linux-androideabi-gcc -I.. -I../.. -I../modes -I../asn1 -I../evp -I../../include  -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o sha1dgst.o sha1dgst.c
 arm-linux-androideabi-gcc -I.. -I../.. -I../modes -I../asn1 -I../evp -I../../include  -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o sha256.o sha256.c
@@ -535,11 +521,11 @@ making all in fips...
 making all in fips/sha...
 arm-linux-androideabi-gcc -I.. -I../.. -I../../include -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o fips_standalone_sha1.o fips_standalone_sha1.c
 if [ -z "gcc" ] ; then \
-    FIPS_SHA_ASM=""; for i in sha1-armv4-large.o sha256-armv4.o sha512-armv4.o sha1dgst.o ; do FIPS_SHA_ASM="$FIPS_SHA_ASM ../../crypto/sha/$i" ; done; \
-    arm-linux-androideabi-gcc -o ../fips_standalone_sha1 -I.. -I../.. -I../../include -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM fips_standalone_sha1.o $FIPS_SHA_ASM ; \
-    else \
-        gcc  -o ../fips_standalone_sha1 -I../../include -I../../crypto fips_standalone_sha1.c ../../crypto/sha/sha1dgst.c ; \
-    fi
+	FIPS_SHA_ASM=""; for i in sha1-armv4-large.o sha256-armv4.o sha512-armv4.o sha1dgst.o ; do FIPS_SHA_ASM="$FIPS_SHA_ASM ../../crypto/sha/$i" ; done; \
+	arm-linux-androideabi-gcc -o ../fips_standalone_sha1 -I.. -I../.. -I../../include -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM fips_standalone_sha1.o $FIPS_SHA_ASM ; \
+	else \
+		gcc  -o ../fips_standalone_sha1 -I../../include -I../../crypto fips_standalone_sha1.c ../../crypto/sha/sha1dgst.c ; \
+	fi
 arm-linux-androideabi-gcc -I.. -I../.. -I../../include -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o fips_sha1_selftest.o fips_sha1_selftest.c
 making all in fips/rand...
 arm-linux-androideabi-gcc -I.. -I../.. -I../../include -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o fips_rand.o fips_rand.c
@@ -587,32 +573,32 @@ arm-linux-androideabi-gcc -I. -I.. -I../include -DOPENSSL_FIPSCANISTER -fPIC -DO
 arm-linux-androideabi-gcc -I. -I.. -I../include -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM -DHMAC_EXT=\"${HMAC_EXT:-sha1}\"   -c -o fips_post.o fips_post.c
 arm-linux-androideabi-gcc -I. -I.. -I../include -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM -DHMAC_EXT=\"${HMAC_EXT:-sha1}\" -DFIPS_END -c -o fips_end.o fips_canister.c
 FIPS_ASM=""; \
-    list="bn_asm.o armv4-mont.o "; for i in $list; do FIPS_ASM="$FIPS_ASM ../crypto/bn/$i" ; done; \
-    list="aes_cbc.o aes-armv4.o"; for i in $list; do FIPS_ASM="$FIPS_ASM ../crypto/aes/$i" ; done; \
-    list="des_enc.o fcrypt_b.o"; for i in $list; do FIPS_ASM="$FIPS_ASM ../crypto/des/$i" ; done; \
-    list="sha1-armv4-large.o sha256-armv4.o sha512-armv4.o"; for i in $list; do FIPS_ASM="$FIPS_ASM ../crypto/sha/$i" ; done; \
-    list="ghash-armv4.o"; for i in $list; do FIPS_ASM="$FIPS_ASM ../crypto/modes/$i" ; done; \
-    CPUID=""; \
-    list="armcap.o armv4cpuid.o"; for i in $list; do CPUID="$CPUID ../crypto/$i" ; done; \
-    objs="fips_start.o fips.o fips_post.o ../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o $CPUID $FIPS_ASM"; \
-    for i in sha/lib hmac/lib rand/lib des/lib aes/lib dsa/lib rsa/lib dh/lib utl/lib ecdsa/lib ecdh/lib cmac/lib; do \
-        dir=`dirname $i`; script="s|^|$dir/|;s| | $dir/|g"; \
-        objs="$objs `sed "$script" $i`"; \
-    done; \
-    objs="$objs fips_end.o" ; \
-    os="`(uname -s) 2>/dev/null`"; cflags="-I. -I.. -I../include -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM -DHMAC_EXT=\"${HMAC_EXT:-sha1}\""; \
-    case "$os" in \
-        AIX)    cflags="$cflags -Wl,-bnoobjreorder" ;; \
-        HP-UX)  cflags="$cflags -Wl,+sectionmerge"  ;; \
-    esac; \
-    if [ -n "" ]; then \
-        set -x;  -r -o fipscanister.o $objs; \
-    elif arm-linux-androideabi-gcc -dumpversion >/dev/null 2>&1; then \
-        set -x; arm-linux-androideabi-gcc $cflags -r -nostdlib -o fipscanister.o $objs ; \
-    else case "$os" in \
-        OSF1|SunOS) set -x; /usr/ccs/bin/ld -r -o fipscanister.o $objs ;; \
-        *) set -x; arm-linux-androideabi-gcc $cflags -r -o fipscanister.o $objs ;; \
-    esac fi
+	list="bn_asm.o armv4-mont.o "; for i in $list; do FIPS_ASM="$FIPS_ASM ../crypto/bn/$i" ; done; \
+	list="aes_cbc.o aes-armv4.o"; for i in $list; do FIPS_ASM="$FIPS_ASM ../crypto/aes/$i" ; done; \
+	list="des_enc.o fcrypt_b.o"; for i in $list; do FIPS_ASM="$FIPS_ASM ../crypto/des/$i" ; done; \
+	list="sha1-armv4-large.o sha256-armv4.o sha512-armv4.o"; for i in $list; do FIPS_ASM="$FIPS_ASM ../crypto/sha/$i" ; done; \
+	list="ghash-armv4.o"; for i in $list; do FIPS_ASM="$FIPS_ASM ../crypto/modes/$i" ; done; \
+	CPUID=""; \
+	list="armcap.o armv4cpuid.o"; for i in $list; do CPUID="$CPUID ../crypto/$i" ; done; \
+	objs="fips_start.o fips.o fips_post.o ../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o $CPUID $FIPS_ASM"; \
+	for i in sha/lib hmac/lib rand/lib des/lib aes/lib dsa/lib rsa/lib dh/lib utl/lib ecdsa/lib ecdh/lib cmac/lib; do \
+		dir=`dirname $i`; script="s|^|$dir/|;s| | $dir/|g"; \
+		objs="$objs `sed "$script" $i`"; \
+	done; \
+	objs="$objs fips_end.o" ; \
+	os="`(uname -s) 2>/dev/null`"; cflags="-I. -I.. -I../include -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM -DHMAC_EXT=\"${HMAC_EXT:-sha1}\""; \
+	case "$os" in \
+		AIX)	cflags="$cflags -Wl,-bnoobjreorder" ;; \
+		HP-UX)	cflags="$cflags -Wl,+sectionmerge"  ;; \
+	esac; \
+	if [ -n "" ]; then \
+		set -x;  -r -o fipscanister.o $objs; \
+	elif arm-linux-androideabi-gcc -dumpversion >/dev/null 2>&1; then \
+		set -x; arm-linux-androideabi-gcc $cflags -r -nostdlib -o fipscanister.o $objs ; \
+	else case "$os" in \
+		OSF1|SunOS) set -x; /usr/ccs/bin/ld -r -o fipscanister.o $objs ;; \
+		*) set -x; arm-linux-androideabi-gcc $cflags -r -o fipscanister.o $objs ;; \
+	esac fi
 + arm-linux-androideabi-gcc -I. -I.. -I../include -DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM '-DHMAC_EXT="sha1"' -r -nostdlib -o fipscanister.o fips_start.o fips.o fips_post.o ../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o ../crypto/armcap.o ../crypto/armv4cpuid.o ../crypto/bn/bn_asm.o ../crypto/bn/armv4-mont.o ../crypto/aes/aes_cbc.o ../crypto/aes/aes-armv4.o ../crypto/des/des_enc.o ../crypto/des/fcrypt_b.o ../crypto/sha/sha1-armv4-large.o ../crypto/sha/sha256-armv4.o ../crypto/sha/sha512-armv4.o ../crypto/modes/ghash-armv4.o sha/fips_sha1_selftest.o hmac/fips_hmac_selftest.o rand/fips_rand.o rand/fips_rand_selftest.o rand/fips_drbg_lib.o rand/fips_drbg_hash.o rand/fips_drbg_hmac.o rand/fips_drbg_ctr.o rand/fips_drbg_ec.o rand/fips_drbg_selftest.o rand/fips_drbg_rand.o rand/fips_rand_lib.o des/fips_des_selftest.o aes/fips_aes_selftest.o dsa/fips_dsa_selftest.o dsa/fips_dsa_lib.o dsa/fips_dsa_sign.o rsa/fips_rsa_selftest.o rsa/fips_rsa_sign.o rsa/fips_rsa_lib.o dh/fips_dh_lib.o utl/fips_err.o utl/fips_md.o utl/fips_enc.o utl/fips_lck.o utl/fips_mem.o ecdsa/fips_ecdsa_lib.o ecdsa/fips_ecdsa_sign.o ecdsa/fips_ecdsa_selftest.o ecdh/fips_ecdh_selftest.o cmac/fips_cmac_selftest.o fips_end.o
 ./fips_standalone_sha1 fipscanister.o > fipscanister.o.sha1
 arm-linux-androideabi-ar  r ../libcrypto.a fipscanister.o
@@ -621,23 +607,23 @@ arm-linux-androideabi-ranlib ../libcrypto.a || echo Never mind.
 if [ "y" = "n" -a -n "fipscanister.o" ]; then arm-linux-androideabi-ar  r ../libcrypto.a fipscanister.o; fi
 Password:
 if [ -n "libcrypto" ]; then \
-        EXCL_OBJ='aes_cbc.o aes-armv4.o bn_asm.o armv4-mont.o  des_enc.o fcrypt_b.o armcap.o armv4cpuid.o sha1-armv4-large.o sha256-armv4.o sha512-armv4.o ghash-armv4.o ../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o' ; export EXCL_OBJ ; \
-        ARX='/usr/bin/perl ${TOP}/util/arx.pl arm-linux-androideabi-ar  r' ; \
-    else \
-        ARX='arm-linux-androideabi-ar  r' ; \
-    fi ; export ARX ; \
-    if [ y = "y" ]; then \
-        AS='/usr/bin/perl ${TOP}/util/fipsas.pl ${TOP} ${<} arm-linux-androideabi-gcc' ; \
-    else \
-        AS='arm-linux-androideabi-gcc -c' ; \
-    fi ; export AS ; \
-        dir=crypto; target=fips; if expr " crypto fips test  " : ".* $dir " >/dev/null 2>&1; then if [ -d "$dir" ]; then (  cd $dir && echo "making $target in $dir..." && TOP= && unset TOP ${LIB+LIB} ${LIBS+LIBS} ${INCLUDE+INCLUDE} ${INCLUDES+INCLUDES} ${DIR+DIR} ${DIRS+DIRS} ${SRC+SRC} ${LIBSRC+LIBSRC} ${LIBOBJ+LIBOBJ} ${ALL+ALL} ${EXHEADER+EXHEADER} ${HEADER+HEADER} ${GENERAL+GENERAL} ${CFLAGS+CFLAGS} ${ASFLAGS+ASFLAGS} ${AFLAGS+AFLAGS} ${LDCMD+LDCMD} ${LDFLAGS+LDFLAGS} ${SHAREDCMD+SHAREDCMD} ${SHAREDFLAGS+SHAREDFLAGS} ${SHARED_LIB+SHARED_LIB} ${LIBEXTRAS+LIBEXTRAS} && /Applications/Xcode.app/Contents/Developer/usr/bin/make -e PLATFORM='android-armv7' PROCESSOR='' CC='arm-linux-androideabi-gcc' CFLAG='-DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/include -B/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM' ASFLAG='-DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/include -B/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM -c' AR='arm-linux-androideabi-ar  r' NM='arm-linux-androideabi-nm' RANLIB='arm-linux-androideabi-ranlib' CROSS_COMPILE='arm-linux-androideabi-' PERL='/usr/bin/perl' ENGDIRS='ccgost' SDIRS='sha hmac des aes modes bn ec rsa dsa ecdsa dh buffer evp ecdh cmac' LIBRPATH='/usr/local/ssl/fips-2.0/lib' INSTALL_PREFIX='' INSTALLTOP='/usr/local/ssl/fips-2.0' OPENSSLDIR='/usr/local/ssl/fips-2.0' LIBDIR='lib' MAKEDEPEND='$${TOP}/util/domd $${TOP} -MD arm-linux-androideabi-gcc' DEPFLAG='-DOPENSSL_NO_DEPRECATED -DOPENSSL_NO_BF -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_CAST -DOPENSSL_NO_EC2M -DOPENSSL_NO_EC_NISTP_64_GCC_128 -DOPENSSL_NO_GMP -DOPENSSL_NO_IDEA -DOPENSSL_NO_JPAKE -DOPENSSL_NO_MD2 -DOPENSSL_NO_MD5 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC2 -DOPENSSL_NO_RC4 -DOPENSSL_NO_RC5 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_RIPEMD -DOPENSSL_NO_SEED -DOPENSSL_NO_SRP -DOPENSSL_NO_SSL2 -DOPENSSL_NO_SSL3 -DOPENSSL_NO_STORE -DOPENSSL_NO_TLS1 -DOPENSSL_NO_TLSEXT' MAKEDEPPROG='arm-linux-androideabi-gcc' SHARED_LDFLAGS='' KRB5_INCLUDES='' LIBKRB5='' ZLIB_INCLUDE='' LIBZLIB='' EXE_EXT='' SHARED_LIBS='libcrypto.so.1.1.0 libssl.so.1.1.0' SHLIB_EXT='.so.1.1.0' SHLIB_TARGET='linux-shared' PEX_LIBS='' EX_LIBS='-ldl' CPUID_OBJ='armcap.o armv4cpuid.o' BN_ASM='bn_asm.o armv4-mont.o ' DES_ENC='des_enc.o fcrypt_b.o' AES_ENC='aes_cbc.o aes-armv4.o' CMLL_ENC='camellia.o cmll_misc.o cmll_cbc.o' BF_ENC='bf_enc.o' CAST_ENC='c_enc.o' RC4_ENC='rc4_enc.o rc4_skey.o' RC5_ENC='rc5_enc.o' SHA1_ASM_OBJ='sha1-armv4-large.o sha256-armv4.o sha512-armv4.o' MD5_ASM_OBJ='' RMD160_ASM_OBJ='' WP_ASM_OBJ='wp_block.o' MODES_ASM_OBJ='ghash-armv4.o' PERLASM_SCHEME='void' FIPSLIBDIR='' FIPSCANLIB="${FIPSCANLIB:-libcrypto}" FIPSCANISTERINTERNAL='y' FIPSCANISTERONLY='y' FIPS_EX_OBJ='../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o' THIS=${THIS:-build_crypto} MAKEFILE=Makefile MAKEOVERRIDES= TOP=.. DIR=$dir $target ) || exit 1; fi; fi
+		EXCL_OBJ='aes_cbc.o aes-armv4.o bn_asm.o armv4-mont.o  des_enc.o fcrypt_b.o armcap.o armv4cpuid.o sha1-armv4-large.o sha256-armv4.o sha512-armv4.o ghash-armv4.o ../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o' ; export EXCL_OBJ ; \
+		ARX='/usr/bin/perl ${TOP}/util/arx.pl arm-linux-androideabi-ar  r' ; \
+	else \
+		ARX='arm-linux-androideabi-ar  r' ; \
+	fi ; export ARX ; \
+	if [ y = "y" ]; then \
+		AS='/usr/bin/perl ${TOP}/util/fipsas.pl ${TOP} ${<} arm-linux-androideabi-gcc' ; \
+	else \
+		AS='arm-linux-androideabi-gcc -c' ; \
+	fi ; export AS ; \
+		dir=crypto; target=fips; if expr " crypto fips test  " : ".* $dir " >/dev/null 2>&1; then if [ -d "$dir" ]; then (	cd $dir && echo "making $target in $dir..." && TOP= && unset TOP ${LIB+LIB} ${LIBS+LIBS} ${INCLUDE+INCLUDE} ${INCLUDES+INCLUDES} ${DIR+DIR} ${DIRS+DIRS} ${SRC+SRC} ${LIBSRC+LIBSRC} ${LIBOBJ+LIBOBJ} ${ALL+ALL} ${EXHEADER+EXHEADER} ${HEADER+HEADER} ${GENERAL+GENERAL} ${CFLAGS+CFLAGS} ${ASFLAGS+ASFLAGS} ${AFLAGS+AFLAGS} ${LDCMD+LDCMD} ${LDFLAGS+LDFLAGS} ${SHAREDCMD+SHAREDCMD} ${SHAREDFLAGS+SHAREDFLAGS} ${SHARED_LIB+SHARED_LIB} ${LIBEXTRAS+LIBEXTRAS} && /Applications/Xcode.app/Contents/Developer/usr/bin/make -e PLATFORM='android-armv7' PROCESSOR='' CC='arm-linux-androideabi-gcc' CFLAG='-DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/include -B/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM' ASFLAG='-DOPENSSL_FIPSCANISTER -fPIC -DOPENSSL_PIC -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/include -B/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM -c' AR='arm-linux-androideabi-ar  r' NM='arm-linux-androideabi-nm' RANLIB='arm-linux-androideabi-ranlib' CROSS_COMPILE='arm-linux-androideabi-' PERL='/usr/bin/perl' ENGDIRS='ccgost' SDIRS='sha hmac des aes modes bn ec rsa dsa ecdsa dh buffer evp ecdh cmac' LIBRPATH='/usr/local/ssl/fips-2.0/lib' INSTALL_PREFIX='' INSTALLTOP='/usr/local/ssl/fips-2.0' OPENSSLDIR='/usr/local/ssl/fips-2.0' LIBDIR='lib' MAKEDEPEND='$${TOP}/util/domd $${TOP} -MD arm-linux-androideabi-gcc' DEPFLAG='-DOPENSSL_NO_DEPRECATED -DOPENSSL_NO_BF -DOPENSSL_NO_CAMELLIA -DOPENSSL_NO_CAST -DOPENSSL_NO_EC2M -DOPENSSL_NO_EC_NISTP_64_GCC_128 -DOPENSSL_NO_GMP -DOPENSSL_NO_IDEA -DOPENSSL_NO_JPAKE -DOPENSSL_NO_MD2 -DOPENSSL_NO_MD5 -DOPENSSL_NO_MDC2 -DOPENSSL_NO_RC2 -DOPENSSL_NO_RC4 -DOPENSSL_NO_RC5 -DOPENSSL_NO_RFC3779 -DOPENSSL_NO_RIPEMD -DOPENSSL_NO_SEED -DOPENSSL_NO_SRP -DOPENSSL_NO_SSL2 -DOPENSSL_NO_SSL3 -DOPENSSL_NO_STORE -DOPENSSL_NO_TLS1 -DOPENSSL_NO_TLSEXT' MAKEDEPPROG='arm-linux-androideabi-gcc' SHARED_LDFLAGS='' KRB5_INCLUDES='' LIBKRB5='' ZLIB_INCLUDE='' LIBZLIB='' EXE_EXT='' SHARED_LIBS='libcrypto.so.1.1.0 libssl.so.1.1.0' SHLIB_EXT='.so.1.1.0' SHLIB_TARGET='linux-shared' PEX_LIBS='' EX_LIBS='-ldl' CPUID_OBJ='armcap.o armv4cpuid.o' BN_ASM='bn_asm.o armv4-mont.o ' DES_ENC='des_enc.o fcrypt_b.o' AES_ENC='aes_cbc.o aes-armv4.o' CMLL_ENC='camellia.o cmll_misc.o cmll_cbc.o' BF_ENC='bf_enc.o' CAST_ENC='c_enc.o' RC4_ENC='rc4_enc.o rc4_skey.o' RC5_ENC='rc5_enc.o' SHA1_ASM_OBJ='sha1-armv4-large.o sha256-armv4.o sha512-armv4.o' MD5_ASM_OBJ='' RMD160_ASM_OBJ='' WP_ASM_OBJ='wp_block.o' MODES_ASM_OBJ='ghash-armv4.o' PERLASM_SCHEME='void' FIPSLIBDIR='' FIPSCANLIB="${FIPSCANLIB:-libcrypto}" FIPSCANISTERINTERNAL='y' FIPSCANISTERONLY='y' FIPS_EX_OBJ='../crypto/aes/aes_cfb.o ../crypto/aes/aes_ecb.o ../crypto/aes/aes_ofb.o ../crypto/bn/bn_add.o ../crypto/bn/bn_blind.o ../crypto/bn/bn_ctx.o ../crypto/bn/bn_div.o ../crypto/bn/bn_exp2.o ../crypto/bn/bn_exp.o ../crypto/bn/bn_gcd.o ../crypto/bn/bn_lib.o ../crypto/bn/bn_mod.o ../crypto/bn/bn_mont.o ../crypto/bn/bn_mul.o ../crypto/bn/bn_nist.o ../crypto/bn/bn_prime.o ../crypto/bn/bn_rand.o ../crypto/bn/bn_recp.o ../crypto/bn/bn_shift.o ../crypto/bn/bn_sqr.o ../crypto/bn/bn_word.o ../crypto/bn/bn_x931p.o ../crypto/buffer/buf_str.o ../crypto/cmac/cmac.o ../crypto/cryptlib.o ../crypto/des/cfb64ede.o ../crypto/des/cfb64enc.o ../crypto/des/cfb_enc.o ../crypto/des/ecb3_enc.o ../crypto/des/ofb64ede.o ../crypto/des/fcrypt.o ../crypto/des/set_key.o ../crypto/dh/dh_check.o ../crypto/dh/dh_gen.o ../crypto/dh/dh_key.o ../crypto/dsa/dsa_gen.o ../crypto/dsa/dsa_key.o ../crypto/dsa/dsa_ossl.o ../crypto/ec/ec_curve.o ../crypto/ec/ec_cvt.o ../crypto/ec/ec_key.o ../crypto/ec/ec_lib.o ../crypto/ec/ecp_mont.o ../crypto/ec/ec_mult.o ../crypto/ec/ecp_nist.o ../crypto/ec/ecp_smpl.o ../crypto/ecdh/ech_key.o ../crypto/ecdh/ech_ossl.o ../crypto/ecdsa/ecs_ossl.o ../crypto/evp/e_aes.o ../crypto/evp/e_des3.o ../crypto/evp/e_null.o ../crypto/evp/m_sha1.o ../crypto/evp/m_dss1.o ../crypto/evp/m_dss.o ../crypto/evp/m_ecdsa.o ../crypto/hmac/hmac.o ../crypto/modes/cbc128.o ../crypto/modes/ccm128.o ../crypto/modes/cfb128.o ../crypto/modes/ctr128.o ../crypto/modes/gcm128.o ../crypto/modes/ofb128.o ../crypto/modes/xts128.o ../crypto/rsa/rsa_eay.o ../crypto/rsa/rsa_gen.o ../crypto/rsa/rsa_crpt.o ../crypto/rsa/rsa_none.o ../crypto/rsa/rsa_oaep.o ../crypto/rsa/rsa_pk1.o ../crypto/rsa/rsa_pss.o ../crypto/rsa/rsa_ssl.o ../crypto/rsa/rsa_x931.o ../crypto/rsa/rsa_x931g.o ../crypto/sha/sha1dgst.o ../crypto/sha/sha256.o ../crypto/sha/sha512.o ../crypto/thr_id.o ../crypto/uid.o' THIS=${THIS:-build_crypto} MAKEFILE=Makefile MAKEOVERRIDES= TOP=.. DIR=$dir $target ) || exit 1; fi; fi
 making fips in crypto...
 [ -n "sha hmac des aes modes bn ec rsa dsa ecdsa dh buffer evp ecdh cmac" ] && for i in sha hmac des aes modes bn ec rsa dsa ecdsa dh buffer evp ecdh cmac ; do \
-            ( obj=`/usr/bin/perl ../util/fipsobj.pl $i` && \
-            cd $i && echo "making fips in crypto/$i..." && \
-            /Applications/Xcode.app/Contents/Developer/usr/bin/make -e TOP=../.. DIR=$i INCLUDES='-I.. -I../.. -I../modes -I../asn1 -I../evp -I../../include ' $obj ) || exit 1; \
-        done;
+		    ( obj=`/usr/bin/perl ../util/fipsobj.pl $i` && \
+			cd $i && echo "making fips in crypto/$i..." && \
+		    /Applications/Xcode.app/Contents/Developer/usr/bin/make -e TOP=../.. DIR=$i INCLUDES='-I.. -I../.. -I../modes -I../asn1 -I../evp -I../../include ' $obj ) || exit 1; \
+		done;
 making fips in crypto/sha...
 make[2]: `sha1dgst.o' is up to date.
 make[2]: `sha256.o' is up to date.
@@ -795,29 +781,29 @@ making install in fips/cmac...
 making install in fips/hmac...
 making install in fips/utl...
 for i in fipsld fips_standalone_sha1 ; \
-    do \
-        echo "installing $i"; \
-        cp $i /usr/local/ssl/fips-2.0/bin/$i.new; \
-        chmod 755 /usr/local/ssl/fips-2.0/bin/$i.new; \
-        mv -f /usr/local/ssl/fips-2.0/bin/$i.new /usr/local/ssl/fips-2.0/bin/$i; \
-    done
+	do \
+		echo "installing $i"; \
+		cp $i /usr/local/ssl/fips-2.0/bin/$i.new; \
+		chmod 755 /usr/local/ssl/fips-2.0/bin/$i.new; \
+		mv -f /usr/local/ssl/fips-2.0/bin/$i.new /usr/local/ssl/fips-2.0/bin/$i; \
+	done
 installing fipsld
 installing fips_standalone_sha1
 cp -p -f fipscanister.o fipscanister.o.sha1 \
-        fips_premain.c fips_premain.c.sha1 \
-        /usr/local/ssl/fips-2.0/lib/; \
-    chmod 0444 /usr/local/ssl/fips-2.0/lib/fips*
+		fips_premain.c fips_premain.c.sha1 \
+		/usr/local/ssl/fips-2.0/lib/; \
+	chmod 0444 /usr/local/ssl/fips-2.0/lib/fips*
 making install in test...
 make[1]: Nothing to be done for `install'.
 ----------------------------------------------------------------------------------------------------------
 Compiling ssl files
 ----------------------------------------------------------------------------------------------------------
 cd /Users/scoleman/dev/fips/fcads/dev/openssl-fips-ecp-2.0.2 && \
-    . ../Setenv-android.sh && \
-    cd /Users/scoleman/dev/fips/fcads/dev/openssl-1.0.1f && \
-    ./config fips no-ec2m --with-fipslibdir=/usr/local/ssl/fips-2.0/lib/ && \
-    make depend && \
-    make
+	. ../Setenv-android.sh && \
+	cd /Users/scoleman/dev/fips/fcads/dev/openssl-1.0.1f && \
+	./config fips no-ec2m --with-fipslibdir=/usr/local/ssl/fips-2.0/lib/ && \
+	make depend && \
+	make
 Operating system: armv7l-whatever-android
 Configuring for android-armv7
 Configuring for android-armv7
@@ -1038,7 +1024,7 @@ make[2]: Nothing to be done for `generate'.
 Since you've disabled or enabled at least one algorithm, you need to do
 the following before building:
 
-    make depend
+	make depend
 
 Configured for android-armv7.
 making depend in crypto...
@@ -1153,11 +1139,11 @@ making depend in tools...
 make[2]: Nothing to be done for `depend'.
 making all in crypto...
 ( echo "#ifndef MK1MF_BUILD"; \
-    echo '  /* auto-generated by crypto/Makefile for crypto/cversion.c */'; \
-    echo '  #define CFLAGS "arm-linux-androideabi-gcc -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM"'; \
-    echo '  #define PLATFORM "android-armv7"'; \
-    echo "  #define DATE \"`LC_ALL=C LC_TIME=C date`\""; \
-    echo '#endif' ) >buildinf.h
+	echo '  /* auto-generated by crypto/Makefile for crypto/cversion.c */'; \
+	echo '  #define CFLAGS "arm-linux-androideabi-gcc -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM"'; \
+	echo '  #define PLATFORM "android-armv7"'; \
+	echo "  #define DATE \"`LC_ALL=C LC_TIME=C date`\""; \
+	echo '#endif' ) >buildinf.h
 arm-linux-androideabi-gcc -I. -I.. -I../include  -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o cryptlib.o cryptlib.c
 arm-linux-androideabi-gcc -I. -I.. -I../include  -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o mem.o mem.c
 arm-linux-androideabi-gcc -I. -I.. -I../include  -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o mem_dbg.o mem_dbg.c
@@ -1918,8 +1904,8 @@ arm-linux-androideabi-gcc -I.. -I../.. -I../modes -I../asn1 -I../evp -I../../inc
 arm-linux-androideabi-ar  r ../../libcrypto.a cmac.o cm_ameth.o cm_pmeth.o
 arm-linux-androideabi-ranlib ../../libcrypto.a || echo Never mind.
 if [ -n "" ]; then \
-        (cd ..; /Applications/Xcode.app/Contents/Developer/usr/bin/make libcrypto.so.1.0.0); \
-    fi
+		(cd ..; /Applications/Xcode.app/Contents/Developer/usr/bin/make libcrypto.so.1.0.0); \
+	fi
 making all in ssl...
 arm-linux-androideabi-gcc -I../crypto -I.. -I../include  -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o s2_meth.o s2_meth.c
 arm-linux-androideabi-gcc -I../crypto -I.. -I../include  -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o s2_srvr.o s2_srvr.c
@@ -1972,8 +1958,8 @@ arm-linux-androideabi-ar  r ../libssl.a s2_meth.o  s2_srvr.o  s2_clnt.o  s2_lib.
 arm-linux-androideabi-ar: creating ../libssl.a
 arm-linux-androideabi-ranlib ../libssl.a || echo Never mind.
 if [ -n "" ]; then \
-        (cd ..; /Applications/Xcode.app/Contents/Developer/usr/bin/make libssl.so.1.0.0); \
-    fi
+		(cd ..; /Applications/Xcode.app/Contents/Developer/usr/bin/make libssl.so.1.0.0); \
+	fi
 making all in engines...
 arm-linux-androideabi-gcc -I../include -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o e_4758cca.o e_4758cca.c
 arm-linux-androideabi-gcc -I../include -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o e_aep.o e_aep.c
@@ -2006,14 +1992,14 @@ arm-linux-androideabi-gcc -I../../include -DOPENSSL_THREADS -D_REENTRANT -DDSO_D
 arm-linux-androideabi-gcc -I../../include -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o gost_pmeth.o gost_pmeth.c
 arm-linux-androideabi-gcc -I../../include -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o gost_sign.o gost_sign.c
 if [ -n "" ]; then \
-        /Applications/Xcode.app/Contents/Developer/usr/bin/make -f ../../Makefile.shared -e \
-            LIBNAME=gost \
-            LIBEXTRAS='e_gost_err.o gost2001_keyx.o gost2001.o gost89.o gost94_keyx.o gost_ameth.o gost_asn1.o gost_crypt.o gost_ctl.o gost_eng.o gosthash.o gost_keywrap.o gost_md.o gost_params.o gost_pmeth.o gost_sign.o' \
-            LIBDEPS='-L../.. -lcrypto' \
-            link_o.linux-shared; \
-    else \
-        arm-linux-androideabi-ar  r ../../libcrypto.a e_gost_err.o gost2001_keyx.o gost2001.o gost89.o gost94_keyx.o gost_ameth.o gost_asn1.o gost_crypt.o gost_ctl.o gost_eng.o gosthash.o gost_keywrap.o gost_md.o gost_params.o gost_pmeth.o gost_sign.o; \
-    fi
+		/Applications/Xcode.app/Contents/Developer/usr/bin/make -f ../../Makefile.shared -e \
+			LIBNAME=gost \
+			LIBEXTRAS='e_gost_err.o gost2001_keyx.o gost2001.o gost89.o gost94_keyx.o gost_ameth.o gost_asn1.o gost_crypt.o gost_ctl.o gost_eng.o gosthash.o gost_keywrap.o gost_md.o gost_params.o gost_pmeth.o gost_sign.o' \
+			LIBDEPS='-L../.. -lcrypto' \
+			link_o.linux-shared; \
+	else \
+		arm-linux-androideabi-ar  r ../../libcrypto.a e_gost_err.o gost2001_keyx.o gost2001.o gost89.o gost94_keyx.o gost_ameth.o gost_asn1.o gost_crypt.o gost_ctl.o gost_eng.o gosthash.o gost_keywrap.o gost_md.o gost_params.o gost_pmeth.o gost_sign.o; \
+	fi
 making all in apps...
 arm-linux-androideabi-gcc -DMONOLITH -I.. -I../include  -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o verify.o verify.c
 arm-linux-androideabi-gcc -DMONOLITH -I.. -I../include  -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o asn1pars.o asn1pars.c
@@ -2068,15 +2054,15 @@ arm-linux-androideabi-gcc -DMONOLITH -I.. -I../include  -DOPENSSL_THREADS -D_REE
 arm-linux-androideabi-gcc -DMONOLITH -I.. -I../include  -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o openssl.o openssl.c
 rm -f openssl
 shlib_target=; if [ -n "" ]; then \
-        shlib_target="linux-shared"; \
-    elif [ -n "libcrypto" ]; then \
-      FIPSLD_CC="arm-linux-androideabi-gcc"; CC=/usr/local/ssl/fips-2.0/bin/fipsld; export CC FIPSLD_CC; \
-    fi; \
-    LIBRARIES="-L.. -lssl  -L.. -lcrypto" ; \
-    /Applications/Xcode.app/Contents/Developer/usr/bin/make -f ../Makefile.shared -e \
-        APPNAME=openssl OBJECTS="openssl.o verify.o asn1pars.o req.o dgst.o dh.o dhparam.o enc.o passwd.o gendh.o errstr.o ca.o pkcs7.o crl2p7.o crl.o rsa.o rsautl.o dsa.o dsaparam.o ec.o ecparam.o x509.o genrsa.o gendsa.o genpkey.o s_server.o s_client.o speed.o s_time.o apps.o s_cb.o s_socket.o app_rand.o version.o sess_id.o ciphers.o nseq.o pkcs12.o pkcs8.o pkey.o pkeyparam.o pkeyutl.o spkac.o smime.o cms.o rand.o engine.o ocsp.o prime.o ts.o srp.o" \
-        LIBDEPS=" $LIBRARIES -ldl" \
-        link_app.${shlib_target}
+		shlib_target="linux-shared"; \
+	elif [ -n "libcrypto" ]; then \
+	  FIPSLD_CC="arm-linux-androideabi-gcc"; CC=/usr/local/ssl/fips-2.0/bin/fipsld; export CC FIPSLD_CC; \
+	fi; \
+	LIBRARIES="-L.. -lssl  -L.. -lcrypto" ; \
+	/Applications/Xcode.app/Contents/Developer/usr/bin/make -f ../Makefile.shared -e \
+		APPNAME=openssl OBJECTS="openssl.o verify.o asn1pars.o req.o dgst.o dh.o dhparam.o enc.o passwd.o gendh.o errstr.o ca.o pkcs7.o crl2p7.o crl.o rsa.o rsautl.o dsa.o dsaparam.o ec.o ecparam.o x509.o genrsa.o gendsa.o genpkey.o s_server.o s_client.o speed.o s_time.o apps.o s_cb.o s_socket.o app_rand.o version.o sess_id.o ciphers.o nseq.o pkcs12.o pkcs8.o pkey.o pkeyparam.o pkeyutl.o spkac.o smime.o cms.o rand.o engine.o ocsp.o prime.o ts.o srp.o" \
+		LIBDEPS=" $LIBRARIES -ldl" \
+		link_app.${shlib_target}
 ( :; LIBDEPS="${LIBDEPS:--L.. -lssl  -L.. -lcrypto -ldl}"; LDCMD="${LDCMD:-/usr/local/ssl/fips-2.0/bin/fipsld}"; LDFLAGS="${LDFLAGS:--DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM}"; LIBPATH=`for x in $LIBDEPS; do echo $x; done | sed -e 's/^ *-L//;t' -e d | uniq`; LIBPATH=`echo $LIBPATH | sed -e 's/ /:/g'`; LD_LIBRARY_PATH=$LIBPATH:$LD_LIBRARY_PATH ${LDCMD} ${LDFLAGS} -o ${APPNAME:=openssl} openssl.o verify.o asn1pars.o req.o dgst.o dh.o dhparam.o enc.o passwd.o gendh.o errstr.o ca.o pkcs7.o crl2p7.o crl.o rsa.o rsautl.o dsa.o dsaparam.o ec.o ecparam.o x509.o genrsa.o gendsa.o genpkey.o s_server.o s_client.o speed.o s_time.o apps.o s_cb.o s_socket.o app_rand.o version.o sess_id.o ciphers.o nseq.o pkcs12.o pkcs8.o pkey.o pkeyparam.o pkeyutl.o spkac.o smime.o cms.o rand.o engine.o ocsp.o prime.o ts.o srp.o ${LIBDEPS} )
 making all in test...
 arm-linux-androideabi-gcc -I.. -I../include  -DOPENSSL_THREADS -D_REENTRANT -DDSO_DLFCN -DHAVE_DLFCN_H -Wa,--noexecstack -march=armv7-a -mandroid -I/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/include -B/Users/scoleman/android-ndk-r9d/platforms/android-14/arch-arm/usr/lib -O3 -fomit-frame-pointer -Wall -DOPENSSL_BN_ASM_MONT -DOPENSSL_BN_ASM_GF2m -I/usr/local/ssl/fips-2.0/include -DSHA1_ASM -DSHA256_ASM -DSHA512_ASM -DAES_ASM -DGHASH_ASM   -c -o bntest.o bntest.c
@@ -2155,15 +2141,15 @@ make[2]: Nothing to be done for `all'.
 Compiling sqlcipher files
 ----------------------------------------------------------------------------------------------------------
 cd /Users/scoleman/dev/fips/fcads/dev  &&\
-    cp openssl-1.0.1f/libcrypto.a android-database-sqlcipher/external/android-libs/armeabi && \
-    cp openssl-1.0.1f/libcrypto.a android-database-sqlcipher/external/android-libs/armeabi-v7a && \
-    cd /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher && \
-    echo "--------------------------------------------------" && \
-    echo "------------ Performing make clean ---------------" && \
-    make clean && \
-    echo "--------------------------------------------" && \
-    echo "------------ Performing make ---------------" && \
-    make
+	cp openssl-1.0.1f/libcrypto.a android-database-sqlcipher/external/android-libs/armeabi && \
+	cp openssl-1.0.1f/libcrypto.a android-database-sqlcipher/external/android-libs/armeabi-v7a && \
+	cd /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher && \
+	echo "--------------------------------------------------" && \
+	echo "------------ Performing make clean ---------------" && \
+	make clean && \
+	echo "--------------------------------------------" && \
+	echo "------------ Performing make ---------------" && \
+	make
 --------------------------------------------------
 ------------ Performing make clean ---------------
 rm SQLCipher\ for\ Android\*.zip
@@ -2183,7 +2169,6 @@ Buildfile: /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/build.x
 -pre-clean:
 
 clean:
-   [delete] Deleting directory /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/bin
    [delete] Deleting directory /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/gen
 [getlibpath] Library dependencies:
 [getlibpath] No Libraries
@@ -2302,24 +2287,38 @@ rm libs/armeabi/libsqlcipher_android.so
 rm: libs/armeabi/libsqlcipher_android.so: No such file or directory
 make[1]: [clean] Error 1 (ignored)
 rm libs/armeabi/libdatabase_sqlcipher.so
+rm: libs/armeabi/libdatabase_sqlcipher.so: No such file or directory
+make[1]: [clean] Error 1 (ignored)
 rm libs/armeabi/libstlport_shared.so
+rm: libs/armeabi/libstlport_shared.so: No such file or directory
+make[1]: [clean] Error 1 (ignored)
 rm libs/sqlcipher.jar
+rm: libs/sqlcipher.jar: No such file or directory
+make[1]: [clean] Error 1 (ignored)
 rm libs/x86/libsqlcipher_android.so
 rm: libs/x86/libsqlcipher_android.so: No such file or directory
 make[1]: [clean] Error 1 (ignored)
 rm libs/x86/libdatabase_sqlcipher.so
+rm: libs/x86/libdatabase_sqlcipher.so: No such file or directory
+make[1]: [clean] Error 1 (ignored)
 rm libs/x86/libstlport_shared.so
+rm: libs/x86/libstlport_shared.so: No such file or directory
+make[1]: [clean] Error 1 (ignored)
 rm libs/armeabi-v7a/libsqlcipher_android.so
 rm: libs/armeabi-v7a/libsqlcipher_android.so: No such file or directory
 make[1]: [clean] Error 1 (ignored)
 rm libs/armeabi-v7a/libdatabase_sqlcipher.so
+rm: libs/armeabi-v7a/libdatabase_sqlcipher.so: No such file or directory
+make[1]: [clean] Error 1 (ignored)
 rm libs/armeabi-v7a/libstlport_shared.so
+rm: libs/armeabi-v7a/libstlport_shared.so: No such file or directory
+make[1]: [clean] Error 1 (ignored)
 --------------------------------------------
 ------------ Performing make ---------------
 cd /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external && \
-    make -f Android.mk build-local-hack && \
-    ndk-build NDK_LIBS_OUT=/Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs && \
-    make -f Android.mk copy-libs-hack
+	make -f Android.mk build-local-hack && \
+	ndk-build NDK_LIBS_OUT=/Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs && \
+	make -f Android.mk copy-libs-hack
 cd /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/sqlcipher && ./configure
 checking build system type... i386-apple-darwin13.3.0
 checking host system type... i386-apple-darwin13.3.0
@@ -2336,15 +2335,15 @@ checking for a sed that does not truncate output... /usr/bin/sed
 checking for grep that handles long lines and -e... /usr/bin/grep
 checking for egrep... /usr/bin/grep -E
 checking for fgrep... /usr/bin/grep -F
-checking for ld used by gcc... /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
-checking if the linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) is GNU ld... no
+checking for ld used by gcc... /XCode4.6/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld
+checking if the linker (/XCode4.6/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld) is GNU ld... no
 checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm
 checking the name lister (/usr/bin/nm) interface... BSD nm
 checking whether ln -s works... yes
 checking the maximum length of command line arguments... 196608
 checking whether the shell understands some XSI constructs... yes
 checking whether the shell understands "+="... yes
-checking for /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld option to reload object files... -r
+checking for /XCode4.6/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld option to reload object files... -r
 checking for objdump... no
 checking how to recognize dependent libraries... pass_all
 checking for ar... ar
@@ -2371,13 +2370,13 @@ checking for stdint.h... yes
 checking for unistd.h... yes
 checking for dlfcn.h... yes
 checking for objdir... .libs
-checking if gcc supports -fno-rtti -fno-exceptions... yes
+checking if gcc supports -fno-rtti -fno-exceptions... no
 checking for gcc option to produce PIC... -fno-common -DPIC
 checking if gcc PIC flag -fno-common -DPIC works... yes
 checking if gcc static flag -static works... no
 checking if gcc supports -c -o file.o... yes
 checking if gcc supports -c -o file.o... (cached) yes
-checking whether the gcc linker (/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld) supports shared libraries... yes
+checking whether the gcc linker (/XCode4.6/Xcode.app/Contents/Developer/usr/llvm-gcc-4.2/libexec/gcc/i686-apple-darwin11/4.2.1/ld) supports shared libraries... yes
 checking dynamic linker characteristics... darwin13.3.0 dyld
 checking how to hardcode library paths into programs... immediate
 checking whether stripping libraries is possible... yes
@@ -3497,7 +3496,7 @@ Android NDK: WARNING:/Users/scoleman/dev/fips/fcads/dev/android-database-sqlciph
 make[2]: Leaving directory `/Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external'
 install -p -m644 libs/armeabi/*.so ../obj/local/armeabi/
 cd /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni && \
-    ndk-build NDK_LIBS_OUT=/Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni/libs
+	ndk-build NDK_LIBS_OUT=/Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni/libs
 Android NDK: WARNING:/Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni/Android.mk:database_sqlcipher: non-system libraries in linker flags: -lnativehelper -landroid_runtime -lbinder -lsqlcipher_android -licui18n -licuuc    
 Android NDK:     This is likely to result in incorrect builds. Try using LOCAL_STATIC_LIBRARIES    
 Android NDK:     or LOCAL_SHARED_LIBRARIES instead to list the library dependencies of the    
@@ -3585,8 +3584,8 @@ make[2]: Entering directory `/Users/scoleman/dev/fips/fcads/dev/android-database
 [x86] Install        : libstlport_shared.so => jni/libs/x86/libstlport_shared.so
 make[2]: Leaving directory `/Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni'
 ant release && \
-    cd /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/bin/classes && \
-    jar -cvf sqlcipher.jar .
+	cd /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/bin/classes && \
+	jar -cvf sqlcipher.jar .
 Buildfile: /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/build.xml
 
 -set-mode-check:
@@ -3669,7 +3668,7 @@ Buildfile: /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/build.x
       [dex] Pre-Dexing /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/libs/commons-codec.jar -> commons-codec-6c1ba81b0af2306b569c80d0ac781ad2.jar
       [dex] Converting compiled files and external libraries into /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/bin/classes.dex...
        [dx] Merged dex A (63 defs/113.0KiB) with dex B (2 defs/1.1KiB). Result is 65 defs/138.1KiB. Took 0.2s
-       [dx] Merged dex A (65 defs/138.1KiB) with dex B (883 defs/1023.2KiB). Result is 948 defs/1481.6KiB. Took 0.3s
+       [dx] Merged dex A (65 defs/138.1KiB) with dex B (883 defs/1023.2KiB). Result is 948 defs/1481.6KiB. Took 0.7s
        [dx] Merged dex A (948 defs/1481.6KiB) with dex B (25 defs/42.4KiB). Result is 973 defs/2087.0KiB. Took 0.1s
 
 -crunch:
@@ -3710,7 +3709,7 @@ Buildfile: /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/build.x
 release:
 
 BUILD SUCCESSFUL
-Total time: 13 seconds
+Total time: 14 seconds
 added manifest
 adding: example/(in = 0) (out= 0)(stored 0%)
 adding: example/EventDataSQLHelper.class(in = 1873) (out= 947)(deflated 49%)
@@ -3781,33 +3780,33 @@ adding: net/sqlcipher/SQLException.class(in = 438) (out= 276)(deflated 36%)
 adding: net/sqlcipher/StaleDataException.class(in = 466) (out= 287)(deflated 38%)
 mkdir -p libs/armeabi
 cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs/armeabi/libsqlcipher_android.so \
-         libs/armeabi  && \
-    cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni/libs/armeabi/libdatabase_sqlcipher.so \
-        libs/armeabi && \
-    cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/bin/classes/sqlcipher.jar libs && \
-    cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs/armeabi/libstlport_shared.so \
-         libs/armeabi
+		 libs/armeabi  && \
+	cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni/libs/armeabi/libdatabase_sqlcipher.so \
+		libs/armeabi && \
+	cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/bin/classes/sqlcipher.jar libs && \
+	cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs/armeabi/libstlport_shared.so \
+		 libs/armeabi
 mkdir -p libs/x86
 cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs/x86/libsqlcipher_android.so \
-         libs/x86  && \
-    cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni/libs/x86/libdatabase_sqlcipher.so \
-        libs/x86 && \
-    cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs/x86/libstlport_shared.so \
-         libs/x86
+		 libs/x86  && \
+	cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni/libs/x86/libdatabase_sqlcipher.so \
+		libs/x86 && \
+	cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs/x86/libstlport_shared.so \
+		 libs/x86
 mkdir -p libs/armeabi-v7a
 cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs/armeabi-v7a/libsqlcipher_android.so \
-         libs/armeabi-v7a  && \
-    cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni/libs/armeabi-v7a/libdatabase_sqlcipher.so \
-        libs/armeabi-v7a && \
-    cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs/armeabi-v7a/libstlport_shared.so \
-         libs/armeabi-v7a
+		 libs/armeabi-v7a  && \
+	cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/jni/libs/armeabi-v7a/libdatabase_sqlcipher.so \
+		libs/armeabi-v7a && \
+	cp /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external/libs/armeabi-v7a/libstlport_shared.so \
+		 libs/armeabi-v7a
 ----------------------------------------------------------------------------------------------------------
 Compiling t2 files
 ----------------------------------------------------------------------------------------------------------
 cd /Users/scoleman/dev/fips/fcads/dev/android-database-sqlcipher/external  && \
-    . ./buildit.sh && \
-    cd /Users/scoleman/dev/fips/fcads/dev  &&\
-    cp -R android-database-sqlcipher/libs /Users/scoleman/dev/fips/fcads/test/FcadsTestAndroidApp
+	. ./buildit.sh && \
+	cd /Users/scoleman/dev/fips/fcads/dev  &&\
+	rsync -a android-database-sqlcipher/libs /Users/scoleman/dev/fips/fcads/test/FcadsTestAndroidApp
 ANDROID_NDK_ROOT: /Users/scoleman/android-ndk-r9d
 ANDROID_EABI: arm-linux-androideabi-4.6
 ANDROID_API: android-14
@@ -3848,6 +3847,12 @@ FIPSLD_CC = /Users/scoleman/android-ndk-r9d/toolchains/arm-linux-androideabi-4.6
 
  -----------------  Copying lib files to lib directories  ----------
 
+++ test -d ../libs/armeabi
+++ cp libsqlcipher_android.so ../libs/armeabi
+++ test -d ../libs/armeabi-v7a
+++ cp libsqlcipher_android.so ../libs/armeabi-v7a
+++ test -d ../libs/x86
+++ cp libsqlcipher_android.so ../libs/x86
 ++ cp libsqlcipher_android.so ../libs/armeabi
 ++ cp libsqlcipher_android.so ../libs/armeabi-v7a
 ++ cp libsqlcipher_android.so ../libs/x86
