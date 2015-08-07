@@ -186,6 +186,7 @@ public class MainActivity extends Activity
 				testDescription = startTest("Test 1.0 - file encryption - short file");
 				createBinaryFile(inputFileName, 20); // Create an initial file to test with
 				try {
+					//fipsWrapper.doProcessBinaryFile("1", "2",1, "password");
 					fipsWrapper.doProcessBinaryFile(inputFileName, encryptedFileName,FipsWrapper.T2Encrypt, "password"); // Encrypt to the file into encryptedFileName
 					fipsWrapper.doProcessBinaryFile(encryptedFileName, decryptedFileName,FipsWrapper.T2Decrypt , "password"); // Decrypt the file into encryptedFileName
 				} catch (Exception e2) {
@@ -206,7 +207,7 @@ public class MainActivity extends Activity
 				
 				
 				testDescription = startTest("Test 1.1 - file encryption - long file file");
-				createBinaryFile(inputFileName, 2000); // Create an initial file to test with
+				createBinaryFile(inputFileName, 2000000); // Create an initial file to test with
 				try {
 					fipsWrapper.doProcessBinaryFile(inputFileName, encryptedFileName,FipsWrapper.T2Encrypt , "password"); // Encrypt to the file into encryptedFileName
 					fipsWrapper.doProcessBinaryFile(encryptedFileName, decryptedFileName,FipsWrapper.T2Decrypt , "password"); // Decrypt the file into encryptedFileName
@@ -225,6 +226,19 @@ public class MainActivity extends Activity
 					e2.printStackTrace();
 				}				
 				assertT2Test(filesEqual == true, testDescription);			
+				
+				testDescription = startTest("Test 1.2 - file encryption - Missing files");
+				int retStatus1 = T2Success;
+				int retStatus2 = T2Success;
+				try {
+					retStatus1 = fipsWrapper.doProcessBinaryFile("A", "B",FipsWrapper.T2Encrypt , "password"); // Encrypt to the file into encryptedFileName
+					retStatus2 = fipsWrapper.doProcessBinaryFile("C", "D",FipsWrapper.T2Decrypt , "password"); // Decrypt the file into encryptedFileName
+				} catch (Exception e2) {
+					e2.printStackTrace();
+				}
+				
+				// We want to make sure doProcessBinaryFile returned an error and didn't crash
+				assertT2Test((retStatus1 == T2Error && retStatus2 == T2Error), testDescription);
 				
 				
 				testDescription = startTest("Test 2.1 - doIsInitialized");

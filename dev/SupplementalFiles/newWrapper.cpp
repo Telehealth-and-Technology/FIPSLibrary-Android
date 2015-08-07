@@ -1263,6 +1263,8 @@ enum T2Operation {
  */
 jint Java_com_t2_fcads_FipsWrapper_processBinaryFile(JNIEnv* env, jobject thiz, jstring jInputFile, jstring jOutputFile, jint jOperation, jstring jPassword) {
 
+   int retVal = T2Success;
+
    // convert Java string to UTF-8
     const char *inputFileName = env->GetStringUTFChars(jInputFile, NULL);
     T2Assert(NULL != inputFileName, "Memory Error");
@@ -1282,48 +1284,60 @@ jint Java_com_t2_fcads_FipsWrapper_processBinaryFile(JNIEnv* env, jobject thiz, 
         blocklength = 1040;// since we know the plaitext block is 1024, doe to the encryption we're using the encrypted block is 1040
     }
 
+
     char * buffer = (char *) malloc (sizeof (char) * blocklength); // allocate memory 
+
     FILE * pInputFile = fopen (inputFileName, "rb");
-    T2Assert(NULL != pInputFile, "Memory Error");  
+    if (pInputFile == NULL) {
+        LOGE("Cannot open input file:  = %s", inputFileName);
+        retVal = T2Error;
+    }
 
     FILE * pOutputfile = fopen (outputFileName, "wb");
-    T2Assert(NULL != pOutputfile, "Memory Error");
-    // Check errors
+    if (pOutputfile == NULL) {
+        LOGE("Cannot open output file:  = %s", outputFileName);
+        retVal = T2Error;
+    }
 
-    
-    int limit = 4096;  // just a safeguard
-    while(limit-- > 0) {
+    long limit = 0;  // just a safeguard
+    while(limit++ < 2000000 && retVal == T2Success) {
+        //LOGE("limit = %ld", limit);
 
         int bytesRead = fread (buffer, sizeof (char), blocklength, pInputFile); 
-        if (bytesRead == 0) break;
-      
-        //LOGE("bytesRead = %d", bytesRead);
-
+          //LOGE("bytesRead = %d", bytesRead);
+        if (bytesRead == 0) break; // Done
 
         if (jOperation == T2Encrypt) {
+
             jbyteArray bytestoEncrypt = env->NewByteArray(bytesRead);
-
             T2Assert((bytestoEncrypt != NULL), "Memory allocation error");
-            void *temp = env->GetPrimitiveArrayCritical((jarray)bytestoEncrypt, 0);
-            memcpy(temp, buffer, bytesRead);
-            env->ReleasePrimitiveArrayCritical(bytestoEncrypt, temp, 0);
 
+            void *temp = env->GetPrimitiveArrayCritical((jarray)bytestoEncrypt, 0);
+            if (temp != NULL) memcpy(temp, buffer, bytesRead);
+            env->ReleasePrimitiveArrayCritical(bytestoEncrypt, temp, 0);
+            
             jbyteArray jEncryptedBytes  = Java_com_t2_fcads_FipsWrapper_encryptBytesRaw(env, thiz, jPassword, bytestoEncrypt);
+
             jbyte* encryptedBytes = env->GetByteArrayElements(jEncryptedBytes, 0);
             int length = env->GetArrayLength(jEncryptedBytes);
-            //LOGE("length = %d", length);
 
             //fwrite cannot reach intothe jbyte* pointer so we have to copy it to local memory
             char * buffer1 = (char *) malloc (length);
             T2Assert((buffer1 != NULL), "Memory allocation error");
             memcpy(buffer1, encryptedBytes, length);
-
             int bytesWritten = fwrite(buffer1 , 1 , length , pOutputfile );
-            //LOGE("bytesWritten = %d", bytesWritten);
+
             if (buffer1 != NULL) free(buffer1);
             env->ReleaseByteArrayElements(jEncryptedBytes, encryptedBytes, 0);
-            T2Assert(bytesWritten == length, "Error writing file");
 
+            env->DeleteLocalRef(bytestoEncrypt);
+            env->DeleteLocalRef(jEncryptedBytes);
+
+            if (bytesWritten != length) {
+              LOGE("File Assess Problem, bytes read = %d, bytes written = %d", length, bytesWritten);
+              retVal = T2Error;
+              break;
+            }
         }
         
         if (jOperation == T2Decrypt) {
@@ -1331,13 +1345,12 @@ jint Java_com_t2_fcads_FipsWrapper_processBinaryFile(JNIEnv* env, jobject thiz, 
 
             T2Assert((bytestoDecrypt != NULL), "Memory allocation error");
             void *temp = env->GetPrimitiveArrayCritical((jarray)bytestoDecrypt, 0);
-            memcpy(temp, buffer, bytesRead);
+            if (temp != NULL) memcpy(temp, buffer, bytesRead);
             env->ReleasePrimitiveArrayCritical(bytestoDecrypt, temp, 0);
 
             jbyteArray jDecryptedBytes  = Java_com_t2_fcads_FipsWrapper_decryptBytesRaw(env, thiz, jPassword, bytestoDecrypt);
             jbyte* decryptedBytes = env->GetByteArrayElements(jDecryptedBytes, 0);
             int length = env->GetArrayLength(jDecryptedBytes);
-            //LOGE("length = %d", length);
 
             //fwrite cannot reach intothe jbyte* pointer so we have to copy it to local memory
             char * buffer1 = (char *) malloc (length);
@@ -1345,10 +1358,17 @@ jint Java_com_t2_fcads_FipsWrapper_processBinaryFile(JNIEnv* env, jobject thiz, 
             memcpy(buffer1, decryptedBytes, length);
 
             int bytesWritten = fwrite(buffer1 , 1 , length , pOutputfile );
-            //LOGE("bytesWritten = %d", bytesWritten);
             if (buffer1 != NULL) free(buffer1);
             env->ReleaseByteArrayElements(jDecryptedBytes, decryptedBytes, 0);
-            T2Assert(bytesWritten == length, "Error writing file");        
+
+            env->DeleteLocalRef(bytestoDecrypt);
+            env->DeleteLocalRef(jDecryptedBytes);
+
+            if (bytesWritten != length) {
+              LOGE("File Assess Problem, bytes read = %d, bytes written = %d", length, bytesWritten);
+              retVal = T2Error;
+              break;
+            }       
 
         }
         
@@ -1359,18 +1379,20 @@ jint Java_com_t2_fcads_FipsWrapper_processBinaryFile(JNIEnv* env, jobject thiz, 
             LOGE("bytesWritten = %d", bytesWritten);
         }
     }
-   
-
-
   
-    if (buffer != NULL) free (buffer); // manually release the allocated memory 
+    if (buffer != NULL) {
+        free (buffer); // manually release the allocated memory 
+        buffer = NULL;
+    } 
 
     if (pInputFile != NULL) {
       fclose (pInputFile) ;// close the stream 
+      pInputFile = NULL;
     }
 
     if (pOutputfile != NULL) {
       fclose (pOutputfile) ;// close the stream 
+      pOutputfile = NULL;
     }
 
     // Clean up jni variables
@@ -1388,7 +1410,7 @@ jint Java_com_t2_fcads_FipsWrapper_processBinaryFile(JNIEnv* env, jobject thiz, 
         env->ReleaseStringUTFChars(jPassword, password);
         password = NULL;
     }   
-    return T2Success;
+    return retVal;
 }
 
 
@@ -1396,6 +1418,12 @@ jint Java_com_t2_fcads_FipsWrapper_processBinaryFile(JNIEnv* env, jobject thiz, 
  * @brief Encrypts a byte array using given pin
  * @discussion Note that this method does NOT depend on T2Crypto being previously initialized
  *   meaning  masterKey MUST have been [previously initialized!] 
+ *
+ *  IMPORTANT!!, If you call this from a C or CPP file then you MUST
+ *  free the return array
+ *    Ex: jbyteArray jEncryptedBytes  = Java_com_t2_fcads_FipsWrapper_encryptBytesRaw(...);
+ *    env->DeleteLocalRef(jEncryptedBytes);
+ *
  * @param thiz Passed jni object
  * @param jPin Password use
  * @param jInputData bytes to encrypt
