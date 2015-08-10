@@ -138,8 +138,8 @@ public class MainActivity extends Activity
 		fipsWrapper.doPrepare(useTestVectorsFoRiKey);
 		
 		
+		fipsWrapper.doSetVerboseLogging(false);
 		
-		fipsWrapper.doSetVerboseLogging(true);
 		// ---------------------------------------------------------------------------------------
 		
 		// Test t2Crypto
